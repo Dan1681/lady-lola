@@ -36,6 +36,352 @@ a{color:#087b9b}
 .check input{width:auto}
 .danger{color:#b33131}
 </style>
+  
+<!-- LADY LOLA 1.5 - NAUTICAL DARK -->
+<style id="lady-lola-nautical-dark">
+
+:root {
+  color-scheme: dark;
+  --ll-bg: #081525;
+  --ll-surface: #10263a;
+  --ll-surface2: #19374a;
+  --ll-border: #29465a;
+  --ll-text: #f2f8fc;
+  --ll-muted: #a4bdcd;
+  --ll-accent: #65dce8;
+  --ll-blue: #228ac1;
+}
+
+/* Base */
+
+html {
+  background: var(--ll-bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      ellipse at 50% -15%,
+      #17405b 0%,
+      #081525 55%
+    );
+  color: var(--ll-text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.55;
+  min-height: 100vh;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3 {
+  color: #ffffff;
+  letter-spacing: -0.35px;
+  line-height: 1.3;
+}
+
+h1 {
+  font-size: clamp(25px, 6vw, 36px);
+}
+
+h2 {
+  font-size: 21px;
+}
+
+h3 {
+  font-size: 17px;
+}
+
+p, li, label {
+  line-height: 1.6;
+}
+
+.muted, small {
+  color: var(--ll-muted);
+}
+
+a {
+  color: var(--ll-accent);
+}
+
+a:hover {
+  color: #a3f5fa;
+}
+
+/* Intestazione */
+
+body > header {
+  background: linear-gradient(
+    135deg,
+    #102e47,
+    #081525
+  );
+  border-bottom: 1px solid var(--ll-border);
+  padding: 20px 16px;
+  padding-top: calc(20px + env(safe-area-inset-top));
+  text-align: center;
+}
+
+body > header h1 {
+  margin: 0 0 6px;
+  font-weight: 800;
+}
+
+body > header p {
+  margin: 0;
+  color: var(--ll-muted);
+  font-size: 13px;
+}
+
+/* Contenuto */
+
+main {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 16px 14px 28px;
+}
+
+main section {
+  min-width: 0;
+}
+
+/* Schede */
+
+.card {
+  background: linear-gradient(
+    155deg,
+    #132d43,
+    #102235
+  ) !important;
+  border: 1px solid var(--ll-border) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  margin-bottom: 16px !important;
+  color: var(--ll-text) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card h2,
+.card h3 {
+  margin-top: 0;
+}
+
+.item {
+  background: var(--ll-surface2) !important;
+  border: 1px solid var(--ll-border) !important;
+  border-radius: 14px !important;
+  padding: 15px !important;
+  margin: 10px 0 !important;
+  color: var(--ll-text) !important;
+}
+
+.item h3 {
+  margin-top: 0;
+}
+
+/* Campi di inserimento */
+
+input,
+select,
+textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 46px;
+  padding: 12px 13px;
+  background: #0a1c2d !important;
+  color: #ffffff !important;
+  border: 1px solid #38586e !important;
+  border-radius: 12px !important;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ll-accent) !important;
+  box-shadow:
+    0 0 0 3px rgba(101, 220, 232, 0.15);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  min-height: auto;
+  accent-color: #65dce8;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8ba9ba;
+}
+
+label {
+  display: block;
+  margin: 12px 0 6px;
+  color: #c7e0ee;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Pulsanti */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.primary,
+.primary {
+  background: linear-gradient(
+    135deg,
+    #26b6d4,
+    #197ba9
+  ) !important;
+  color: #ffffff !important;
+  border: 1px solid #3fc6df !important;
+  border-radius: 13px !important;
+  min-height: 48px;
+  padding: 12px 16px;
+  font-weight: 700;
+  box-shadow:
+    0 5px 16px rgba(24, 135, 180, 0.22);
+}
+
+button:not(.primary):not(#menu button) {
+  border-radius: 12px;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Menu fisso in basso */
+
+#menu {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(8, 21, 37, 0.97) !important;
+  border-top: 1px solid var(--ll-border);
+  padding:
+    12px
+    12px
+    calc(12px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.25);
+  scrollbar-width: none;
+}
+
+#menu::-webkit-scrollbar {
+  display: none;
+}
+
+#menu button {
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 95px;
+  min-height: 47px;
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border: 1px solid #29465a !important;
+  border-radius: 12px !important;
+  background: #142e43 !important;
+  color: #bcd3e1 !important;
+  font-size: 12px !important;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+#menu button.active {
+  background: #174d67 !important;
+  border-color: #65dce8 !important;
+  color: #a3f5fa !important;
+}
+
+/* Tabelle */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--ll-text);
+}
+
+th, td {
+  border-bottom: 1px solid var(--ll-border);
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  color: var(--ll-accent);
+}
+
+/* Separazioni */
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--ll-border);
+  margin: 18px 0;
+}
+
+/* iPhone */
+
+@media (max-width: 480px) {
+  main {
+    padding: 12px 10px 24px;
+  }
+
+  .card {
+    padding: 16px !important;
+    border-radius: 17px !important;
+  }
+
+  .item {
+    padding: 13px !important;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  #menu button {
+    min-width: 88px;
+    font-size: 11px !important;
+  }
+}
+
+</style>
+<!-- FINE LADY LOLA 1.5 -->
+
 </head>
 <body>
 <header>
