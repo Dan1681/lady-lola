@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07324a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lady Lola">
+<title>Lady Lola - Boat Manager</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#edf4f7;color:#183347;font-family:Arial,sans-serif}
+header{background:#07324a;color:white;padding:24px 18px}
+header h1{margin:0;font-size:27px}
+header p{margin:7px 0 0;color:#c9e5ef}
+nav{display:flex;overflow-x:auto;gap:7px;padding:12px;background:white;position:sticky;top:0;z-index:2}
+nav button{white-space:nowrap;background:#e6f1f5;color:#07324a}
+button{border:0;border-radius:10px;padding:12px;font-weight:bold;cursor:pointer}
+button.active,.primary{background:#087b9b;color:white}
+main{max-width:850px;margin:auto;padding:15px 15px 50px}
+section{display:none}
+section.active{display:block}
+.card{background:white;border-radius:15px;padding:18px;margin-bottom:14px;box-shadow:0 2px 9px #17384b12}
+h2{margin-top:5px}
+h3{color:#087b9b}
+label{display:block;margin:12px 0 5px;font-weight:bold}
+input,textarea,select{width:100%;padding:11px;border:1px solid #c5d5dd;border-radius:8px;font:inherit}
+textarea{min-height:75px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e9eff2}
+.muted{color:#607887;font-size:14px}
+.result{font-size:24px;font-weight:bold;color:#087b9b}
+a{color:#087b9b}
+.item{padding:11px 0;border-bottom:1px solid #e6edf0}
+.check{display:flex;align-items:center;gap:10px;padding:10px 0}
+.check input{width:auto}
+.danger{color:#b33131}
+</style>
+</head>
+<body>
+<header>
+<h1>🚤 Lady Lola</h1>
+<p>Boat Manager · Bluline 19 Open</p>
+</header>
+<nav id="menu">
+<button class="active" data-page="home">🏠 Home</button>
+<button data-page="meteo">🌤 Meteo</button>
+<button data-page="fuel">⛽ Carburante</button>
+<button data-page="maintenance">🔧 Motore</button>
+<button data-page="gear">🧰 Dotazioni</button>
+<button data-page="fishing">🎣 Pesca</button>
+<button data-page="checklist">✅ Checklist</button>
+</nav>
+<main>
+<section id="home" class="active">
+<div class="card">
+<h2>Benvenuto a bordo!</h2>
+<p>La tua barca, la tua attrezzatura e le tue uscite in un'unica app.</p>
+<h3>La mia barca</h3>
+<div class="row"><span>Modello</span><b>Bluline 19 Open</b></div>
+<div class="row"><span>Anno scafo</span><b>2022</b></div>
+<div class="row"><span>Motore</span><b>Mercury F40 Pro</b></div>
+<div class="row"><span>Anno motore</span><b>2022</b></div>
+<div class="row"><span>Serbatoio principale</span><b>30 L</b></div>
+<div class="row"><span>Secondario</span><b>13 L</b></div>
+<div class="row"><span>Tanica di riserva</span><b>10 L</b></div>
+<div class="row"><span>Consumo di riferimento</span><b>12 L/h</b></div>
+<div class="row"><span>Velocità di riferimento</span><b>26 nodi</b></div>
+<div class="row"><span>Rimessaggio</span><b>Nautilus Capitana</b></div>
+</div>
+<div class="card">
+<h3>📍 Le mie zone</h3>
+<p>Foxi · Capitana · Torre delle Stelle · Cala Regina · Solanas</p>
+<p class="muted">Verifica sempre condizioni marine, carburante e dotazioni prima della partenza.</p>
+</div>
+</section>
+
+<section id="meteo">
+<div class="card">
+<h2>🌤 Meteo marino</h2>
+<p>Il tuo criterio: uscire preferibilmente con mare calmo e vento debole.</p>
+<p><a href="https://www.sar.sardegna.it/" target="_blank">ARPAS Sardegna</a></p>
+<p><a href="https://www.meteoam.it/" target="_blank">Aeronautica Militare</a></p>
+<p><a href="https://www.ilmeteo.it/" target="_blank">ilMeteo</a></p>
+<p class="muted">Questi sono collegamenti alle fonti, non previsioni integrate automaticamente.</p>
+</div>
+<div class="card">
+<h3>Valutazione indicativa</h3>
+<label>Vento previsto (nodi)</label>
+<input id="wind" type="number" min="0" step="0.5" placeholder="Es. 6">
+<label>Altezza onde prevista (metri)</label>
+<input id="waves" type="number" min="0" step="0.1" placeholder="Es. 0.3">
+<button class="primary" onclick="evaluateWeather()">Valuta condizioni</button>
+<p id="weatherResult"></p>
+<p class="muted">Soglie indicative personalizzate, non un'autorizzazione alla navigazione. Controlla anche raffiche, direzione, evoluzione del tempo, avvisi e condizioni locali.</p>
+</div>
+</section>
+
+<section id="fuel">
+<div class="card">
+<h2>⛽ Autonomia carburante</h2>
+<label>Carburante disponibile (litri)</label>
+<input id="liters" type="number" value="30" min="0" max="53">
+<label>Consumo (litri/ora)</label>
+<input id="consumption" type="number" value="12" min="0.1" step="0.1">
+<label>Velocità (nodi)</label>
+<input id="speed" type="number" value="26" min="0" step="0.5">
+<label>Riserva da mantenere (%)</label>
+<input id="reserve" type="number" value="33" min="0" max="90">
+<button class="primary" onclick="calculateFuel()">Calcola autonomia</button>
+<div id="fuelResult"></div>
+<p class="muted">Stima teorica, non distanza sicura garantita. Vento, onde, carico e regime motore possono modificare sensibilmente il consumo. Pianifica anche il ritorno.</p>
+</div>
+</section>
+
+<section id="maintenance">
+<div class="card">
+<h2>🔧 Manutenzione Mercury</h2>
+<p><b>Mercury F40 Pro · 2022</b></p>
+<p>Ore motore note: meno di 50. Ultimo tagliando indicato: 2024.</p>
+<p>Controlli da pianificare: olio motore, filtro, olio piede, girante, candele, anodi e circuito carburante secondo manuale e matricola.</p>
+<h3>Registra intervento</h3>
+<label>Data</label><input id="maintDate" type="date">
+<label>Intervento</label><textarea id="maintText" placeholder="Es. Cambio olio motore"></textarea>
+<button class="primary" onclick="addRecord('maintenance','maintDate','maintText')">Salva intervento</button>
+<div id="maintenanceList"></div>
+</div>
+</section>
+
+<section id="gear">
+<div class="card">
+<h2>🧰 Attrezzatura</h2>
+<div id="gearList"></div>
+<h3>Aggiungi accessorio</h3>
+<input id="newGear" placeholder="Nome accessorio">
+<button class="primary" onclick="addGear()">Aggiungi</button>
+</div>
+</section>
+
+<section id="fishing">
+<div class="card">
+<h2>🎣 Diario di pesca</h2>
+<p>Traina abituale: 4–6 nodi. Zone principali: Golfo di Cagliari e costa sud-orientale.</p>
+<h3>Registra uscita</h3>
+<label>Data</label><input id="fishDate" type="date">
+<label>Zona, tecnica e catture</label>
+<textarea id="fishText" placeholder="Es. Torre delle Stelle, traina, artificiale, catture..."></textarea>
+<button class="primary" onclick="addRecord('fishing','fishDate','fishText')">Salva uscita</button>
+<div id="fishingList"></div>
+</div>
+</section>
+
+<section id="checklist">
+<div class="card">
+<h2>✅ Prima di uscire</h2>
+<div id="checkList"></div>
+<button onclick="resetChecks()">Azzera checklist</button>
+</div>
+</section>
+</main>
+<script>
+const defaults={
+gear:[
+"Garmin ECHOMAP UHD2 72cv",
+"Trasduttore GT20-TM",
+"Ancora Trefoil 7,5 kg",
+"Catena 6 mm - 6 m",
+"Cima ancora 12 mm - 35 m",
+"6 giubbotti di salvataggio",
+"Salvagente anulare",
+"Fuochi a mano e boetta fumogena",
+"Estintore 1 kg",
+"Pompa di sentina",
+"Tracker TKSTAR TK915",
+"JBL Charge 6",
+"Canne, mulinelli e artificiali"
+],
+checks:[
+"Meteo e avvisi verificati",
+"Vento, raffiche e onde compatibili",
+"Carburante e riserva sufficienti",
+"Motore e circuito carburante controllati",
+"Dotazioni di sicurezza a bordo",
+"Giubbotti adeguati alle persone",
+"Ancora, cima e ormeggi controllati",
+"GPS e telefono carichi",
+"Rotta e rientro pianificati",
+"Persona a terra informata"
+]};
+function load(key,fallback){
+try{
+const v=localStorage.getItem("ll_"+key);
+return v===null?fallback:JSON.parse(v);
+}catch(e){return fallback;}
+}
+function save(key,value){
+localStorage.setItem("ll_"+key,JSON.stringify(value));
+}
+document.querySelectorAll("#menu button").forEach(btn=>{
+btn.onclick=()=>{
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
+document.getElementById(btn.dataset.page).classList.add("active");
+btn.classList.add("active");
+};
+});
+function evaluateWeather(){
+const w=Number(document.getElementById("wind").value);
+const h=Number(document.getElementById("waves").value);
+const rawW=document.getElementById("wind").value;
+const rawH=document.getElementById("waves").value;
+const out=document.getElementById("weatherResult");
+if(rawW===""||rawH===""||w<0||h<0){
+out.textContent="Inserisci valori validi.";return;
+}
+if(w>10||h>0.5){
+out.innerHTML="<b class='danger'>NON ESCO</b> - condizioni oltre le soglie indicative.";
+}else if(w>6||h>0.3){
+out.innerHTML="<b>ATTENZIONE</b> - condizioni da valutare con prudenza.";
+}else{
+out.innerHTML="<b>Condizioni indicative favorevoli</b>. Verifica comunque tutte le previsioni e gli avvisi prima di decidere.";
+}
+}
+function calculateFuel(){
+const l=Number(document.getElementById("liters").value);
+const c=Number(document.getElementById("consumption").value);
+const s=Number(document.getElementById("speed").value);
+const r=Number(document.getElementById("reserve").value);
+const out=document.getElementById("fuelResult");
+if(l<0||l>53||c<=0||s<0||r<0||r>90){
+out.textContent="Controlla i valori inseriti.";return;
+}
+const usable=l*(1-r/100);
+const hours=usable/c;
+out.innerHTML="<p>Carburante utilizzabile: <b>"+usable.toFixed(1)+" L</b></p><p>Autonomia teorica: <span class='result'>"+hours.toFixed(2)+" ore</span></p><p>Distanza teorica totale: <b>"+(hours*s).toFixed(1)+" miglia nautiche</b></p>";
+}
+function addRecord(key,dateId,textId){
+const date=document.getElementById(dateId);
+const field=document.getElementById(textId);
+if(!date.value||!field.value.trim()){alert("Inserisci data e descrizione.");return;}
+const records=load(key,[]);
+records.unshift({date:date.value,text:field.value.trim()});
+save(key,records);field.value="";renderRecords(key);
+}
+function renderRecords(key){
+const target=document.getElementById(key+"List");
+target.replaceChildren();
+load(key,[]).forEach((record,i)=>{
+const div=document.createElement("div");
+div.className="item";
+const p=document.createElement("p");
+p.textContent=record.date+" - "+record.text;
+const del=document.createElement("button");
+del.textContent="Elimina";
+del.onclick=()=>{
+const arr=load(key,[]);arr.splice(i,1);save(key,arr);renderRecords(key);
+};
+div.append(p,del);target.append(div);
+});
+}
+function renderGear(){
+const target=document.getElementById("gearList");
+target.replaceChildren();
+load("gear",defaults.gear).forEach((item,i)=>{
+const div=document.createElement("div");
+div.className="item";
+const span=document.createElement("span");
+span.textContent="✓ "+item+" ";
+const del=document.createElement("button");
+del.textContent="×";
+del.onclick=()=>{
+const arr=load("gear",defaults.gear);arr.splice(i,1);save("gear",arr);renderGear();
+};
+div.append(span,del);target.append(div);
+});
+}
+function addGear(){
+const input=document.getElementById("newGear");
+if(!input.value.trim())return;
+const arr=load("gear",defaults.gear);
+arr.push(input.value.trim());save("gear",arr);
+input.value="";renderGear();
+}
+function renderChecks(){
+const target=document.getElementById("checkList");
+target.replaceChildren();
+const saved=load("checks",{});
+defaults.checks.forEach((item,i)=>{
+const label=document.createElement("label");
+label.className="check";
+const cb=document.createElement("input");
+cb.type="checkbox";cb.checked=!!saved[i];
+cb.onchange=()=>{
+const data=load("checks",{});data[i]=cb.checked;save("checks",data);
+};
+const text=document.createElement("span");text.textContent=item;
+label.append(cb,text);target.append(label);
+});
+}
+function resetChecks(){save("checks",{});renderChecks();}
+renderGear();renderChecks();
+renderRecords("maintenance");renderRecords("fishing");
+</script>
+</body>
+</html>
