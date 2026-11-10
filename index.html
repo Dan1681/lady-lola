@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 2.8 - Boat Manager</title>
+<title>Lady Lola 2.8.1 - Boat Manager</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -48,6 +48,14 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 </style>
 <style id="ll28-style">
 #ll28HomeMap{height:235px;border-radius:14px;background:#18374b;overflow:hidden;margin:12px 0}#ll28HomeMap .leaflet-container{background:#18374b}.ll28-actions{display:flex;gap:8px;flex-wrap:wrap}.ll28-actions button{flex:1 1 130px}.ll28-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ll28-form>div{min-width:0}.ll28-form .full{grid-column:1/-1}.ll28-list{display:grid;gap:8px}.ll28-poi{border:1px solid #355c73;background:#193b51;border-radius:12px;padding:12px}.ll28-poi .ll28-actions{margin-top:8px}.ll28-poi button{min-height:38px}.ll28-map-hint{font-size:12px;color:#b6cddd}@media(max-width:480px){.ll28-form{grid-template-columns:1fr}.ll28-form .full{grid-column:auto}#ll28HomeMap{height:210px}}
+</style>
+<style id="ll28-map-fix-css">
+/* Leaflet deve gestire le dimensioni native delle tessere, senza regole globali sulle immagini. */
+#ll27Map .leaflet-tile, #ll28HomeMap .leaflet-tile{max-width:none!important;max-height:none!important;width:256px;height:256px}
+#ll27Map .leaflet-pane img, #ll28HomeMap .leaflet-pane img{border:0!important;border-radius:0!important}
+#ll27Map .leaflet-container, #ll28HomeMap .leaflet-container{width:100%;height:100%}
+.ll-map-load-status{position:absolute;left:10px;bottom:28px;z-index:800;background:#10283de8;color:#fff;border-radius:8px;padding:5px 9px;font-size:12px;pointer-events:none}
+.ll-map-load-status:empty{display:none}
 </style>
 </head>
 <body>
@@ -1930,6 +1938,32 @@ updateRoute();
 })();
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script id="ll28-map-repair">
+(function(){
+  window.llMapTiles=function(map){
+    const providers=[
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+    ];
+    let provider=0, failures=0;
+    const status=document.createElement('div');
+    status.className='ll-map-load-status';
+    status.setAttribute('role','status');
+    map.getContainer().appendChild(status);
+    function mount(){
+      const layer=L.tileLayer(providers[provider],{maxZoom:19,attribution:provider===0?'© OpenStreetMap contributors':'© OpenStreetMap contributors · CARTO',crossOrigin:true,updateWhenIdle:false,keepBuffer:3});
+      layer.on('tileerror',()=>{failures++;if(failures>=3&&provider===0){provider=1;failures=0;map.removeLayer(layer);mount();status.textContent='Caricamento mappa alternativa…';}else if(failures>=3){status.textContent='Impossibile caricare la cartografia. Verifica la connessione Internet.';}});
+      layer.on('load',()=>{status.textContent='';});
+      layer.addTo(map);
+    }
+    mount();
+    const observer=new ResizeObserver(()=>{if(map.getContainer().offsetWidth&&map.getContainer().offsetHeight)map.invalidateSize({pan:false});});
+    observer.observe(map.getContainer());
+    setTimeout(()=>map.invalidateSize({pan:false}),250);
+    setTimeout(()=>map.invalidateSize({pan:false}),900);
+  };
+})();
+</script>
 <script id="ll27-gps-script">
 (function(){
 'use strict';
@@ -1941,7 +1975,7 @@ function meters(a,b){const dLat=(b.lat-a.lat)*rad,dLon=(b.lon-a.lon)*rad;const v
 function status(msg,state='idle'){$('ll27GpsStatus').textContent=msg;$('ll27GpsStatus').dataset.state=state;}
 function initMap(){if(map)return true;if(!window.L){status('Mappa non caricata: controlla la connessione Internet. Il GPS può comunque fornire coordinate.','error');return false;}
 map=L.map('ll27Map',{zoomControl:true}).setView([39.17,9.35],10);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+window.llMapTiles(map);
 line=L.polyline([],{color:'#31d5e6',weight:4}).addTo(map);window.dispatchEvent(new CustomEvent('ll28-full-map',{detail:map}));
 map.on('dragstart',()=>{follow=false;});map.on('zoomstart',()=>{follow=false;});return true;}
 function resize(){if(initMap())setTimeout(()=>map.invalidateSize(),100);}
@@ -1989,7 +2023,7 @@ function read(){try{const v=JSON.parse(localStorage.getItem(key)||'[]');return A
 function store(){try{localStorage.setItem(key,JSON.stringify(items));return true;}catch(e){msg('Salvataggio non riuscito: memoria del browser non disponibile.');return false;}}
 function msg(t){$('ll28PoiStatus').textContent=t;}
 function iconFor(cat){return ({pesca:'🎣',ormeggio:'⚓',porto:'🚤',altro:'📍'})[cat]||'📍';}
-function initMini(){if(mini||!window.L)return;if(!$('ll28HomeMap').offsetWidth)return;mini=L.map('ll28HomeMap',{zoomControl:false,scrollWheelZoom:false,dragging:true}).setView([39.17,9.35],10);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mini);drawMarkers();}
+function initMini(){if(mini||!window.L)return;if(!$('ll28HomeMap').offsetWidth)return;mini=L.map('ll28HomeMap',{zoomControl:false,scrollWheelZoom:false,dragging:true}).setView([39.17,9.35],10);window.llMapTiles(mini);drawMarkers();}
 function getFull(){if(!window.L)return null;const el=$('ll27Map');if(el&&el._leaflet_id){for(const k in L.Map.prototype){} try{return window.ll28FullMap||null;}catch(e){return null;}}return null;}
 function renderMarkers(map,arr){arr.forEach(m=>map.removeLayer(m));arr.length=0;items.forEach(p=>{const m=L.marker([p.lat,p.lon]).addTo(map);m.bindPopup(iconFor(p.category)+' '+p.name);arr.push(m);});}
 function drawMarkers(){if(mini)renderMarkers(mini,miniMarkers);if(full)renderMarkers(full,fullMarkers);}
