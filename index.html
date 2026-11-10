@@ -4,531 +4,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07324a">
+<meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
 <title>Lady Lola - Boat Manager</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#edf4f7;color:#183347;font-family:Arial,sans-serif}
-header{background:#07324a;color:white;padding:24px 18px}
-header h1{margin:0;font-size:27px}
-header p{margin:7px 0 0;color:#c9e5ef}
-nav{display:flex;overflow-x:auto;gap:7px;padding:12px;background:white;position:sticky;top:0;z-index:2}
-nav button{white-space:nowrap;background:#e6f1f5;color:#07324a}
-button{border:0;border-radius:10px;padding:12px;font-weight:bold;cursor:pointer}
-button.active,.primary{background:#087b9b;color:white}
-main{max-width:850px;margin:auto;padding:15px 15px 50px}
-section{display:none}
-section.active{display:block}
-.card{background:white;border-radius:15px;padding:18px;margin-bottom:14px;box-shadow:0 2px 9px #17384b12}
-h2{margin-top:5px}
-h3{color:#087b9b}
-label{display:block;margin:12px 0 5px;font-weight:bold}
-input,textarea,select{width:100%;padding:11px;border:1px solid #c5d5dd;border-radius:8px;font:inherit}
-textarea{min-height:75px}
-.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e9eff2}
-.muted{color:#607887;font-size:14px}
-.result{font-size:24px;font-weight:bold;color:#087b9b}
-a{color:#087b9b}
-.item{padding:11px 0;border-bottom:1px solid #e6edf0}
-.check{display:flex;align-items:center;gap:10px;padding:10px 0}
-.check input{width:auto}
-.danger{color:#b33131}
+<style id="lady-lola-v2-style">
+:root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
+*{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+header{background:linear-gradient(110deg,#102f46,#081525);border-bottom:1px solid var(--line);padding:18px 20px;text-align:center}header h1{font-size:28px;margin:0;color:white}header p{margin:2px 0;color:var(--muted);font-size:13px}
+main{max-width:1120px;margin:auto;padding:24px 18px calc(110px + env(safe-area-inset-bottom))}section{display:none}section.active{display:block}
+h1,h2,h3{color:#fff;line-height:1.3}h2{font-size:21px;margin:0 0 14px}h3{font-size:17px;margin:0 0 10px}p{margin:9px 0 14px}.muted,small{color:var(--muted)!important}.result{color:var(--aqua);font-size:24px;font-weight:800}.danger{color:#ff8585}a{color:var(--aqua)}
+.card{background:linear-gradient(145deg,#142f45,#102337);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:16px;box-shadow:0 10px 25px #0002;min-width:0}.item{background:#18374b;border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;min-width:0}.item p{white-space:pre-line}.row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #29475a}.row span{color:var(--muted)}.row b{text-align:right}
+label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:650}input,select,textarea{width:100%;max-width:100%;min-height:46px;background:#0a1d2e;color:#fff;border:1px solid #3a5a70;border-radius:12px;padding:12px;font:inherit;font-size:16px}input:focus,select:focus,textarea:focus{outline:2px solid #4cb5c7;outline-offset:1px}input[type=checkbox],input[type=radio]{width:auto;min-height:0;accent-color:var(--aqua)}.check{display:flex;align-items:center;gap:10px;padding:10px 0}.check input{flex-shrink:0}button{border:1px solid #34576b;border-radius:12px;background:#1b3b51;color:#e8f7fc;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;min-height:44px}button.primary,.primary{background:linear-gradient(120deg,#22b5d1,#197ba9);border-color:#45c9dd;color:white}button:disabled{opacity:.55}button:focus-visible,a:focus-visible{outline:3px solid #a5f4f7;outline-offset:2px}
+#menu{position:fixed;inset:auto 0 0;z-index:1000;display:flex;justify-content:center;align-items:stretch;gap:7px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#081525f5;border-top:1px solid var(--line);box-shadow:0 -8px 22px #0004;overflow-x:auto;scrollbar-width:none}#menu::-webkit-scrollbar{display:none}#menu button{flex:0 1 150px;min-width:0;min-height:50px;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;font-size:13px;padding:9px 12px;background:#153249;border:1px solid #2b4b60;color:#bed5e1}#menu button.active{background:#18506a;border-color:var(--aqua);color:#b2f5fa}
+.ll-hero{background:linear-gradient(125deg,#164a62,#10283c 65%,#11283c);position:relative;overflow:hidden}.ll-eyebrow{font-size:11px;color:#79dfe9;letter-spacing:2px;font-weight:800;text-transform:uppercase}.ll-hero h2{font-size:clamp(25px,4vw,36px);margin:8px 0}.ll-hero p{color:#bed6e2}.ll-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.ll-chip{background:#1b4558;border:1px solid #397087;border-radius:999px;padding:6px 12px;font-size:12px;color:#d4f1f5}.ll-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.ll-grid .card{margin:0}.ll-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ll-quick button{background:#193a50;min-height:92px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;text-align:left}.ll-quick .ll-ico{font-size:25px}.ll-weather-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:15px 0}.ll-metric{background:#1b3b50;border:1px solid #31556a;border-radius:13px;padding:14px 9px;text-align:center}.ll-metric span{display:block;color:#a9c6d6;font-size:12px}.ll-metric strong{display:block;font-size:22px;color:white;margin-top:4px}.ll-weather-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.ll-weather-head select{max-width:250px}.ll-status{font-weight:800;margin-top:10px}.ll-status[data-level=good]{color:#67e3aa}.ll-status[data-level=warn]{color:#ffd07d}.ll-status[data-level=bad]{color:#ff8e90}.ll-status[data-level=none]{color:#b2cbd8}.ll-note{font-size:12px;color:var(--muted)}
+#llMorePanel{max-width:560px;margin:0 auto}#llMorePanel button{display:flex;width:100%;align-items:center;justify-content:space-between;margin:8px 0;text-align:left}.ll-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px}.ll-section-heading h2{margin:0}
+#ll13Results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#ll13Results>.card{margin:0}#ll13Results>.card p{white-space:pre-line}#marineResult .item{border-left:3px solid #3a95ae}
+@media(max-width:700px){main{padding:14px 11px calc(112px + env(safe-area-inset-bottom))}.card{padding:16px;border-radius:17px}.ll-grid{grid-template-columns:1fr}.ll-quick{grid-template-columns:repeat(2,minmax(0,1fr))}.ll-weather-grid{gap:6px}.ll-metric{padding:12px 5px}.ll-metric strong{font-size:18px}#ll13Results{grid-template-columns:1fr}#menu{gap:4px;padding:7px 5px calc(7px + env(safe-area-inset-bottom))}#menu button{flex:1 1 0;font-size:10px;min-height:53px;padding:7px 2px;white-space:normal;text-align:center;line-height:1.2}.ll-weather-head{align-items:stretch;flex-direction:column}.ll-weather-head select{max-width:none}}
+@media(min-width:701px) and (max-width:950px){#menu button{font-size:12px}.ll-quick{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-  
-<!-- LADY LOLA 1.5 - NAUTICAL DARK -->
-<style id="lady-lola-nautical-dark">
-
-:root {
-  color-scheme: dark;
-  --ll-bg: #081525;
-  --ll-surface: #10263a;
-  --ll-surface2: #19374a;
-  --ll-border: #29465a;
-  --ll-text: #f2f8fc;
-  --ll-muted: #a4bdcd;
-  --ll-accent: #65dce8;
-  --ll-blue: #228ac1;
-}
-
-/* Base */
-
-html {
-  background: var(--ll-bg);
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  background:
-    radial-gradient(
-      ellipse at 50% -15%,
-      #17405b 0%,
-      #081525 55%
-    );
-  color: var(--ll-text);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  line-height: 1.55;
-  min-height: 100vh;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
-}
-
-* {
-  box-sizing: border-box;
-}
-
-h1, h2, h3 {
-  color: #ffffff;
-  letter-spacing: -0.35px;
-  line-height: 1.3;
-}
-
-h1 {
-  font-size: clamp(25px, 6vw, 36px);
-}
-
-h2 {
-  font-size: 21px;
-}
-
-h3 {
-  font-size: 17px;
-}
-
-p, li, label {
-  line-height: 1.6;
-}
-
-.muted, small {
-  color: var(--ll-muted);
-}
-
-a {
-  color: var(--ll-accent);
-}
-
-a:hover {
-  color: #a3f5fa;
-}
-
-/* Intestazione */
-
-body > header {
-  background: linear-gradient(
-    135deg,
-    #102e47,
-    #081525
-  );
-  border-bottom: 1px solid var(--ll-border);
-  padding: 20px 16px;
-  padding-top: calc(20px + env(safe-area-inset-top));
-  text-align: center;
-}
-
-body > header h1 {
-  margin: 0 0 6px;
-  font-weight: 800;
-}
-
-body > header p {
-  margin: 0;
-  color: var(--ll-muted);
-  font-size: 13px;
-}
-
-/* Contenuto */
-
-main {
-  width: 100%;
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 16px 14px 28px;
-}
-
-main section {
-  min-width: 0;
-}
-
-/* Schede */
-
-.card {
-  background: linear-gradient(
-    155deg,
-    #132d43,
-    #102235
-  ) !important;
-  border: 1px solid var(--ll-border) !important;
-  border-radius: 20px !important;
-  padding: 20px !important;
-  margin-bottom: 16px !important;
-  color: var(--ll-text) !important;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.card h2,
-.card h3 {
-  margin-top: 0;
-}
-
-.item {
-  background: var(--ll-surface2) !important;
-  border: 1px solid var(--ll-border) !important;
-  border-radius: 14px !important;
-  padding: 15px !important;
-  margin: 10px 0 !important;
-  color: var(--ll-text) !important;
-}
-
-.item h3 {
-  margin-top: 0;
-}
-
-/* Campi di inserimento */
-
-input,
-select,
-textarea {
-  width: 100%;
-  max-width: 100%;
-  min-height: 46px;
-  padding: 12px 13px;
-  background: #0a1c2d !important;
-  color: #ffffff !important;
-  border: 1px solid #38586e !important;
-  border-radius: 12px !important;
-  font: inherit;
-  font-size: 16px;
-  outline: none;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--ll-accent) !important;
-  box-shadow:
-    0 0 0 3px rgba(101, 220, 232, 0.15);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  width: auto;
-  min-height: auto;
-  accent-color: #65dce8;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #8ba9ba;
-}
-
-label {
-  display: block;
-  margin: 12px 0 6px;
-  color: #c7e0ee;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-/* Pulsanti */
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.15s ease;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-button.primary,
-.primary {
-  background: linear-gradient(
-    135deg,
-    #26b6d4,
-    #197ba9
-  ) !important;
-  color: #ffffff !important;
-  border: 1px solid #3fc6df !important;
-  border-radius: 13px !important;
-  min-height: 48px;
-  padding: 12px 16px;
-  font-weight: 700;
-  box-shadow:
-    0 5px 16px rgba(24, 135, 180, 0.22);
-}
-
-button:not(.primary):not(#menu button) {
-  border-radius: 12px;
-}
-
-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-/* Menu fisso in basso */
-
-#menu {
-  position: fixed !important;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  gap: 7px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  background: rgba(8, 21, 37, 0.97) !important;
-  border-top: 1px solid var(--ll-border);
-  padding:
-    12px
-    12px
-    calc(12px + env(safe-area-inset-bottom));
-  box-shadow: 0 -8px 24px rgba(0,0,0,0.25);
-  scrollbar-width: none;
-}
-
-#menu::-webkit-scrollbar {
-  display: none;
-}
-
-#menu button {
-  flex: 0 0 auto;
-  width: auto !important;
-  min-width: 95px;
-  min-height: 47px;
-  margin: 0 !important;
-  padding: 9px 12px !important;
-  border: 1px solid #29465a !important;
-  border-radius: 12px !important;
-  background: #142e43 !important;
-  color: #bcd3e1 !important;
-  font-size: 12px !important;
-  font-weight: 650;
-  white-space: nowrap;
-}
-
-#menu button.active {
-  background: #174d67 !important;
-  border-color: #65dce8 !important;
-  color: #a3f5fa !important;
-}
-
-/* Tabelle */
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: var(--ll-text);
-}
-
-th, td {
-  border-bottom: 1px solid var(--ll-border);
-  padding: 10px;
-  text-align: left;
-}
-
-th {
-  color: var(--ll-accent);
-}
-
-/* Separazioni */
-
-hr {
-  border: 0;
-  border-top: 1px solid var(--ll-border);
-  margin: 18px 0;
-}
-
-/* iPhone */
-
-@media (max-width: 480px) {
-  main {
-    padding: 12px 10px 24px;
-  }
-
-  .card {
-    padding: 16px !important;
-    border-radius: 17px !important;
-  }
-
-  .item {
-    padding: 13px !important;
-  }
-
-  h2 {
-    font-size: 19px;
-  }
-
-  #menu button {
-    min-width: 88px;
-    font-size: 11px !important;
-  }
-}
-
-</style>
-<!-- FINE LADY LOLA 1.5 -->
-
-  
-<!-- LADY LOLA 1.5.1 - FIX LAYOUT PC E IPHONE -->
-<style id="lady-lola-layout-fix">
-
-/* MENU: ANNULLA LE ALTEZZE DEL VECCHIO CSS */
-
-#menu {
-  position: fixed !important;
-  top: auto !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: 90px !important;
-
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  flex-wrap: nowrap !important;
-
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-
-  padding: 10px 14px !important;
-  margin: 0 !important;
-
-  background: #081525 !important;
-  border: 0 !important;
-  border-top: 1px solid #29465a !important;
-  border-radius: 0 !important;
-
-  box-sizing: border-box !important;
-  z-index: 9999 !important;
-}
-
-/* PULSANTI MENU */
-
-#menu button {
-  position: static !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  flex: 0 0 auto !important;
-  width: auto !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  max-height: 46px !important;
-  min-width: 100px !important;
-
-  padding: 8px 12px !important;
-  margin: 0 !important;
-
-  font-size: 12px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-
-  border-radius: 12px !important;
-}
-
-/* RIPRISTINA LE DIMENSIONI DEL CONTENUTO */
-
-main {
-  display: block !important;
-  width: 100% !important;
-  max-width: 1100px !important;
-  min-height: 0 !important;
-  margin: 0 auto !important;
-  padding: 24px 20px 110px !important;
-  color: #f2f8fc !important;
-}
-
-main section {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 0 !important;
-  color: #f2f8fc !important;
-}
-
-/* MIGLIORA CONTRASTO */
-
-body,
-main,
-.card,
-.item {
-  color: #f2f8fc !important;
-}
-
-.card p,
-.card li,
-.item p,
-.item li,
-main label {
-  color: #d8e8f1;
-}
-
-.muted {
-  color: #aac1d1 !important;
-}
-
-/* PC: MENU CENTRATO E CONTENUTO SPAZIOSO */
-
-@media (min-width: 900px) {
-  #menu {
-    justify-content: center !important;
-  }
-
-  main {
-    padding-top: 30px !important;
-  }
-
-  .card {
-    padding: 24px !important;
-  }
-}
-
-/* IPHONE: MENU SCORREVOLE */
-
-@media (max-width: 600px) {
-  #menu {
-    justify-content: flex-start !important;
-    padding:
-      8px
-      10px
-      calc(8px + env(safe-area-inset-bottom))
-      !important;
-    max-height: 110px !important;
-  }
-
-  #menu button {
-    min-width: 92px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-  }
-
-  main {
-    padding: 14px 12px 120px !important;
-  }
-}
-
-</style>
-<!-- FINE FIX LADY LOLA 1.5.1 -->
 
 
 </head>
@@ -548,27 +42,13 @@ main label {
 </nav>
 <main>
 <section id="home" class="active">
-<div class="card">
-<h2>Benvenuto a bordo!</h2>
-<p>La tua barca, la tua attrezzatura e le tue uscite in un'unica app.</p>
-<h3>La mia barca</h3>
-<div class="row"><span>Modello</span><b>Bluline 19 Open</b></div>
-<div class="row"><span>Anno scafo</span><b>2022</b></div>
-<div class="row"><span>Motore</span><b>Mercury F40 Pro</b></div>
-<div class="row"><span>Anno motore</span><b>2022</b></div>
-<div class="row"><span>Serbatoio principale</span><b>30 L</b></div>
-<div class="row"><span>Secondario</span><b>13 L</b></div>
-<div class="row"><span>Tanica di riserva a bordo</span><b>10 L</b></div>
-<div class="row"><span>Tanica di riserva rifornimento</span><b>20 L</b></div> 
-<div class="row"><span>Consumo di riferimento</span><b>12 L/h</b></div>
-<div class="row"><span>Velocità di riferimento</span><b>26 nodi</b></div>
-<div class="row"><span>Rimessaggio</span><b>Nautilus Capitana</b></div>
+<div class="card ll-hero"><div class="ll-eyebrow">⚓ Nautical Command Center</div><h2>Benvenuto a bordo di Lady Lola</h2><p>La tua Bluline 19 Open, sempre sotto controllo.</p><div class="ll-chips"><span class="ll-chip">🚤 Bluline 19 Open · 2022</span><span class="ll-chip">⚙️ Mercury F40 Pro · 2022</span><span class="ll-chip">📍 Nautilus Capitana</span></div></div>
+<div class="ll-grid">
+<div class="card"><div class="ll-weather-head"><h2>🌊 Meteo a colpo d'occhio</h2><select id="llHomeZone" aria-label="Zona meteo home"><option value="foxi">Foxi</option><option value="capitana">Capitana</option><option value="torre" selected>Torre delle Stelle</option></select></div><p id="llHomeWhen" class="muted">Previsioni orarie Open-Meteo · oggi</p><div class="ll-weather-grid"><div class="ll-metric"><span>🌬 Vento</span><strong id="llHomeWind">-- kn</strong></div><div class="ll-metric"><span>💨 Raffiche</span><strong id="llHomeGust">-- kn</strong></div><div class="ll-metric"><span>🌊 Onde</span><strong id="llHomeWave">-- m</strong></div></div><p id="llHomeVerdict" class="ll-status" data-level="none">Dati non caricati</p><button class="primary" id="llHomeRefresh" type="button">↻ Aggiorna meteo</button><p class="ll-note">Valutazione indicativa: non è un via libera alla navigazione. Controlla avvisi e condizioni reali.</p></div>
+<div class="card"><h2>🧭 Accessi rapidi</h2><div class="ll-quick"><button type="button" data-go="planner"><span class="ll-ico">⚓</span>Pianifica</button><button type="button" data-go="dashboard"><span class="ll-ico">📊</span>Dashboard</button><button type="button" data-go="fuel"><span class="ll-ico">⛽</span>Carburante</button><button type="button" data-go="fishing"><span class="ll-ico">🎣</span>Pesca</button></div><p class="muted">Apri una funzione con un tocco.</p></div>
 </div>
-<div class="card">
-<h3>📍 Le mie zone</h3>
-<p>Foxi · Capitana · Torre delle Stelle · Cala Regina · Solanas</p>
-<p class="muted">Verifica sempre condizioni marine, carburante e dotazioni prima della partenza.</p>
-</div>
+<div class="ll-grid" style="margin-top:16px"><div class="card"><h2>🚤 La mia barca</h2><div class="row"><span>Modello</span><b>Bluline 19 Open</b></div><div class="row"><span>Motore</span><b>Mercury F40 Pro</b></div><div class="row"><span>Serbatoio principale</span><b>30 L</b></div><div class="row"><span>Secondario</span><b>13 L</b></div><div class="row"><span>Tanica a bordo</span><b>10 L</b></div><div class="row"><span>Tanica per rifornimento</span><b>20 L</b></div><div class="row"><span>Consumo di riferimento</span><b>12 L/h a 26 kn</b></div></div>
+<div class="card"><h2>📋 Attività a bordo</h2><div class="row"><span>Controlli checklist</span><b id="llHomeChecks">--</b></div><div class="row"><span>Interventi registrati</span><b id="llHomeMaint">--</b></div><div class="row"><span>Uscite di pesca registrate</span><b id="llHomeFishing">--</b></div><div class="row"><span>Zone preferite</span><b id="llHomeFav">--</b></div><p class="muted">I dati sono salvati sul dispositivo in uso.</p><button type="button" data-go="checklist">Apri checklist</button></div></div>
 </section>
 
 
@@ -676,6 +156,7 @@ e situazione reale prima di navigare.
 <button onclick="resetChecks()">Azzera checklist</button>
 </div>
 </section>
+<section id="more"><div class="card" id="llMorePanel"><h2>☰ Altre funzioni</h2><p class="muted">Tutti gli strumenti di Lady Lola.</p><button type="button" data-go="fuel">⛽ Carburante <span>›</span></button><button type="button" data-go="maintenance">🔧 Motore e manutenzione <span>›</span></button><button type="button" data-go="gear">🧰 Dotazioni <span>›</span></button><button type="button" data-go="fishing">🎣 Diario di pesca <span>›</span></button><button type="button" data-go="checklist">✅ Checklist <span>›</span></button></div></section>
 </main>
 <script>
 const defaults={
@@ -2113,6 +1594,94 @@ async function () {
 
 })();
   
+</script>
+<script id="lady-lola-v2-navigation">
+(function(){
+"use strict";
+const nav=document.getElementById("menu");
+const entries=[
+  ["home","⌂","Home"],["meteo","🌤","Meteo"],
+  ["dashboard","📊","Dashboard"],["planner","⚓","Pianifica"],
+  ["more","☰","Altro"]
+];
+// Le vecchie funzioni rimangono intatte; sostituiamo soltanto la navigazione.
+nav.replaceChildren();
+for(const [id,icon,label] of entries){
+ const b=document.createElement("button");b.type="button";b.dataset.page=id;
+ b.textContent=icon+" "+label;b.setAttribute("aria-label",label);
+ b.addEventListener("click",()=>go(id));nav.append(b);
+}
+function go(id){
+ const section=document.getElementById(id);
+ if(!section)return;
+ document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
+ section.classList.add("active");
+ nav.querySelectorAll("button").forEach(b=>{
+  const selected=b.dataset.page===(entries.some(e=>e[0]===id)?id:"more");
+  b.classList.toggle("active",selected);
+  if(selected)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
+ });
+ if(id==="home")refreshHomeStats();
+ if(id==="dashboard"){
+   // Il modulo 1.3 avvia il refresh dal suo pulsante originale.
+   document.getElementById("ll13Refresh")?.click();
+ }
+ window.scrollTo({top:0,behavior:"instant"});
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+function refreshHomeStats(){
+ try{
+  const checks=load("checks",{});
+  document.getElementById("llHomeChecks").textContent=Object.values(checks).filter(Boolean).length+" / "+defaults.checks.length;
+  document.getElementById("llHomeMaint").textContent=load("maintenance",[]).length;
+  document.getElementById("llHomeFishing").textContent=load("fishing",[]).length;
+  document.getElementById("llHomeFav").textContent=llGetFavorites().length;
+ }catch(e){/* Mantiene la home utilizzabile anche con dati non leggibili */}
+}
+const fmt=(v,unit)=>typeof v==="number"&&Number.isFinite(v)?v.toFixed(1)+" "+unit:"N/D";
+let loading=false;
+async function homeWeather(){
+ if(loading)return;
+ loading=true;
+ const btn=document.getElementById("llHomeRefresh");btn.disabled=true;
+ const verdict=document.getElementById("llHomeVerdict");
+ verdict.textContent="Caricamento previsioni...";verdict.dataset.level="none";
+ for(const id of ["llHomeWind","llHomeGust","llHomeWave"])document.getElementById(id).textContent="--";
+ const zone=marineZones[document.getElementById("llHomeZone").value];
+ try{
+  const common={latitude:zone.lat,longitude:zone.lon,timezone:"Europe/Rome",forecast_days:"2"};
+  const w=new URLSearchParams({...common,hourly:"wind_speed_10m,wind_gusts_10m,precipitation",wind_speed_unit:"kn"});
+  const m=new URLSearchParams({...common,hourly:"wave_height"});
+  const [wr,mr]=await Promise.all([
+   fetch("https://api.open-meteo.com/v1/forecast?"+w),
+   fetch("https://marine-api.open-meteo.com/v1/marine?"+m)
+  ]);
+  if(!wr.ok||!mr.ok)throw Error("Servizio non disponibile");
+  const [weather,marine]=await Promise.all([wr.json(),mr.json()]);
+  const nowParts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Rome",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+  const p=Object.fromEntries(nowParts.map(x=>[x.type,x.value]));
+  const date=p.year+"-"+p.month+"-"+p.day;
+  const hour=Number(p.hour);
+  const target=date+"T"+String(hour).padStart(2,"0")+":00";
+  const wi=weather.hourly?.time?.indexOf(target)??-1;
+  const mi=marine.hourly?.time?.indexOf(target)??-1;
+  if(wi<0||mi<0)throw Error("Nessun dato per l'ora corrente");
+  const wind=weather.hourly.wind_speed_10m?.[wi],gust=weather.hourly.wind_gusts_10m?.[wi];
+  const wave=marine.hourly.wave_height?.[mi],rain=weather.hourly.precipitation?.[wi];
+  document.getElementById("llHomeWind").textContent=fmt(wind,"kn");
+  document.getElementById("llHomeGust").textContent=fmt(gust,"kn");
+  document.getElementById("llHomeWave").textContent=fmt(wave,"m");
+  const rating=marineRating(wind,gust,wave,rain);
+  verdict.textContent=rating.label+" · Valutazione indicativa";
+  verdict.dataset.level=rating.label==="ESCO*"?"good":rating.label==="ATTENZIONE"?"warn":rating.label==="NON ESCO"?"bad":"none";
+  document.getElementById("llHomeWhen").textContent="Previsioni per "+date+" ore "+String(hour).padStart(2,"0")+":00 · Open-Meteo";
+ }catch(e){verdict.textContent="Dati non disponibili: "+e.message;verdict.dataset.level="none";}
+ finally{loading=false;btn.disabled=false;}
+}
+document.getElementById("llHomeRefresh").addEventListener("click",homeWeather);
+document.getElementById("llHomeZone").addEventListener("change",homeWeather);
+refreshHomeStats();go("home");homeWeather();
+})();
 </script>
 </body>
 </html>
