@@ -1232,6 +1232,391 @@ llInitMarineZones();
 
 })();
 
+
+/* LADY LOLA 1.4 - PIANIFICATORE USCITE */
+
+(function () {
+"use strict";
+
+const menu = document.getElementById("menu");
+const btn = document.createElement("button");
+btn.textContent = "⚓ Pianifica";
+btn.dataset.page = "planner";
+menu.append(btn);
+
+const page = document.createElement("section");
+page.id = "planner";
+page.innerHTML = `
+<div class="card">
+<h2>⚓ Pianifica uscita</h2>
+<p>Trova le fasce orarie con condizioni
+più favorevoli per Lady Lola.</p>
+
+<label>Partenza</label>
+<select id="pStart"></select>
+
+<label>Destinazione</label>
+<select id="pEnd"></select>
+
+<label>Giorno</label>
+<select id="pDay">
+<option value="0">Oggi</option>
+<option value="1" selected>Domani</option>
+<option value="2">Dopodomani</option>
+</select>
+
+<label>Durata dell'uscita</label>
+<select id="pDuration">
+<option value="2">2 ore</option>
+<option value="3">3 ore</option>
+<option value="4" selected>4 ore</option>
+<option value="5">5 ore</option>
+<option value="6">6 ore</option>
+</select>
+
+<button class="primary" id="pAnalyze">
+🌊 Analizza le fasce orarie
+</button>
+
+<p id="pStatus" class="muted"></p>
+</div>
+
+<div class="card">
+<h3>📊 Risultati</h3>
+<div id="pResults">
+Seleziona le zone e avvia l'analisi.
+</div>
+</div>
+
+<div class="card">
+<h3>⚠️ Avvertenze</h3>
+<p class="muted">
+L'analisi considera soltanto i punti
+di partenza e destinazione, non
+tutta la rotta. Non considera
+automaticamente avvisi ufficiali,
+correnti, visibilità, temporali,
+traffico marittimo o condizioni
+effettive del mare. Le soglie
+sono indicative, non certificano
+la sicurezza della navigazione.
+</p>
+</div>
+`;
+document.querySelector("main").append(page);
+
+btn.onclick = () => {
+document.querySelectorAll("main section")
+.forEach(s => s.classList.remove("active"));
+document.querySelectorAll("#menu button")
+.forEach(b => b.classList.remove("active"));
+page.classList.add("active");
+btn.classList.add("active");
+};
+
+const start = document.getElementById("pStart");
+const end = document.getElementById("pEnd");
+
+for (const [key,zone] of llZoneMap) {
+  for (const select of [start,end]) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = zone.name;
+    select.append(option);
+  }
+}
+
+function selectZone(select,name) {
+  for (const [key,zone] of llZoneMap) {
+    if (zone.name === name) {
+      select.value = key;
+      break;
+    }
+  }
+}
+
+selectZone(start,"Foxi");
+selectZone(end,"Torre delle Stelle");
+
+function getDate(offset) {
+  const parts = new Intl.DateTimeFormat("en-GB",{
+    timeZone:"Europe/Rome",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(new Date());
+
+  const v = Object.fromEntries(
+    parts.map(p => [p.type,p.value])
+  );
+
+  return new Date(Date.UTC(
+    Number(v.year),
+    Number(v.month)-1,
+    Number(v.day)+offset
+  )).toISOString().slice(0,10);
+}
+
+function isNumber(v) {
+  return typeof v === "number" &&
+    Number.isFinite(v);
+}
+
+async function fetchForecast(zone) {
+  const common = {
+    latitude:zone.lat,
+    longitude:zone.lon,
+    timezone:"Europe/Rome",
+    forecast_days:"4"
+  };
+
+  const w = new URLSearchParams({
+    ...common,
+    hourly:
+      "wind_speed_10m,wind_gusts_10m,"+
+      "wind_direction_10m,precipitation",
+    wind_speed_unit:"kn"
+  });
+
+  const m = new URLSearchParams({
+    ...common,
+    hourly:"wave_height,wave_direction"
+  });
+
+  const responses = await Promise.all([
+    fetch("https://api.open-meteo.com/v1/forecast?"+w),
+    fetch("https://marine-api.open-meteo.com/v1/marine?"+m)
+  ]);
+
+  if (responses.some(r => !r.ok)) {
+    throw new Error("Servizio meteo non disponibile");
+  }
+
+  const [weather,marine] = await Promise.all(
+    responses.map(r => r.json())
+  );
+
+  if (!weather.hourly?.time || !marine.hourly?.time) {
+    throw new Error("Previsioni incomplete");
+  }
+
+  const waveIndex = new Map(
+    marine.hourly.time.map((t,i) => [t,i])
+  );
+
+  const rows = new Map();
+
+  weather.hourly.time.forEach((time,i) => {
+    const j = waveIndex.get(time);
+    if (j === undefined) return;
+
+    rows.set(time,{
+      wind:weather.hourly.wind_speed_10m?.[i],
+      gust:weather.hourly.wind_gusts_10m?.[i],
+      rain:weather.hourly.precipitation?.[i],
+      wave:marine.hourly.wave_height?.[j]
+    });
+  });
+
+  return rows;
+}
+
+function classify(data) {
+  if (!data || ![
+    data.wind,data.gust,data.rain,data.wave
+  ].every(isNumber)) return 3;
+
+  if (data.wind>10 || data.gust>15 ||
+      data.wave>0.5 || data.rain>2) return 2;
+
+  if (data.wind>6 || data.gust>10 ||
+      data.wave>0.3 || data.rain>0) return 1;
+
+  return 0;
+}
+
+const labels = [
+  "ESCO*","ATTENZIONE",
+  "NON ESCO","DATI INCOMPLETI"
+];
+
+const colors = [
+  "#087448","#a36b00",
+  "#b33131","#a36b00"
+];
+
+function makeRow(title,value) {
+  const p = document.createElement("p");
+  const strong = document.createElement("strong");
+  strong.textContent = title+": ";
+  p.append(strong,document.createTextNode(value));
+  return p;
+}
+
+let busy = false;
+
+document.getElementById("pAnalyze").onclick =
+async function () {
+  if (busy) return;
+
+  const a = marineZones[start.value];
+  const b = marineZones[end.value];
+  const day = Number(
+    document.getElementById("pDay").value
+  );
+  const duration = Number(
+    document.getElementById("pDuration").value
+  );
+
+  const status = document.getElementById("pStatus");
+  const output = document.getElementById("pResults");
+
+  if (!a || !b || start.value===end.value) {
+    status.textContent =
+      "Scegli due località differenti.";
+    return;
+  }
+
+  busy = true;
+  this.disabled = true;
+  output.replaceChildren();
+  status.textContent = "Caricamento previsioni...";
+
+  try {
+    const [first,second] = await Promise.all([
+      fetchForecast(a),fetchForecast(b)
+    ]);
+
+    const date = getDate(day);
+    const now = new Date();
+    const candidates = [];
+
+    for (let h=7; h+duration<=20; h++) {
+      let rank=0;
+      let maxWind=0;
+      let maxGust=0;
+      let maxWave=0;
+      let maxRain=0;
+      let complete=true;
+
+      for (let t=h;t<=h+duration;t++) {
+        const stamp=date+"T"+
+          String(t).padStart(2,"0")+":00";
+
+        // Non proporre ore già trascorse.
+        const localNow = new Intl.DateTimeFormat(
+          "sv-SE",{
+            timeZone:"Europe/Rome",
+            year:"numeric",
+            month:"2-digit",
+            day:"2-digit",
+            hour:"2-digit",
+            minute:"2-digit",
+            hourCycle:"h23"
+          }
+        ).format(now).replace(" ","T");
+
+        if (stamp<=localNow) {
+          complete=false;
+          break;
+        }
+
+        for (const rows of [first,second]) {
+          const data=rows.get(stamp);
+          const score=classify(data);
+          rank=Math.max(rank,score);
+
+          if (score===3) {
+            complete=false;
+            break;
+          }
+
+          maxWind=Math.max(maxWind,data.wind);
+          maxGust=Math.max(maxGust,data.gust);
+          maxWave=Math.max(maxWave,data.wave);
+          maxRain=Math.max(maxRain,data.rain);
+        }
+        if (!complete) break;
+      }
+
+      if (!complete) continue;
+
+      candidates.push({
+        start:h,
+        end:h+duration,
+        rank,
+        maxWind,
+        maxGust,
+        maxWave,
+        maxRain
+      });
+    }
+
+    candidates.sort((x,y) =>
+      x.rank-y.rank ||
+      x.maxWave-y.maxWave ||
+      x.maxGust-y.maxGust ||
+      x.start-y.start
+    );
+
+    if (!candidates.length) {
+      output.textContent =
+        "Nessuna fascia con dati completi "+
+        "e orari futuri disponibili.";
+    } else {
+      candidates.forEach((c,index) => {
+        const card=document.createElement("div");
+        card.className="item";
+
+        const heading=document.createElement("h3");
+        heading.textContent =
+          (index===0?"⭐ Prima fascia in graduatoria: ":"")+
+          String(c.start).padStart(2,"0")+
+          ":00 – "+
+          String(c.end).padStart(2,"0")+
+          ":00";
+
+        const verdict=document.createElement("strong");
+        verdict.textContent=labels[c.rank];
+        verdict.style.color=colors[c.rank];
+
+        card.append(
+          heading,
+          verdict,
+          makeRow("Vento massimo",
+            c.maxWind.toFixed(1)+" kn"),
+          makeRow("Raffiche massime",
+            c.maxGust.toFixed(1)+" kn"),
+          makeRow("Onde massime previste",
+            c.maxWave.toFixed(1)+" m"),
+          makeRow("Pioggia oraria massima",
+            c.maxRain.toFixed(1)+" mm")
+        );
+
+        output.append(card);
+      });
+    }
+
+    status.textContent =
+      "Analisi completata per "+date+
+      ". Fonte: Open-Meteo. "+
+      "Aggiornato: "+
+      new Date().toLocaleString("it-IT",{
+        timeZone:"Europe/Rome"
+      });
+
+  } catch(e) {
+    output.textContent =
+      "Previsioni non disponibili. "+
+      "Nessuna valutazione possibile.";
+    status.textContent=e.message;
+  } finally {
+    busy=false;
+    this.disabled=false;
+  }
+};
+
+})();
   
 </script>
 </body>
