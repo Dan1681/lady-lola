@@ -552,6 +552,251 @@ async function loadMarineWeather() {
   }
 }
 
+
+/* LADY LOLA 1.2 - ZONE E PREFERITI */
+
+const llAreas = [
+  {
+    name: "Golfo di Cagliari / Golfo degli Angeli",
+    places: [
+      ["Golfo degli Angeli (centro)",39.145,9.155],
+      ["Cagliari – Poetto",39.195,9.170],
+      ["Cala Mosca",39.185,9.155],
+      ["Sella del Diavolo",39.185,9.165],
+      ["Margine Rosso",39.205,9.245],
+      ["Foxi",39.205,9.285],
+      ["Capitana",39.194,9.320],
+      ["Is Mortorius",39.190,9.335],
+      ["Cala Regina",39.184,9.350],
+      ["Mari Pintau",39.175,9.365],
+      ["Geremeas",39.165,9.375],
+      ["Torre delle Stelle",39.139,9.400]
+    ]
+  },
+  {
+    name: "Costa sud-orientale",
+    places: [
+      ["Solanas",39.135,9.435],
+      ["Porto Sa Ruxi",39.125,9.465],
+      ["Campus",39.130,9.485],
+      ["Villasimius – Simius",39.120,9.520],
+      ["Porto Giunco",39.110,9.525],
+      ["Capo Carbonara",39.100,9.525],
+      ["Isola dei Cavoli",39.085,9.530],
+      ["Punta Molentis",39.145,9.555],
+      ["Cala Pira",39.170,9.565],
+      ["Cala Sinzias",39.195,9.565],
+      ["Costa Rei",39.255,9.570],
+      ["Capo Ferrato",39.310,9.590]
+    ]
+  },
+  {
+    name: "Costa sud-occidentale",
+    places: [
+      ["Giorgino",39.205,9.075],
+      ["La Maddalena Spiaggia",39.165,9.015],
+      ["Frutti d'Oro",39.155,9.005],
+      ["Nora – Pula",38.990,9.015],
+      ["Santa Margherita di Pula",38.930,8.930],
+      ["Chia",38.890,8.865],
+      ["Su Giudeu",38.885,8.855],
+      ["Capo Spartivento",38.875,8.845],
+      ["Tuerredda",38.895,8.815],
+      ["Capo Malfatano",38.895,8.800],
+      ["Teulada",38.925,8.770],
+      ["Porto Pino",38.965,8.600],
+      ["Sant'Antioco",39.060,8.460],
+      ["Carloforte",39.145,8.310]
+    ]
+  }
+];
+
+// Coordinate indicative per interrogare i modelli.
+// Non usare come waypoint nautici.
+
+const llDefaultFavorites = [
+  "Golfo degli Angeli (centro)",
+  "Foxi",
+  "Capitana",
+  "Cala Regina",
+  "Torre delle Stelle",
+  "Solanas",
+  "Mari Pintau",
+  "Is Mortorius",
+  "Sella del Diavolo",
+  "Margine Rosso",
+  "Cagliari – Poetto",
+  "Geremeas"
+];
+
+const llZoneMap = new Map();
+
+llAreas.forEach(area => {
+  area.places.forEach(place => {
+    const key = "area_" + llZoneMap.size;
+    const zone = {
+      name: place[0],
+      lat: place[1],
+      lon: place[2],
+      group: area.name
+    };
+    llZoneMap.set(key, zone);
+    marineZones[key] = zone;
+  });
+});
+
+function llGetFavorites() {
+  try {
+    const stored = localStorage.getItem("ll_marineFavorites");
+    if (stored === null) return [...llDefaultFavorites];
+    const data = JSON.parse(stored);
+    return Array.isArray(data)
+      ? data.filter(x => typeof x === "string")
+      : [...llDefaultFavorites];
+  } catch(e) {
+    return [...llDefaultFavorites];
+  }
+}
+
+function llSaveFavorites(items) {
+  localStorage.setItem(
+    "ll_marineFavorites",
+    JSON.stringify(items)
+  );
+}
+
+function llFindZoneKey(name) {
+  for (const [key, zone] of llZoneMap) {
+    if (zone.name === name) return key;
+  }
+  return null;
+}
+
+function llRenderZones() {
+  const select = document.getElementById("marineZone");
+  if (!select) return;
+
+  const oldValue = select.value;
+  const query = document.getElementById("llZoneSearch")
+    .value.trim().toLocaleLowerCase("it");
+
+  const favorites = llGetFavorites();
+  select.replaceChildren();
+
+  const groups = [
+    {
+      name: "⭐ Preferiti",
+      places: favorites
+        .map(name => {
+          const key = llFindZoneKey(name);
+          return key ? {key, name} : null;
+        })
+        .filter(Boolean)
+    },
+    ...llAreas.map(area => ({
+      name: area.name,
+      places: [...llZoneMap]
+        .filter(([key, zone]) => zone.group === area.name)
+        .map(([key, zone]) => ({key, name: zone.name}))
+    }))
+  ];
+
+  groups.forEach(group => {
+    const matching = group.places.filter(place =>
+      place.name.toLocaleLowerCase("it").includes(query)
+    );
+
+    if (!matching.length) return;
+
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = group.name;
+
+    matching.forEach(place => {
+      const option = document.createElement("option");
+      option.value = place.key;
+      option.textContent = place.name;
+      optgroup.append(option);
+    });
+
+    select.append(optgroup);
+  });
+
+  const options = [...select.options];
+  const previous = options.find(o => o.value === oldValue);
+
+  if (previous) {
+    select.value = oldValue;
+  } else if (options.length) {
+    const preferred = options.find(o =>
+      marineZones[o.value]?.name === "Torre delle Stelle"
+    );
+    select.value = preferred ? preferred.value : options[0].value;
+  }
+
+  llUpdateStar();
+}
+
+function llUpdateStar() {
+  const select = document.getElementById("marineZone");
+  const star = document.getElementById("llFavoriteButton");
+  if (!select || !star) return;
+
+  const zone = marineZones[select.value];
+  const isFavorite = zone &&
+    llGetFavorites().includes(zone.name);
+
+  star.textContent = isFavorite
+    ? "★ Rimuovi dai preferiti"
+    : "☆ Aggiungi ai preferiti";
+
+  star.disabled = !zone;
+}
+
+function llToggleFavorite() {
+  const select = document.getElementById("marineZone");
+  const zone = marineZones[select.value];
+  if (!zone) return;
+
+  const favorites = llGetFavorites();
+  const index = favorites.indexOf(zone.name);
+
+  if (index >= 0) {
+    favorites.splice(index, 1);
+  } else {
+    favorites.push(zone.name);
+  }
+
+  llSaveFavorites(favorites);
+  llRenderZones();
+}
+
+function llInitMarineZones() {
+  const select = document.getElementById("marineZone");
+  if (!select) return;
+
+  const search = document.createElement("input");
+  search.id = "llZoneSearch";
+  search.type = "search";
+  search.placeholder = "🔎 Cerca una località...";
+  search.setAttribute("aria-label", "Cerca località");
+
+  const star = document.createElement("button");
+  star.id = "llFavoriteButton";
+  star.type = "button";
+  star.style.margin = "10px 0";
+  star.onclick = llToggleFavorite;
+
+  select.parentNode.insertBefore(search, select);
+  select.insertAdjacentElement("afterend", star);
+
+  search.addEventListener("input", llRenderZones);
+  select.addEventListener("change", llUpdateStar);
+
+  llRenderZones();
+}
+
+llInitMarineZones();
+
   
 </script>
 </body>
