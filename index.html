@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola - Boat Manager</title>
+<title>Lady Lola 2.1 - Boat Manager</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -19,6 +19,7 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 #menu{position:fixed;inset:auto 0 0;z-index:1000;display:flex;justify-content:center;align-items:stretch;gap:7px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#081525f5;border-top:1px solid var(--line);box-shadow:0 -8px 22px #0004;overflow-x:auto;scrollbar-width:none}#menu::-webkit-scrollbar{display:none}#menu button{flex:0 1 150px;min-width:0;min-height:50px;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;font-size:13px;padding:9px 12px;background:#153249;border:1px solid #2b4b60;color:#bed5e1}#menu button.active{background:#18506a;border-color:var(--aqua);color:#b2f5fa}
 .ll-hero{background:linear-gradient(125deg,#164a62,#10283c 65%,#11283c);position:relative;overflow:hidden}.ll-eyebrow{font-size:11px;color:#79dfe9;letter-spacing:2px;font-weight:800;text-transform:uppercase}.ll-hero h2{font-size:clamp(25px,4vw,36px);margin:8px 0}.ll-hero p{color:#bed6e2}.ll-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.ll-chip{background:#1b4558;border:1px solid #397087;border-radius:999px;padding:6px 12px;font-size:12px;color:#d4f1f5}.ll-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.ll-grid .card{margin:0}.ll-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ll-quick button{background:#193a50;min-height:92px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;text-align:left}.ll-quick .ll-ico{font-size:25px}.ll-weather-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:15px 0}.ll-metric{background:#1b3b50;border:1px solid #31556a;border-radius:13px;padding:14px 9px;text-align:center}.ll-metric span{display:block;color:#a9c6d6;font-size:12px}.ll-metric strong{display:block;font-size:22px;color:white;margin-top:4px}.ll-weather-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.ll-weather-head select{max-width:250px}.ll-status{font-weight:800;margin-top:10px}.ll-status[data-level=good]{color:#67e3aa}.ll-status[data-level=warn]{color:#ffd07d}.ll-status[data-level=bad]{color:#ff8e90}.ll-status[data-level=none]{color:#b2cbd8}.ll-note{font-size:12px;color:var(--muted)}
 #llMorePanel{max-width:560px;margin:0 auto}#llMorePanel button{display:flex;width:100%;align-items:center;justify-content:space-between;margin:8px 0;text-align:left}.ll-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px}.ll-section-heading h2{margin:0}
+.ll-wind-from{background:#173b51;border:1px solid #34647a;border-radius:12px;padding:10px 13px;color:#d6f5fa;font-weight:650;margin:8px 0 12px}
 #ll13Results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#ll13Results>.card{margin:0}#ll13Results>.card p{white-space:pre-line}#marineResult .item{border-left:3px solid #3a95ae}
 @media(max-width:700px){main{padding:14px 11px calc(112px + env(safe-area-inset-bottom))}.card{padding:16px;border-radius:17px}.ll-grid{grid-template-columns:1fr}.ll-quick{grid-template-columns:repeat(2,minmax(0,1fr))}.ll-weather-grid{gap:6px}.ll-metric{padding:12px 5px}.ll-metric strong{font-size:18px}#ll13Results{grid-template-columns:1fr}#menu{gap:4px;padding:7px 5px calc(7px + env(safe-area-inset-bottom))}#menu button{flex:1 1 0;font-size:10px;min-height:53px;padding:7px 2px;white-space:normal;text-align:center;line-height:1.2}.ll-weather-head{align-items:stretch;flex-direction:column}.ll-weather-head select{max-width:none}}
 @media(min-width:701px) and (max-width:950px){#menu button{font-size:12px}.ll-quick{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -44,7 +45,7 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 <section id="home" class="active">
 <div class="card ll-hero"><div class="ll-eyebrow">⚓ Nautical Command Center</div><h2>Benvenuto a bordo di Lady Lola</h2><p>La tua Bluline 19 Open, sempre sotto controllo.</p><div class="ll-chips"><span class="ll-chip">🚤 Bluline 19 Open · 2022</span><span class="ll-chip">⚙️ Mercury F40 Pro · 2022</span><span class="ll-chip">📍 Nautilus Capitana</span></div></div>
 <div class="ll-grid">
-<div class="card"><div class="ll-weather-head"><h2>🌊 Meteo a colpo d'occhio</h2><select id="llHomeZone" aria-label="Zona meteo home"><option value="foxi">Foxi</option><option value="capitana">Capitana</option><option value="torre" selected>Torre delle Stelle</option></select></div><p id="llHomeWhen" class="muted">Previsioni orarie Open-Meteo · oggi</p><div class="ll-weather-grid"><div class="ll-metric"><span>🌬 Vento</span><strong id="llHomeWind">-- kn</strong></div><div class="ll-metric"><span>💨 Raffiche</span><strong id="llHomeGust">-- kn</strong></div><div class="ll-metric"><span>🌊 Onde</span><strong id="llHomeWave">-- m</strong></div></div><p id="llHomeVerdict" class="ll-status" data-level="none">Dati non caricati</p><button class="primary" id="llHomeRefresh" type="button">↻ Aggiorna meteo</button><p class="ll-note">Valutazione indicativa: non è un via libera alla navigazione. Controlla avvisi e condizioni reali.</p></div>
+<div class="card"><div class="ll-weather-head"><h2>🌊 Meteo a colpo d'occhio</h2><select id="llHomeZone" aria-label="Zona meteo home"><option value="foxi">Foxi</option><option value="capitana">Capitana</option><option value="torre" selected>Torre delle Stelle</option></select></div><p id="llHomeWhen" class="muted">Previsioni orarie Open-Meteo · oggi</p><div class="ll-weather-grid"><div class="ll-metric"><span>🌬 Vento</span><strong id="llHomeWind">-- kn</strong></div><div class="ll-metric"><span>💨 Raffiche</span><strong id="llHomeGust">-- kn</strong></div><div class="ll-metric"><span>🌊 Onde</span><strong id="llHomeWave">-- m</strong></div></div><p id="llHomeWindFrom" class="ll-wind-from">🧭 Direzione vento: dati non caricati</p><p id="llHomeVerdict" class="ll-status" data-level="none">Dati non caricati</p><button class="primary" id="llHomeRefresh" type="button">↻ Aggiorna meteo</button><p class="ll-note">Valutazione indicativa: non è un via libera alla navigazione. Controlla avvisi e condizioni reali.</p></div>
 <div class="card"><h2>🧭 Accessi rapidi</h2><div class="ll-quick"><button type="button" data-go="planner"><span class="ll-ico">⚓</span>Pianifica</button><button type="button" data-go="dashboard"><span class="ll-ico">📊</span>Dashboard</button><button type="button" data-go="fuel"><span class="ll-ico">⛽</span>Carburante</button><button type="button" data-go="fishing"><span class="ll-ico">🎣</span>Pesca</button></div><p class="muted">Apri una funzione con un tocco.</p></div>
 </div>
 <div class="ll-grid" style="margin-top:16px"><div class="card"><h2>🚤 La mia barca</h2><div class="row"><span>Modello</span><b>Bluline 19 Open</b></div><div class="row"><span>Motore</span><b>Mercury F40 Pro</b></div><div class="row"><span>Serbatoio principale</span><b>30 L</b></div><div class="row"><span>Secondario</span><b>13 L</b></div><div class="row"><span>Tanica a bordo</span><b>10 L</b></div><div class="row"><span>Tanica per rifornimento</span><b>20 L</b></div><div class="row"><span>Consumo di riferimento</span><b>12 L/h a 26 kn</b></div></div>
@@ -339,6 +340,23 @@ function marineDirection(degrees) {
   return names[Math.round(degrees / 45) % 8];
 }
 
+// Rosa dei venti: la direzione indica DA DOVE arriva il vento.
+function marineWindName(degrees) {
+  if (typeof degrees !== "number" || !Number.isFinite(degrees)) return "N/D";
+  const winds = ["Tramontana", "Grecale", "Levante", "Scirocco",
+                 "Ostro", "Libeccio", "Ponente", "Maestrale"];
+  const index = Math.round((((degrees % 360) + 360) % 360) / 45) % 8;
+  return winds[index];
+}
+function marineWindFrom(degrees) {
+  if (typeof degrees !== "number" || !Number.isFinite(degrees)) return "N/D";
+  const directions = ["Nord", "Nord-Est", "Est", "Sud-Est",
+                      "Sud", "Sud-Ovest", "Ovest", "Nord-Ovest"];
+  const index = Math.round((((degrees % 360) + 360) % 360) / 45) % 8;
+  return marineWindName(degrees) + " · da " + directions[index] +
+         " (" + marineDirection(degrees) + ", " + Math.round(degrees) + "°)";
+}
+
 function marineRating(wind, gust, wave, rain) {
   if (![wind, gust, wave, rain].every(Number.isFinite)) {
     return {
@@ -495,7 +513,7 @@ async function loadMarineWeather() {
       detail.textContent =
         "Vento: " + marineNumber(row.wind) + " kn (" +
         marineNumber(row.wind * 1.852, 0) + " km/h), " +
-        marineDirection(row.direction) +
+        " | " + marineWindFrom(row.direction) +
         " | Raffiche: " + marineNumber(row.gust) + " kn" +
         " | Onde: " + marineNumber(row.wave) + " m" +
         " da " + marineDirection(row.waveDir) +
@@ -1087,7 +1105,7 @@ llInitMarineZones();
           " (" + fmt(data.wind * 1.852, 0) + " km/h)" +
           "\n💨 Raffiche: " + fmt(data.gust) + " kn" +
           "\n🧭 Direzione vento: " +
-          marineDirection(data.direction) +
+          marineWindFrom(data.direction) +
           "\n🌊 Onde: " + fmt(data.wave) + " m" +
           "\n🧭 Direzione onde: " +
           marineDirection(data.waveDirection) +
@@ -1647,10 +1665,11 @@ async function homeWeather(){
  const verdict=document.getElementById("llHomeVerdict");
  verdict.textContent="Caricamento previsioni...";verdict.dataset.level="none";
  for(const id of ["llHomeWind","llHomeGust","llHomeWave"])document.getElementById(id).textContent="--";
+ document.getElementById("llHomeWindFrom").textContent="🧭 Direzione vento: caricamento...";
  const zone=marineZones[document.getElementById("llHomeZone").value];
  try{
   const common={latitude:zone.lat,longitude:zone.lon,timezone:"Europe/Rome",forecast_days:"2"};
-  const w=new URLSearchParams({...common,hourly:"wind_speed_10m,wind_gusts_10m,precipitation",wind_speed_unit:"kn"});
+  const w=new URLSearchParams({...common,hourly:"wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation",wind_speed_unit:"kn"});
   const m=new URLSearchParams({...common,hourly:"wave_height"});
   const [wr,mr]=await Promise.all([
    fetch("https://api.open-meteo.com/v1/forecast?"+w),
@@ -1668,6 +1687,8 @@ async function homeWeather(){
   if(wi<0||mi<0)throw Error("Nessun dato per l'ora corrente");
   const wind=weather.hourly.wind_speed_10m?.[wi],gust=weather.hourly.wind_gusts_10m?.[wi];
   const wave=marine.hourly.wave_height?.[mi],rain=weather.hourly.precipitation?.[wi];
+  const direction=weather.hourly.wind_direction_10m?.[wi];
+  document.getElementById("llHomeWindFrom").textContent="🧭 "+marineWindFrom(direction);
   document.getElementById("llHomeWind").textContent=fmt(wind,"kn");
   document.getElementById("llHomeGust").textContent=fmt(gust,"kn");
   document.getElementById("llHomeWave").textContent=fmt(wave,"m");
@@ -1675,7 +1696,7 @@ async function homeWeather(){
   verdict.textContent=rating.label+" · Valutazione indicativa";
   verdict.dataset.level=rating.label==="ESCO*"?"good":rating.label==="ATTENZIONE"?"warn":rating.label==="NON ESCO"?"bad":"none";
   document.getElementById("llHomeWhen").textContent="Previsioni per "+date+" ore "+String(hour).padStart(2,"0")+":00 · Open-Meteo";
- }catch(e){verdict.textContent="Dati non disponibili: "+e.message;verdict.dataset.level="none";}
+ }catch(e){verdict.textContent="Dati non disponibili: "+e.message;verdict.dataset.level="none";document.getElementById("llHomeWindFrom").textContent="🧭 Direzione vento: N/D";}
  finally{loading=false;btn.disabled=false;}
 }
 document.getElementById("llHomeRefresh").addEventListener("click",homeWeather);
