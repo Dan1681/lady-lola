@@ -75,26 +75,49 @@ a{color:#087b9b}
 </div>
 </section>
 
+
 <section id="meteo">
 <div class="card">
-<h2>🌤 Meteo marino</h2>
-<p>Il tuo criterio: uscire preferibilmente con mare calmo e vento debole.</p>
+<h2>🌊 Meteo marino automatico</h2>
+<p>Previsioni per le zone della Lady Lola.</p>
+
+<label>Zona di navigazione</label>
+<select id="marineZone">
+<option value="foxi">Foxi</option>
+<option value="capitana">Capitana</option>
+<option value="torre" selected>Torre delle Stelle</option>
+</select>
+
+<label>Giorno</label>
+<select id="marineDay">
+<option value="0">Oggi</option>
+<option value="1">Domani</option>
+<option value="2">Dopodomani</option>
+</select>
+
+<button class="primary" onclick="loadMarineWeather()">
+🌤 Aggiorna previsioni
+</button>
+
+<p id="marineStatus" class="muted">
+Premi Aggiorna previsioni.
+</p>
+<div id="marineResult"></div>
+</div>
+
+<div class="card">
+<h3>Fonti ufficiali da verificare</h3>
 <p><a href="https://www.sar.sardegna.it/" target="_blank">ARPAS Sardegna</a></p>
 <p><a href="https://www.meteoam.it/" target="_blank">Aeronautica Militare</a></p>
 <p><a href="https://www.ilmeteo.it/" target="_blank">ilMeteo</a></p>
-<p class="muted">Questi sono collegamenti alle fonti, non previsioni integrate automaticamente.</p>
-</div>
-<div class="card">
-<h3>Valutazione indicativa</h3>
-<label>Vento previsto (nodi)</label>
-<input id="wind" type="number" min="0" step="0.5" placeholder="Es. 6">
-<label>Altezza onde prevista (metri)</label>
-<input id="waves" type="number" min="0" step="0.1" placeholder="Es. 0.3">
-<button class="primary" onclick="evaluateWeather()">Valuta condizioni</button>
-<p id="weatherResult"></p>
-<p class="muted">Soglie indicative personalizzate, non un'autorizzazione alla navigazione. Controlla anche raffiche, direzione, evoluzione del tempo, avvisi e condizioni locali.</p>
+<p class="muted">
+Previsioni automatiche: Open-Meteo.
+Controlla anche avvisi, raffiche, condizioni locali
+e situazione reale prima di navigare.
+</p>
 </div>
 </section>
+
 
 <section id="fuel">
 <div class="card">
@@ -300,6 +323,236 @@ label.append(cb,text);target.append(label);
 function resetChecks(){save("checks",{});renderChecks();}
 renderGear();renderChecks();
 renderRecords("maintenance");renderRecords("fishing");
+
+/* LADY LOLA 1.1 - METEO MARINO */
+
+const marineZones = {
+  foxi: {
+    name: "Foxi",
+    lat: 39.205,
+    lon: 9.285
+  },
+  capitana: {
+    name: "Capitana",
+    lat: 39.194,
+    lon: 9.320
+  },
+  torre: {
+    name: "Torre delle Stelle",
+    lat: 39.139,
+    lon: 9.400
+  }
+};
+
+// Coordinate indicative delle zone costiere.
+// Non sono waypoint di navigazione.
+
+function marineNumber(value, digits = 1) {
+  return Number.isFinite(value)
+    ? value.toFixed(digits)
+    : "N/D";
+}
+
+function marineDirection(degrees) {
+  if (!Number.isFinite(degrees)) return "N/D";
+  const names = [
+    "N", "NE", "E", "SE",
+    "S", "SO", "O", "NO"
+  ];
+  return names[Math.round(degrees / 45) % 8];
+}
+
+function marineRating(wind, gust, wave, rain) {
+  if (![wind, gust, wave, rain].every(Number.isFinite)) {
+    return {
+      label: "DATI INCOMPLETI",
+      color: "#a36b00"
+    };
+  }
+
+  // Soglie prudenziali indicative.
+  if (wind > 10 || gust > 15 ||
+      wave > 0.5 || rain > 2) {
+    return {
+      label: "NON ESCO",
+      color: "#b33131"
+    };
+  }
+
+  if (wind > 6 || gust > 10 ||
+      wave > 0.3 || rain > 0) {
+    return {
+      label: "ATTENZIONE",
+      color: "#a36b00"
+    };
+  }
+
+  return {
+    label: "ESCO*",
+    color: "#087448"
+  };
+}
+
+async function loadMarineWeather() {
+  const zoneKey = document.getElementById("marineZone").value;
+  const dayOffset = Number(document.getElementById("marineDay").value);
+  const zone = marineZones[zoneKey];
+  const status = document.getElementById("marineStatus");
+  const result = document.getElementById("marineResult");
+
+  status.textContent = "Caricamento previsioni...";
+  result.replaceChildren();
+
+  const common = new URLSearchParams({
+    latitude: zone.lat,
+    longitude: zone.lon,
+    timezone: "Europe/Rome",
+    forecast_days: "4"
+  });
+
+  const weatherParams = new URLSearchParams(common);
+  weatherParams.set(
+    "hourly",
+    "wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation"
+  );
+  weatherParams.set("wind_speed_unit", "kn");
+
+  const waveParams = new URLSearchParams(common);
+  waveParams.set("hourly", "wave_height,wave_direction");
+
+  try {
+    const [weatherResponse, waveResponse] = await Promise.all([
+      fetch("https://api.open-meteo.com/v1/forecast?" + weatherParams),
+      fetch("https://marine-api.open-meteo.com/v1/marine?" + waveParams)
+    ]);
+
+    if (!weatherResponse.ok || !waveResponse.ok) {
+      throw new Error("Servizio previsioni non disponibile");
+    }
+
+    const weather = await weatherResponse.json();
+    const waves = await waveResponse.json();
+
+    const hourly = weather.hourly;
+    const marine = waves.hourly;
+
+    if (!hourly || !marine || !hourly.time || !marine.time) {
+      throw new Error("Dati meteo incompleti");
+    }
+
+    const dateParts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Rome",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+
+    const parts = Object.fromEntries(
+      dateParts.map(p => [p.type, p.value])
+    );
+
+    const today = new Date(
+      Date.UTC(
+        Number(parts.year),
+        Number(parts.month) - 1,
+        Number(parts.day) + dayOffset
+      )
+    ).toISOString().slice(0, 10);
+
+    const waveIndex = new Map(
+      marine.time.map((time, i) => [time, i])
+    );
+
+    const rows = [];
+
+    for (let i = 0; i < hourly.time.length; i++) {
+      const time = hourly.time[i];
+      const hour = Number(time.slice(11, 13));
+
+      if (!time.startsWith(today)) continue;
+      if (hour < 7 || hour > 20) continue;
+
+      const j = waveIndex.get(time);
+      if (j === undefined) continue;
+
+      const wind = hourly.wind_speed_10m?.[i];
+      const gust = hourly.wind_gusts_10m?.[i];
+      const direction = hourly.wind_direction_10m?.[i];
+      const rain = hourly.precipitation?.[i];
+      const wave = marine.wave_height?.[j];
+      const waveDir = marine.wave_direction?.[j];
+
+      const rating = marineRating(wind, gust, wave, rain);
+
+      rows.push({
+        time, wind, gust, direction,
+        rain, wave, waveDir, rating
+      });
+    }
+
+    if (!rows.length) {
+      throw new Error("Nessuna previsione disponibile per il giorno scelto");
+    }
+
+    const heading = document.createElement("h3");
+    heading.textContent = zone.name + " - " + today;
+    result.append(heading);
+
+    const summary = document.createElement("p");
+    summary.textContent =
+      "Previsioni orarie dalle 07:00 alle 20:00";
+    result.append(summary);
+
+    rows.forEach(row => {
+      const card = document.createElement("div");
+      card.className = "item";
+
+      const title = document.createElement("h3");
+      title.textContent = "Ore " + row.time.slice(11, 16);
+
+      const verdict = document.createElement("strong");
+      verdict.textContent = row.rating.label;
+      verdict.style.color = row.rating.color;
+
+      const detail = document.createElement("p");
+      detail.textContent =
+        "Vento: " + marineNumber(row.wind) + " kn (" +
+        marineNumber(row.wind * 1.852, 0) + " km/h), " +
+        marineDirection(row.direction) +
+        " | Raffiche: " + marineNumber(row.gust) + " kn" +
+        " | Onde: " + marineNumber(row.wave) + " m" +
+        " da " + marineDirection(row.waveDir) +
+        " | Pioggia: " + marineNumber(row.rain) + " mm";
+
+      card.append(title, verdict, detail);
+      result.append(card);
+    });
+
+    const warning = document.createElement("p");
+    warning.className = "muted";
+    warning.textContent =
+      "* ESCO indica solo valori sotto le soglie impostate. " +
+      "Non è un via libera alla navigazione. " +
+      "Le onde sono altezze significative previste, " +
+      "non massimi garantiti. Verifica avvisi e condizioni locali.";
+    result.append(warning);
+
+    status.textContent =
+      "Previsioni caricate alle " +
+      new Date().toLocaleString("it-IT", {
+        timeZone: "Europe/Rome"
+      }) +
+      " - Fonte: Open-Meteo";
+
+  } catch (error) {
+    status.textContent =
+      "Impossibile aggiornare: " + error.message;
+    result.textContent =
+      "Nessun verdetto disponibile. Controlla le fonti ufficiali.";
+  }
+}
+
+  
 </script>
 </body>
 </html>
