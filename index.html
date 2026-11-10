@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 2.4 - Boat Manager</title>
+<title>Lady Lola 2.5 - Boat Manager</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -37,11 +37,12 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 <style id="ll24-style">
 .ll24-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.ll24-title h2{margin-bottom:5px}.ll24-title button{flex-shrink:0;font-size:13px}.ll24-official{display:flex;gap:16px;align-items:center;padding:18px;border-radius:16px;border:1px solid #597080;margin:15px 0 5px}.ll24-unknown{background:#263a4b}.ll24-big-icon{font-size:44px;line-height:1}.ll24-official strong{font-size:19px;color:#fff}.ll24-official p{margin:5px 0 0;font-size:13px;color:#d6e3ec}.ll24-timestamp{color:#abc3d1;font-size:12px;margin:8px 0 20px}.ll24-explain{color:#c4d7e2;font-size:13px}.ll24-signal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 20px}.ll24-signal{border-radius:14px;border:1px solid #426075;padding:14px;min-width:0;background:#1b3549}.ll24-signal .ll24-icon{font-size:31px;display:block;line-height:1.3}.ll24-signal strong{display:block;color:#fff;font-size:14px;margin:5px 0}.ll24-signal small{display:block;font-size:12px;line-height:1.4}.ll24-signal.ll24-ok{border-color:#277b60;background:#143d35}.ll24-signal.ll24-warn{border-color:#a17c25;background:#4c3c1d}.ll24-signal.ll24-danger{border-color:#b0524d;background:#522c31}.ll24-signal.ll24-neutral{border-color:#597080}.ll24-links{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 18px}.ll24-links a{padding:10px 12px;background:#1b3b51;border:1px solid #3b6379;border-radius:12px;font-size:13px;text-decoration:none}.ll24-municipal{border-top:1px solid #35566b;padding-top:12px}.ll24-municipal summary{cursor:pointer;font-weight:700}.ll24-municipal .ll24-links{margin-top:14px}@media(max-width:650px){.ll24-signal-grid{grid-template-columns:1fr}.ll24-title{flex-wrap:wrap}.ll24-official{gap:12px;padding:14px}.ll24-big-icon{font-size:38px}}
 </style>
+<style id="ll25-style">.ll25-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.ll25-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ll25-filters label{margin:0}.ll25-group{margin:22px 0}.ll25-group h3{border-bottom:1px solid #31556a;padding-bottom:8px}.ll25-item{background:#17364b;border:1px solid #34566c;border-radius:14px;padding:14px;margin:9px 0}.ll25-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.ll25-head strong{font-size:16px;overflow-wrap:anywhere}.ll25-meta{color:#9fc5d6;font-size:12px;margin:4px 0}.ll25-item p{white-space:pre-line;overflow-wrap:anywhere;margin:6px 0;font-size:13px}.ll25-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ll25-actions button{min-height:38px;padding:6px 10px;font-size:13px}.ll25-empty{padding:18px;border:1px dashed #42677b;border-radius:12px;color:#b8cfdc}#ll25Editor[hidden]{display:none!important}@media(max-width:600px){.ll25-filters{grid-template-columns:1fr}.ll25-toolbar button{flex:1 1 auto}}</style>
 </head>
 <body>
 <header>
 <h1>🚤 Lady Lola</h1>
-<p>Boat Manager · v2.4 · Bluline 19 Open</p>
+<p>Boat Manager · v2.5 · Bluline 19 Open</p>
 </header>
 <nav id="menu">
 <button class="active" data-page="home">🏠 Home</button>
@@ -139,13 +140,20 @@ e situazione reale prima di navigare.
 </section>
 
 <section id="gear">
-<div class="card">
-<h2>🧰 Attrezzatura</h2>
-<div id="gearList"></div>
-<h3>Aggiungi accessorio</h3>
-<input id="newGear" placeholder="Nome accessorio">
-<button class="primary" onclick="addGear()">Aggiungi</button>
-</div>
+<div class="card"><h2>🎣 Attrezzatura & Pesca</h2><p class="muted">Inventario personale modificabile: canne, mulinelli, esche, lenze e accessori. Le modifiche sono salvate su questo dispositivo.</p>
+<div class="ll25-toolbar"><button class="primary" type="button" id="ll25New">＋ Nuovo articolo</button><button type="button" id="ll25Export">⬇ Esporta backup</button><button type="button" id="ll25Import">⬆ Importa backup</button><input type="file" id="ll25File" accept="application/json,.json" hidden></div>
+<div class="ll25-filters"><label>Categoria<select id="ll25Filter"><option value="">Tutte le categorie</option></select></label><label>Cerca<input type="search" id="ll25Search" placeholder="Nome, tecnica, colore..."></label></div><p id="ll25Count" class="muted"></p><div id="ll25List"></div></div>
+<div class="card" id="ll25Editor" hidden><h3 id="ll25EditorTitle">Nuovo articolo</h3><form id="ll25Form">
+<label>Categoria<select id="ll25Category"><option>Canne e combo</option><option>Esche e attrattori</option><option>Lenze e terminali</option><option>Accessori pesca</option><option>Dotazioni barca</option><option>Altra attrezzatura</option></select></label>
+<label>Nome articolo *<input id="ll25Name" required maxlength="160" placeholder="Es. Biastos Slow 90 g"></label>
+<label>Marca / modello<input id="ll25Brand" maxlength="160" placeholder="Facoltativo"></label>
+<label>Quantità<input id="ll25Qty" type="number" min="0" step="1" value="1"></label>
+<label>Posizione<select id="ll25Location"><option>A bordo</option><option>A casa</option><option>Da acquistare</option><option>Non specificato</option></select></label>
+<label>Caratteristiche / lenza / colore / grammatura<textarea id="ll25Details" rows="3" placeholder="Specifiche tecniche, lunghezza, terminali..."></textarea></label>
+<label>Tecnica / utilizzo<textarea id="ll25Use" rows="2" placeholder="Traina, spinning, jigging..."></textarea></label>
+<label>Note<textarea id="ll25Notes" rows="2" placeholder="Altre informazioni"></textarea></label>
+<div class="ll25-toolbar"><button class="primary" type="submit">💾 Salva articolo</button><button id="ll25Cancel" type="button">Annulla</button></div></form></div>
+<div class="card"><h3>🧰 Dotazioni già presenti a bordo</h3><p class="muted">Manteniamo anche la lista originale per non perdere eventuali modifiche. Puoi continuare a gestirla qui.</p><div id="gearList"></div><label>Aggiungi dotazione alla lista originale<input id="newGear" placeholder="Nome accessorio"></label><button type="button" onclick="addGear()">Aggiungi alla lista originale</button></div>
 </section>
 
 <section id="fishing">
@@ -168,7 +176,7 @@ e situazione reale prima di navigare.
 <button onclick="resetChecks()">Azzera checklist</button>
 </div>
 </section>
-<section id="more"><div class="card" id="llMorePanel"><h2>☰ Altre funzioni</h2><p class="muted">Tutti gli strumenti di Lady Lola.</p><button type="button" data-go="fuel">⛽ Carburante <span>›</span></button><button type="button" data-go="maintenance">🔧 Motore e manutenzione <span>›</span></button><button type="button" data-go="gear">🧰 Dotazioni <span>›</span></button><button type="button" data-go="fishing">🎣 Diario di pesca <span>›</span></button><button type="button" data-go="checklist">✅ Checklist <span>›</span></button></div></section>
+<section id="more"><div class="card" id="llMorePanel"><h2>☰ Altre funzioni</h2><p class="muted">Tutti gli strumenti di Lady Lola.</p><button type="button" data-go="fuel">⛽ Carburante <span>›</span></button><button type="button" data-go="maintenance">🔧 Motore e manutenzione <span>›</span></button><button type="button" data-go="gear">🎣 Attrezzatura & Pesca <span>›</span></button><button type="button" data-go="fishing">🎣 Diario di pesca <span>›</span></button><button type="button" data-go="checklist">✅ Checklist <span>›</span></button></div></section>
 </main>
 <script>
 const defaults={
@@ -1801,6 +1809,57 @@ window.addEventListener('ll24:forecast',event=>{
   root.append(makeSignal('⛈️',rainDanger?'Pioggia: NON ESCO':rainWarn?'Pioggia prevista':'Nessuna pioggia prevista',`Massimo ${rain.data.rain.toFixed(1)} mm nell'ora a ${rain.name}. Non è una diagnosi di temporali.`,rainDanger?'danger':rainWarn?'warn':'ok'));
   if(valid.length!==values.length)root.append(makeSignal('❔','Copertura incompleta',`${valid.length} località su ${values.length} con dati completi.`, 'neutral'));
 });
+})();
+</script>
+<script id="ll25-script">
+(()=>{
+'use strict';
+const KEY='ll_fishingInventory_v25';
+const seed=[
+['Canne e combo','Caperlan 180 cm + Bauxit 6000','Caperlan / Bauxit','Canna fino a 300 g. Trecciato 0,28 mm / PE 8.0 (0,47 mm) + 3–4 m Falcon Hi-Power 100% FC 13,9 kg.','Slow jigging e piombo guardiano / fondo. Secche 30–50 m; Biastos Slow 90 g per dentici, cernie e pagri.'],
+['Canne e combo','Daiwa Sea Hunter 20 lb + mulinello da traina','Daiwa','Mulinello da traina (rotante/fisso, modello da precisare). Backing nylon + 130 m Caperlan MTX8 0,12 mm multicolor + girella con moschettone.','Traina veloce a galla 4–4,8 nodi, distanza 20–25 m; aeroplanino, polpetti, filose, Bulox Jet.'],
+['Canne e combo','Mitchell Avocet Gravel Maui 210 cm + Lineaeffe SL 600','Mitchell / Lineaeffe','Backing trecciato vecchio + Yacuma PE 8.0 multicolor 0,47 mm, 53,5 kg + girella con moschettone.','Traina costiera e lunga distanza 45–50 m, 3,2–3,8 nodi; Stylo Jointed e minnow affondanti.'],
+['Canne e combo','Daiwa Ninja + mulinello da spinning','Daiwa','Trecciato leggero / nylon + FTK 0,35 mm (o fluorocarbon leggero). Modello mulinello da precisare.','Spinning light su mangianze; casting jig e Biastos 30–40 g per alletterati e tombarelli.'],
+['Lenze e terminali','Caperlan MTX8 8X Multicolor 0,12 mm','Caperlan','PE 0.6, 9,7 kg / 21,3 lb, bobina 130 m; cambia colore ogni 10 m.','Lenza madre per traina, stima della distanza dell’esca.'],
+['Lenze e terminali','Yacuma Braid X8 PE 8.0 Multicolor 0,47 mm','Yacuma','53,52 kg / 118 lb, spola 1000 m.','Lenza madre / backing per traina e fondo.'],
+['Lenze e terminali','Falcon Hi-Power 100% Fluorocarbon','Falcon','Resistenza 13,9 kg.','Terminale pesante per slow jigging e fondo, Caperlan 180 cm.'],
+['Lenze e terminali','FTK Fluoro Coating 0,35 mm','FTK','Finale 3–5 m con asola per aggancio rapido al moschettone.','Terminale fusibile per traina e spinning.'],
+['Esche e attrattori','Aeroplanino (Bird)','','Attrattore di superficie, crea spruzzi e schiuma.','Traina veloce, 20–25 m dalla poppa.'],
+['Esche e attrattori','Stylo Jointed','','Needle snodato.','Traina lunga 3,2–3,8 nodi.'],
+['Esche e attrattori','Minnow con paletta','','Artificiale rigido affondante.','Traina a mezza colonna.'],
+['Esche e attrattori','Bulox Jet','','Artificiale rigido jet.','Traina veloce a galla.'],
+['Esche e attrattori','Biastos Slow 90 g','','Disponibile anche phosphorescent blue.','Slow jigging su secche e fondo.'],
+['Esche e attrattori','Biastos 30–40 g / casting jig','','Jig metallici leggeri.','Spinning sulle mangianze a vista.'],
+['Esche e attrattori','Octopus in silicone','','Colori arancione e giallo.','Traina.'],
+['Esche e attrattori','Piumette bianche e rosse','','Soft bait / filose.','Traina.'],
+['Esche e attrattori','Chipirons (calamaretti)','','Soft bait.','Traina.'],
+['Esche e attrattori','Filose multi-artificiali','','Più artificiali in serie.','Traina.']
+];
+const categories=['Canne e combo','Esche e attrattori','Lenze e terminali','Accessori pesca','Dotazioni barca','Altra attrezzatura'];
+const $=id=>document.getElementById(id);
+const uuid=()=>('id'+Date.now().toString(36)+Math.random().toString(36).slice(2));
+function initial(){return seed.map(([category,name,brand,details,use])=>({id:uuid(),category,name,brand,details,use,notes:'',qty:1,location:'Non specificato'}));}
+function read(){try{const raw=localStorage.getItem(KEY);if(raw!==null){const v=JSON.parse(raw);if(Array.isArray(v))return v;}}catch(e){}return null;}
+let items=read();if(items===null){items=initial();try{localStorage.setItem(KEY,JSON.stringify(items));}catch(e){alert('Memoria dispositivo non disponibile: impossibile salvare l’inventario.');}}
+function store(){try{localStorage.setItem(KEY,JSON.stringify(items));return true;}catch(e){alert('Salvataggio non riuscito. Controlla lo spazio disponibile sul dispositivo.');return false;}}
+function el(tag,txt,cls){const x=document.createElement(tag);if(txt!==undefined)x.textContent=txt;if(cls)x.className=cls;return x;}
+function render(){const filter=$('ll25Filter'),current=filter.value;filter.replaceChildren();filter.append(new Option('Tutte le categorie',''));[...new Set([...categories,...items.map(i=>i.category)])].forEach(c=>filter.append(new Option(c,c)));filter.value=current;
+const q=$('ll25Search').value.trim().toLocaleLowerCase('it');const matches=items.filter(i=>(!current||i.category===current)&&[i.name,i.brand,i.details,i.use,i.notes,i.location].join(' ').toLocaleLowerCase('it').includes(q));$('ll25Count').textContent=`${matches.length} articoli visualizzati · ${items.length} in inventario`;
+const root=$('ll25List');root.replaceChildren();if(!matches.length){root.append(el('p','Nessun articolo trovato. Usa “Nuovo articolo” per aggiungerne uno.','ll25-empty'));return;}
+for(const cat of [...new Set(matches.map(i=>i.category))]){const group=el('div',undefined,'ll25-group');group.append(el('h3',cat+' · '+matches.filter(i=>i.category===cat).length));for(const item of matches.filter(i=>i.category===cat)){const card=el('article',undefined,'ll25-item'),head=el('div',undefined,'ll25-head');head.append(el('strong',item.name));head.append(el('span','×'+item.qty,'ll25-meta'));card.append(head);card.append(el('div',[item.brand,item.location].filter(Boolean).join(' · '),'ll25-meta'));
+if(item.details)card.append(el('p','📋 '+item.details));if(item.use)card.append(el('p','🎣 '+item.use));if(item.notes)card.append(el('p','📝 '+item.notes));const actions=el('div',undefined,'ll25-actions');
+const edit=el('button','✏️ Modifica');edit.type='button';edit.onclick=()=>openEditor(item.id);actions.append(edit);
+const up=el('button','↑');up.type='button';up.title='Sposta su';up.setAttribute('aria-label','Sposta su '+item.name);up.onclick=()=>move(item.id,-1);actions.append(up);
+const down=el('button','↓');down.type='button';down.title='Sposta giù';down.setAttribute('aria-label','Sposta giù '+item.name);down.onclick=()=>move(item.id,1);actions.append(down);
+const del=el('button','🗑 Elimina');del.type='button';del.onclick=()=>{if(confirm('Eliminare “'+item.name+'”?')){items=items.filter(x=>x.id!==item.id);if(store())render();}};actions.append(del);card.append(actions);group.append(card);}root.append(group);}}
+function move(id,d){const idx=items.findIndex(i=>i.id===id);if(idx<0)return;const category=items[idx].category;const peers=items.map((i,n)=>i.category===category?n:-1).filter(n=>n>=0);const pos=peers.indexOf(idx),other=peers[pos+d];if(other===undefined)return;[items[idx],items[other]]=[items[other],items[idx]];if(store())render();}
+let editing=null;
+function openEditor(id){const item=items.find(i=>i.id===id);editing=item?item.id:null;$('ll25Form').reset();$('ll25EditorTitle').textContent=item?'✏️ Modifica articolo':'＋ Nuovo articolo';const values={ll25Category:item?.category||categories[0],ll25Name:item?.name||'',ll25Brand:item?.brand||'',ll25Qty:item?.qty??1,ll25Location:item?.location||'Non specificato',ll25Details:item?.details||'',ll25Use:item?.use||'',ll25Notes:item?.notes||''};for(const [k,v] of Object.entries(values)){$(k).value=v;if(k==='ll25Category'&&$(k).value!==v)$(k).add(new Option(v,v,true,true));}$('ll25Editor').hidden=false;$('ll25Editor').scrollIntoView({behavior:'smooth',block:'start'});$('ll25Name').focus();}
+$('ll25New').onclick=()=>openEditor(null);$('ll25Cancel').onclick=()=>{$('ll25Editor').hidden=true;};$('ll25Filter').onchange=render;$('ll25Search').oninput=render;
+$('ll25Form').onsubmit=e=>{e.preventDefault();const name=$('ll25Name').value.trim(),qty=Number($('ll25Qty').value);if(!name||!Number.isInteger(qty)||qty<0){alert('Inserisci nome e quantità valida.');return;}const data={category:$('ll25Category').value,name,brand:$('ll25Brand').value.trim(),qty,location:$('ll25Location').value,details:$('ll25Details').value.trim(),use:$('ll25Use').value.trim(),notes:$('ll25Notes').value.trim()};const idx=items.findIndex(i=>i.id===editing);if(idx>=0)items[idx]={...items[idx],...data};else items.push({id:uuid(),...data});if(store()){$('ll25Editor').hidden=true;render();$('ll25List').scrollIntoView({behavior:'smooth'});}};
+$('ll25Export').onclick=()=>{const backup={app:'Lady Lola',version:'2.5',type:'fishing-inventory',exportedAt:new Date().toISOString(),items};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='lady-lola-attrezzatura-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);};
+$('ll25Import').onclick=()=>$('ll25File').click();$('ll25File').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>2000000)throw Error('File troppo grande');const data=JSON.parse(await f.text());if(data.type!=='fishing-inventory'||!Array.isArray(data.items)||data.items.length>10000||!data.items.every(i=>i&&typeof i.name==='string'&&i.name.length<=160&&typeof i.category==='string'&&i.category.length<=100))throw Error('Formato backup non valido');if(!confirm('Importare '+data.items.length+' articoli? L’inventario attuale verrà sostituito. Esporta prima un backup.'))return;const old=items;items=data.items.map(i=>({id:uuid(),category:i.category,name:i.name,brand:String(i.brand||''),qty:Number.isInteger(i.qty)&&i.qty>=0?i.qty:1,location:String(i.location||'Non specificato'),details:String(i.details||''),use:String(i.use||''),notes:String(i.notes||'')}));if(!store()){items=old;return;}render();alert('Inventario importato.');}catch(err){alert('Importazione non riuscita: '+err.message);}finally{e.target.value='';}};
+render();
 })();
 </script>
 </body>
