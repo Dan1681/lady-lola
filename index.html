@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 2.5 - Boat Manager</title>
+<title>Lady Lola 2.6 - Boat Manager</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -42,7 +42,7 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 <body>
 <header>
 <h1>🚤 Lady Lola</h1>
-<p>Boat Manager · v2.5 · Bluline 19 Open</p>
+<p>Boat Manager · v2.6 · Bluline 19 Open</p>
 </header>
 <nav id="menu">
 <button class="active" data-page="home">🏠 Home</button>
@@ -58,7 +58,7 @@ label{display:block;margin:12px 0 6px;color:#c9e3ef;font-size:13px;font-weight:6
 <div class="card ll-hero"><div class="ll-eyebrow">⚓ Nautical Command Center</div><h2>Benvenuto a bordo di Lady Lola</h2><p>La tua Bluline 19 Open, sempre sotto controllo.</p><div class="ll-chips"><span class="ll-chip">🚤 Bluline 19 Open · 2022</span><span class="ll-chip">⚙️ Mercury F40 Pro · 2022</span><span class="ll-chip">📍 Nautilus Capitana</span></div></div>
 <div class="ll-grid">
 <div class="card"><div class="ll-weather-head"><h2>🌊 Meteo a colpo d'occhio</h2><select id="llHomeZone" aria-label="Zona meteo home"><option value="foxi">Foxi</option><option value="capitana">Capitana</option><option value="torre" selected>Torre delle Stelle</option></select></div><p id="llHomeWhen" class="muted">Previsioni orarie Open-Meteo · oggi</p><div class="ll-weather-grid"><div class="ll-metric"><span>🌬 Vento</span><strong id="llHomeWind">-- kn</strong></div><div class="ll-metric"><span>💨 Raffiche</span><strong id="llHomeGust">-- kn</strong></div><div class="ll-metric"><span>🌊 Onde</span><strong id="llHomeWave">-- m</strong></div></div><p id="llHomeWindFrom" class="ll-wind-from">🧭 Direzione vento: dati non caricati</p><p id="llHomeVerdict" class="ll-status" data-level="none">Dati non caricati</p><button class="primary" id="llHomeRefresh" type="button">↻ Aggiorna meteo</button><p class="ll-note">Valutazione indicativa: non è un via libera alla navigazione. Controlla avvisi e condizioni reali.</p></div>
-<div class="card"><h2>🧭 Accessi rapidi</h2><div class="ll-quick"><button type="button" data-go="planner"><span class="ll-ico">⚓</span>Pianifica</button><button type="button" data-go="dashboard"><span class="ll-ico">📊</span>Dashboard</button><button type="button" data-go="fuel"><span class="ll-ico">⛽</span>Carburante</button><button type="button" data-go="fishing"><span class="ll-ico">🎣</span>Pesca</button></div><p class="muted">Apri una funzione con un tocco.</p></div>
+<div class="card"><h2>🧭 Accessi rapidi</h2><div class="ll-quick"><button type="button" data-go="planner"><span class="ll-ico">⚓</span>Pianifica</button><button type="button" data-go="meteo" data-ll26-tab="compare"><span class="ll-ico">🌤</span>Confronta zone</button><button type="button" data-go="fuel"><span class="ll-ico">⛽</span>Carburante</button><button type="button" data-go="fishing"><span class="ll-ico">🎣</span>Pesca</button></div><p class="muted">Apri una funzione con un tocco.</p><div class="ll26-extra"><button type="button" data-go="gear">🎣 Attrezzatura</button><button type="button" data-go="maintenance">🔧 Motore</button><button type="button" data-go="checklist">✅ Checklist</button><button type="button" data-go="more">☰ Altre funzioni</button></div></div>
 </div>
 <div class="ll-grid" style="margin-top:16px"><div class="card"><h2>🚤 La mia barca</h2><div class="row"><span>Modello</span><b>Bluline 19 Open</b></div><div class="row"><span>Motore</span><b>Mercury F40 Pro</b></div><div class="row"><span>Serbatoio principale</span><b>30 L</b></div><div class="row"><span>Secondario</span><b>13 L</b></div><div class="row"><span>Tanica a bordo</span><b>10 L</b></div><div class="row"><span>Tanica per rifornimento</span><b>20 L</b></div><div class="row"><span>Consumo di riferimento</span><b>12 L/h a 26 kn</b></div></div>
 <div class="card"><h2>📋 Attività a bordo</h2><div class="row"><span>Controlli checklist</span><b id="llHomeChecks">--</b></div><div class="row"><span>Interventi registrati</span><b id="llHomeMaint">--</b></div><div class="row"><span>Uscite di pesca registrate</span><b id="llHomeFishing">--</b></div><div class="row"><span>Zone preferite</span><b id="llHomeFav">--</b></div><p class="muted">I dati sono salvati sul dispositivo in uso.</p><button type="button" data-go="checklist">Apri checklist</button></div></div>
@@ -153,7 +153,7 @@ e situazione reale prima di navigare.
 <label>Tecnica / utilizzo<textarea id="ll25Use" rows="2" placeholder="Traina, spinning, jigging..."></textarea></label>
 <label>Note<textarea id="ll25Notes" rows="2" placeholder="Altre informazioni"></textarea></label>
 <div class="ll25-toolbar"><button class="primary" type="submit">💾 Salva articolo</button><button id="ll25Cancel" type="button">Annulla</button></div></form></div>
-<div class="card"><h3>🧰 Dotazioni già presenti a bordo</h3><p class="muted">Manteniamo anche la lista originale per non perdere eventuali modifiche. Puoi continuare a gestirla qui.</p><div id="gearList"></div><label>Aggiungi dotazione alla lista originale<input id="newGear" placeholder="Nome accessorio"></label><button type="button" onclick="addGear()">Aggiungi alla lista originale</button></div>
+<div class="card"><h3>🧰 Dotazioni già presenti nella vecchia app</h3><p class="muted">Manteniamo anche la lista originale per non perdere eventuali modifiche. Puoi continuare a gestirla qui.</p><div id="gearList"></div><label>Aggiungi dotazione alla lista originale<input id="newGear" placeholder="Nome accessorio"></label><button type="button" onclick="addGear()">Aggiungi alla lista originale</button></div>
 </section>
 
 <section id="fishing">
@@ -1287,6 +1287,7 @@ più favorevoli per Lady Lola.</p>
 <option value="6">6 ore</option>
 </select>
 
+<div class="ll26-route"><label for="ll26Speed">Velocità di navigazione (nodi)</label><input id="ll26Speed" type="number" min="0.5" max="60" step="0.5" value="20"><div id="ll26RouteSummary" class="ll26-summary" aria-live="polite">Seleziona partenza e destinazione.</div></div>
 <button class="primary" id="pAnalyze">
 🌊 Analizza le fasce orarie
 </button>
@@ -1637,9 +1638,7 @@ async function () {
 "use strict";
 const nav=document.getElementById("menu");
 const entries=[
-  ["home","⌂","Home"],["meteo","🌤","Meteo"],
-  ["dashboard","📊","Dashboard"],["planner","⚓","Pianifica"],
-  ["more","☰","Altro"]
+  ["home","⌂","Home"],["meteo","🌤","Meteo"],["planner","⚓","Pianifica"]
 ];
 // Le vecchie funzioni rimangono intatte; sostituiamo soltanto la navigazione.
 nav.replaceChildren();
@@ -1654,18 +1653,18 @@ function go(id){
  document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
  section.classList.add("active");
  nav.querySelectorAll("button").forEach(b=>{
-  const selected=b.dataset.page===(entries.some(e=>e[0]===id)?id:"more");
+  const selected=b.dataset.page===(entries.some(e=>e[0]===id)?id:"home");
   b.classList.toggle("active",selected);
   if(selected)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
  });
  if(id==="home")refreshHomeStats();
- if(id==="dashboard"){
+ if(id==="meteo"){
    // Il modulo 1.3 avvia il refresh dal suo pulsante originale.
-   document.getElementById("ll13Refresh")?.click();
+   if(window.ll26OpenMeteoTab)window.ll26OpenMeteoTab("forecast");
  }
  window.scrollTo({top:0,behavior:"instant"});
 }
-document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{go(b.dataset.go);if(b.dataset.ll26Tab&&window.ll26OpenMeteoTab)window.ll26OpenMeteoTab(b.dataset.ll26Tab);}));
 function refreshHomeStats(){
  try{
   const checks=load("checks",{});
@@ -1860,6 +1859,48 @@ $('ll25Form').onsubmit=e=>{e.preventDefault();const name=$('ll25Name').value.tri
 $('ll25Export').onclick=()=>{const backup={app:'Lady Lola',version:'2.5',type:'fishing-inventory',exportedAt:new Date().toISOString(),items};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='lady-lola-attrezzatura-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);};
 $('ll25Import').onclick=()=>$('ll25File').click();$('ll25File').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>2000000)throw Error('File troppo grande');const data=JSON.parse(await f.text());if(data.type!=='fishing-inventory'||!Array.isArray(data.items)||data.items.length>10000||!data.items.every(i=>i&&typeof i.name==='string'&&i.name.length<=160&&typeof i.category==='string'&&i.category.length<=100))throw Error('Formato backup non valido');if(!confirm('Importare '+data.items.length+' articoli? L’inventario attuale verrà sostituito. Esporta prima un backup.'))return;const old=items;items=data.items.map(i=>({id:uuid(),category:i.category,name:i.name,brand:String(i.brand||''),qty:Number.isInteger(i.qty)&&i.qty>=0?i.qty:1,location:String(i.location||'Non specificato'),details:String(i.details||''),use:String(i.use||''),notes:String(i.notes||'')}));if(!store()){items=old;return;}render();alert('Inventario importato.');}catch(err){alert('Importazione non riuscita: '+err.message);}finally{e.target.value='';}};
 render();
+})();
+</script>
+<style id="ll26-style">
+#menu{justify-content:space-around}#menu button{flex:1 1 0;max-width:300px;font-size:14px}
+.ll26-tabs{display:flex;gap:9px;margin:0 0 15px}.ll26-tabs button{flex:1}.ll26-tabs button.active{background:#185b71;border-color:#65dce8;color:#fff}
+.ll26-extra{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:15px}.ll26-extra button{text-align:left;font-size:13px}
+.ll26-summary{margin:12px 0;padding:14px;border:1px solid #42677b;border-radius:12px;background:#17394b;white-space:pre-line}
+.ll26-route{margin-top:12px}#ll26Compare[hidden],#ll26Forecast[hidden]{display:none!important}
+@media(max-width:600px){#menu button{font-size:13px}.ll26-tabs button{font-size:13px;padding:9px 5px}}
+</style>
+<script id="ll26-reorganization">
+(function(){
+'use strict';
+const meteo=document.getElementById('meteo'), dashboard=document.getElementById('dashboard');
+if(!meteo||!dashboard)return;
+const tabs=document.createElement('div');tabs.className='ll26-tabs';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Visualizzazione meteo');
+const forecastBtn=document.createElement('button'), compareBtn=document.createElement('button');
+forecastBtn.type=compareBtn.type='button';forecastBtn.textContent='🌤 Previsioni dettagliate';compareBtn.textContent='📊 Confronta preferiti';
+tabs.append(forecastBtn,compareBtn);
+const forecast=document.createElement('div');forecast.id='ll26Forecast';
+while(meteo.firstChild)forecast.append(meteo.firstChild);
+const compare=document.createElement('div');compare.id='ll26Compare';
+while(dashboard.firstChild)compare.append(dashboard.firstChild);
+meteo.append(tabs,forecast,compare);
+function openTab(which){const isCompare=which==='compare';forecast.hidden=isCompare;compare.hidden=!isCompare;forecastBtn.classList.toggle('active',!isCompare);compareBtn.classList.toggle('active',isCompare);forecastBtn.setAttribute('aria-pressed',String(!isCompare));compareBtn.setAttribute('aria-pressed',String(isCompare));if(isCompare)document.getElementById('ll13Refresh')?.click();}
+window.ll26OpenMeteoTab=openTab;
+forecastBtn.addEventListener('click',()=>openTab('forecast'));compareBtn.addEventListener('click',()=>openTab('compare'));
+openTab('forecast');
+// Tutti gli strumenti secondari sono raggiungibili dalla Home.
+const home=document.getElementById('home');
+const tools=document.createElement('div');tools.className='card';tools.innerHTML='<h2>🧰 Strumenti di bordo</h2><div class="ll26-extra"><button type="button" data-go="fuel">⛽ Carburante</button><button type="button" data-go="maintenance">🔧 Manutenzione</button><button type="button" data-go="gear">🎣 Attrezzatura & Pesca</button><button type="button" data-go="fishing">🐟 Diario di pesca</button><button type="button" data-go="checklist">✅ Checklist</button></div>';
+home.append(tools);
+// La navigazione originaria è racchiusa in un modulo: attiviamo i nuovi accessi in modo indipendente.
+function showTool(id){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));section.classList.add('active');document.querySelectorAll('#menu button').forEach(b=>{b.classList.toggle('active',b.dataset.page==='home');});window.scrollTo(0,0);}
+tools.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showTool(b.dataset.go)));
+// Riepilogo distanza geodetica: non sostituisce una rotta navigabile.
+const start=document.getElementById('pStart'),end=document.getElementById('pEnd'),speed=document.getElementById('ll26Speed'),out=document.getElementById('ll26RouteSummary');
+function distance(a,b){const rad=Math.PI/180,R=3440.065,dLat=(b.lat-a.lat)*rad,dLon=(b.lon-a.lon)*rad;const q=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(q)));}
+function updateRoute(){if(!start||!end||!speed||!out)return;const a=marineZones[start.value],b=marineZones[end.value],v=Number(speed.value);if(!a||!b){out.textContent='Seleziona due località valide.';return;}const nm=distance(a,b);if(!Number.isFinite(v)||v<=0){out.textContent='Inserisci una velocità valida in nodi.';return;}const minutes=nm/v*60;out.textContent='📏 Distanza in linea d’aria: '+nm.toFixed(1)+' MN\n⏱ Tempo teorico di sola andata: '+Math.floor(minutes/60)+' h '+Math.round(minutes%60)+' min a '+v.toFixed(1)+' kn\n⚠️ Non è una rotta navigabile: coste, ostacoli e restrizioni possono aumentare distanza e durata.';}
+[start,end,speed].forEach(el=>el?.addEventListener('change',updateRoute));
+start?.addEventListener('input',updateRoute);end?.addEventListener('input',updateRoute);speed?.addEventListener('input',updateRoute);
+updateRoute();
 })();
 </script>
 </body>
