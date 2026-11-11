@@ -2240,6 +2240,18 @@ function apply(){
   if(stamp&&bulletin.issued_at){const d=new Date(bulletin.issued_at);if(Number.isFinite(d.getTime())){const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);stamp.value=local.toISOString().slice(0,16);}}
   status.textContent='ARPAS '+x.zone+' · '+x.date+' '+x.slot+' · Hx '+x.hx_m+' m · periodo '+x.period_s+' s · direzione '+x.direction+' · '+x.sea_state+'. Premi «Analizza le condizioni»; il vento resta da verificare.';
  };
+ // Se si seleziona una zona marina, visualizza subito la prima fascia disponibile.
+ // Non richiede GPS né punti di pesca.
+ if(records.length){
+   choice.value='0';
+   choice.dispatchEvent(new Event('change'));
+ }else{
+   const field=document.querySelector('[data-source="arpas"][data-metric="wave"]');
+   const stamp=document.querySelector('[data-source="arpas"][data-metric="time"]');
+   if(field)field.value='';
+   if(stamp)stamp.value='';
+   status.textContent='Nessuna previsione ARPAS disponibile per '+zone.options[zone.selectedIndex].textContent+'.';
+ }
 }
 async function load(){
  status.textContent='Recupero bollettino ARPAS…';
@@ -2250,7 +2262,7 @@ async function load(){
   if(!data.issued_at||!Array.isArray(data.forecasts)||!data.forecasts.length)throw Error('bollettino non ancora generato');
   const issued=new Date(data.issued_at),age=(Date.now()-issued.getTime())/3600000;
   if(!Number.isFinite(age)||age< -2||age>30)throw Error('bollettino non aggiornato ('+Math.round(age)+' ore)');
-  bulletin=data;apply();status.textContent='Bollettino ARPAS emesso '+issued.toLocaleString('it-IT')+'. Seleziona zona e fascia oraria.';
+  bulletin=data;apply();if(!bulletin.forecasts.some(x=>x.zone===zone.value))status.textContent='Bollettino ARPAS emesso '+issued.toLocaleString('it-IT')+'; nessuna fascia per la zona selezionata.';
  }catch(e){bulletin=null;apply();status.textContent='⚠️ ARPAS non disponibile: '+e.message+'. Nessun dato automatico utilizzabile. Controlla GitHub Actions.';}
 }
 zone.addEventListener('change',()=>{apply();const z=document.getElementById('ll321ZoneStatus');if(z)z.textContent='Zona scelta manualmente: '+zone.options[zone.selectedIndex].textContent+'. Seleziona la fascia oraria per visualizzare le previsioni.';try{localStorage.setItem('ll_arpas_manual_zone',zone.value)}catch(e){}});try{const saved=localStorage.getItem('ll_arpas_manual_zone');if(saved&&[...zone.options].some(o=>o.value===saved))zone.value=saved;}catch(e){}$('ll31Update').addEventListener('click',load);load();
@@ -2413,7 +2425,7 @@ temp.innerHTML=`
 <div class="ll33-metric"><small>🌊 Mare · Open-Meteo</small><b id="ll33Sea">— °C</b></div>
 </div>
 <button type="button" id="ll33FetchTemp" class="primary" style="margin-top:12px">↻ Aggiorna temperature</button>
-<p id="ll33TempStatus" class="ll33-note" role="status">Scegli un punto pesca o usa il GPS per ottenere le temperature locali. Senza una posizione scelta, non viene richiesta alcuna previsione.</p>`;
+<p id="ll33TempStatus" class="ll33-note" role="status">Le 7 zone ARPAS aggiornano il bollettino marino senza GPS. Le temperature Open-Meteo richiedono invece una località con coordinate (GPS o punto pesca).</p>`;
 forecast.append(temp);
 move(verdict,'#ll30Evaluate');move(verdict,'#ll30Clear');move(verdict,'#ll30Verdict');
 const thresholds=weather.querySelector('.ll30-actions')?.nextElementSibling;
