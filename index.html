@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 3.2 - Meteo Marino & Fishing</title>
+<title>Lady Lola 3.2.1 - iPhone Navigation Fix</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -136,6 +136,33 @@ button:active:not(:disabled){transform:translateY(1px)}
 </style>
 <style id="ll30-style">
 .ll30-cols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:16px}.ll30-cols>.card{align-self:start}.ll30-head{border-color:#33758a}.ll30-warning{padding:12px 14px;border-left:4px solid #e6b96c;background:#302d29;border-radius:8px;color:#ffe4ac}.ll30-source{background:#0b2436;border:1px solid #31566c;border-radius:14px;padding:15px;margin:12px 0}.ll30-source h3{margin:0 0 4px}.ll30-source a{font-size:13px}.ll30-inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.ll30-inputs label{min-width:0;font-size:12px}.ll30-inputs input{padding:9px 7px}.ll30-actions{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}.ll30-verdict{padding:16px;background:#0b2637;border:1px solid #42667a;border-radius:13px;white-space:pre-line;overflow-wrap:anywhere}.ll30-verdict.good{border-color:#45ad84}.ll30-verdict.warn{border-color:#d5a04b}.ll30-verdict.bad{border-color:#d46a75}.ll30-fish-info{padding:13px;background:#0b2637;border-radius:12px;margin:10px 0;white-space:pre-line;overflow-wrap:anywhere}.ll30-cols>.card:nth-child(2) .ll30-inputs{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:850px){.ll30-cols{grid-template-columns:1fr}}@media(max-width:420px){.ll30-inputs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<style id="ll32-ios-bottom-nav-fix">
+/* iOS Safari: keep primary navigation attached to the visual viewport bottom. */
+@media (max-width:700px) {
+  html,body {overflow-x:clip;}
+  #menu {
+    position:fixed!important;
+    top:auto!important;
+    bottom:0!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    transform:none!important;
+    display:flex!important;
+    justify-content:space-around!important;
+    align-items:stretch!important;
+    padding:8px max(8px,env(safe-area-inset-right))
+      calc(8px + env(safe-area-inset-bottom))
+      max(8px,env(safe-area-inset-left))!important;
+    z-index:2147483000!important;
+    -webkit-transform:translateZ(0);
+  }
+  #menu button {flex:1 1 0!important;min-width:0!important;padding:9px 4px!important;font-size:12px!important;}
+  main {padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;}
+}
 </style>
 </head>
 <body>
