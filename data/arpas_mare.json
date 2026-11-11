@@ -1,1 +1,1409 @@
-{"source":"ARPAS Sardegna","source_url":"https://www.sar.sardegna.it/servizi/meteo/prevmare_new.asp","issued_at":null,"fetched_at":null,"note":"Nessun aggiornamento ancora eseguito: avvia GitHub Actions.","forecasts":[]}
+{
+  "source": "ARPAS Sardegna",
+  "source_url": "https://www.sar.sardegna.it/servizi/meteo/prevmare_new.asp",
+  "issued_at": "2026-11-11T08:01:42",
+  "fetched_at": "2026-11-11T09:50:02.355543+00:00",
+  "note": "Hx = altezza massima dell’onda, NON altezza significativa; zone marine ampie.",
+  "forecasts": [
+    {
+      "date": "2026-11-11",
+      "zone": "60 N",
+      "slot": "00:00-06:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.2,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 NW",
+      "slot": "00:00-06:00",
+      "hx_m": 1.2,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "61 NE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.4,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "62 W",
+      "slot": "00:00-06:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "63 SE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.1,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 S",
+      "slot": "00:00-06:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.6,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 SW",
+      "slot": "00:00-06:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 5.0,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 N",
+      "slot": "06:00-12:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.4,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 NW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.3,
+      "douglas": 4,
+      "period_s": 4.8,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "61 NE",
+      "slot": "06:00-12:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 4.0,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "62 W",
+      "slot": "06:00-12:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.8,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "63 SE",
+      "slot": "06:00-12:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 4.0,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 S",
+      "slot": "06:00-12:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 SW",
+      "slot": "06:00-12:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 5.1,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 N",
+      "slot": "12:00-18:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.6,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 NW",
+      "slot": "12:00-18:00",
+      "hx_m": 1.3,
+      "douglas": 4,
+      "period_s": 4.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "61 NE",
+      "slot": "12:00-18:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 3.9,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "62 W",
+      "slot": "12:00-18:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.7,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "63 SE",
+      "slot": "12:00-18:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 3.8,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 S",
+      "slot": "12:00-18:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 5.0,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 SW",
+      "slot": "12:00-18:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 N",
+      "slot": "18:00-24:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.8,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "60 NW",
+      "slot": "18:00-24:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "61 NE",
+      "slot": "18:00-24:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.1,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "62 W",
+      "slot": "18:00-24:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "63 SE",
+      "slot": "18:00-24:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 3.6,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 S",
+      "slot": "18:00-24:00",
+      "hx_m": 0.5,
+      "douglas": 2,
+      "period_s": 4.8,
+      "direction": "O",
+      "sea_state": "Poco mosso"
+    },
+    {
+      "date": "2026-11-11",
+      "zone": "64 SW",
+      "slot": "18:00-24:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 5.0,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 N",
+      "slot": "00:00-06:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 NW",
+      "slot": "00:00-06:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.6,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "61 NE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.6,
+      "douglas": 3,
+      "period_s": 3.9,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "62 W",
+      "slot": "00:00-06:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.3,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "63 SE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 3.7,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 S",
+      "slot": "00:00-06:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 3.9,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 SW",
+      "slot": "00:00-06:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.2,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 N",
+      "slot": "06:00-12:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 4.0,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 NW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 4.8,
+      "direction": "S",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "61 NE",
+      "slot": "06:00-12:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.4,
+      "direction": "SE",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "62 W",
+      "slot": "06:00-12:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 4.7,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "63 SE",
+      "slot": "06:00-12:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.4,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 S",
+      "slot": "06:00-12:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.2,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 SW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.4,
+      "douglas": 4,
+      "period_s": 4.6,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 N",
+      "slot": "12:00-18:00",
+      "hx_m": 2.0,
+      "douglas": 4,
+      "period_s": 5.3,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 NW",
+      "slot": "12:00-18:00",
+      "hx_m": 2.5,
+      "douglas": 4,
+      "period_s": 6.2,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "61 NE",
+      "slot": "12:00-18:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 5.1,
+      "direction": "S",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "62 W",
+      "slot": "12:00-18:00",
+      "hx_m": 2.7,
+      "douglas": 5,
+      "period_s": 6.7,
+      "direction": "SO",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "63 SE",
+      "slot": "12:00-18:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 4.9,
+      "direction": "S",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 S",
+      "slot": "12:00-18:00",
+      "hx_m": 2.0,
+      "douglas": 4,
+      "period_s": 5.2,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 SW",
+      "slot": "12:00-18:00",
+      "hx_m": 2.9,
+      "douglas": 5,
+      "period_s": 6.7,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 N",
+      "slot": "18:00-24:00",
+      "hx_m": 2.4,
+      "douglas": 4,
+      "period_s": 6.4,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "60 NW",
+      "slot": "18:00-24:00",
+      "hx_m": 3.2,
+      "douglas": 5,
+      "period_s": 7.8,
+      "direction": "SO",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "61 NE",
+      "slot": "18:00-24:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 5.6,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "62 W",
+      "slot": "18:00-24:00",
+      "hx_m": 3.5,
+      "douglas": 5,
+      "period_s": 8.2,
+      "direction": "SO",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "63 SE",
+      "slot": "18:00-24:00",
+      "hx_m": 2.1,
+      "douglas": 4,
+      "period_s": 5.7,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 S",
+      "slot": "18:00-24:00",
+      "hx_m": 2.9,
+      "douglas": 5,
+      "period_s": 7.2,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-12",
+      "zone": "64 SW",
+      "slot": "18:00-24:00",
+      "hx_m": 3.6,
+      "douglas": 5,
+      "period_s": 8.2,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 N",
+      "slot": "00:00-06:00",
+      "hx_m": 2.3,
+      "douglas": 4,
+      "period_s": 7.3,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 NW",
+      "slot": "00:00-06:00",
+      "hx_m": 3.3,
+      "douglas": 5,
+      "period_s": 8.3,
+      "direction": "SO",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "61 NE",
+      "slot": "00:00-06:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 5.4,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "62 W",
+      "slot": "00:00-06:00",
+      "hx_m": 3.6,
+      "douglas": 5,
+      "period_s": 8.2,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "63 SE",
+      "slot": "00:00-06:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 5.8,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 S",
+      "slot": "00:00-06:00",
+      "hx_m": 3.2,
+      "douglas": 5,
+      "period_s": 8.1,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 SW",
+      "slot": "00:00-06:00",
+      "hx_m": 3.6,
+      "douglas": 5,
+      "period_s": 8.3,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 N",
+      "slot": "06:00-12:00",
+      "hx_m": 2.7,
+      "douglas": 5,
+      "period_s": 7.1,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 NW",
+      "slot": "06:00-12:00",
+      "hx_m": 3.5,
+      "douglas": 5,
+      "period_s": 7.8,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "61 NE",
+      "slot": "06:00-12:00",
+      "hx_m": 1.4,
+      "douglas": 4,
+      "period_s": 5.0,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "62 W",
+      "slot": "06:00-12:00",
+      "hx_m": 3.4,
+      "douglas": 5,
+      "period_s": 8.0,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "63 SE",
+      "slot": "06:00-12:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 5.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 S",
+      "slot": "06:00-12:00",
+      "hx_m": 3.2,
+      "douglas": 5,
+      "period_s": 8.1,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 SW",
+      "slot": "06:00-12:00",
+      "hx_m": 3.5,
+      "douglas": 5,
+      "period_s": 8.1,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 N",
+      "slot": "12:00-18:00",
+      "hx_m": 2.6,
+      "douglas": 5,
+      "period_s": 6.9,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 NW",
+      "slot": "12:00-18:00",
+      "hx_m": 3.1,
+      "douglas": 5,
+      "period_s": 7.9,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "61 NE",
+      "slot": "12:00-18:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 5.0,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "62 W",
+      "slot": "12:00-18:00",
+      "hx_m": 3.2,
+      "douglas": 5,
+      "period_s": 8.0,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "63 SE",
+      "slot": "12:00-18:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 6.0,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 S",
+      "slot": "12:00-18:00",
+      "hx_m": 3.1,
+      "douglas": 5,
+      "period_s": 8.0,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 SW",
+      "slot": "12:00-18:00",
+      "hx_m": 3.3,
+      "douglas": 5,
+      "period_s": 8.0,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 N",
+      "slot": "18:00-24:00",
+      "hx_m": 2.4,
+      "douglas": 4,
+      "period_s": 7.0,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "60 NW",
+      "slot": "18:00-24:00",
+      "hx_m": 2.9,
+      "douglas": 5,
+      "period_s": 7.7,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "61 NE",
+      "slot": "18:00-24:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 4.9,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "62 W",
+      "slot": "18:00-24:00",
+      "hx_m": 2.8,
+      "douglas": 5,
+      "period_s": 7.9,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "63 SE",
+      "slot": "18:00-24:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 6.1,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 S",
+      "slot": "18:00-24:00",
+      "hx_m": 2.7,
+      "douglas": 5,
+      "period_s": 7.8,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-13",
+      "zone": "64 SW",
+      "slot": "18:00-24:00",
+      "hx_m": 2.9,
+      "douglas": 5,
+      "period_s": 7.9,
+      "direction": "O",
+      "sea_state": "Agitato"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 N",
+      "slot": "00:00-06:00",
+      "hx_m": 2.1,
+      "douglas": 4,
+      "period_s": 7.1,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 NW",
+      "slot": "00:00-06:00",
+      "hx_m": 2.4,
+      "douglas": 4,
+      "period_s": 7.5,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "61 NE",
+      "slot": "00:00-06:00",
+      "hx_m": 1.3,
+      "douglas": 4,
+      "period_s": 4.6,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "62 W",
+      "slot": "00:00-06:00",
+      "hx_m": 2.4,
+      "douglas": 4,
+      "period_s": 7.6,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "63 SE",
+      "slot": "00:00-06:00",
+      "hx_m": 1.2,
+      "douglas": 3,
+      "period_s": 5.8,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 S",
+      "slot": "00:00-06:00",
+      "hx_m": 2.2,
+      "douglas": 4,
+      "period_s": 7.6,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 SW",
+      "slot": "00:00-06:00",
+      "hx_m": 2.4,
+      "douglas": 4,
+      "period_s": 7.5,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 N",
+      "slot": "06:00-12:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 7.0,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 NW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.9,
+      "douglas": 4,
+      "period_s": 7.3,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "61 NE",
+      "slot": "06:00-12:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.4,
+      "direction": "N",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "62 W",
+      "slot": "06:00-12:00",
+      "hx_m": 1.9,
+      "douglas": 4,
+      "period_s": 7.3,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "63 SE",
+      "slot": "06:00-12:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 5.4,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 S",
+      "slot": "06:00-12:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 7.5,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 SW",
+      "slot": "06:00-12:00",
+      "hx_m": 2.0,
+      "douglas": 4,
+      "period_s": 7.3,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 N",
+      "slot": "12:00-18:00",
+      "hx_m": 1.2,
+      "douglas": 3,
+      "period_s": 6.2,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 NW",
+      "slot": "12:00-18:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 6.8,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "61 NE",
+      "slot": "12:00-18:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.2,
+      "direction": "N",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "62 W",
+      "slot": "12:00-18:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 6.9,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "63 SE",
+      "slot": "12:00-18:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 5.1,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 S",
+      "slot": "12:00-18:00",
+      "hx_m": 1.4,
+      "douglas": 4,
+      "period_s": 7.0,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 SW",
+      "slot": "12:00-18:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 6.9,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 N",
+      "slot": "18:00-24:00",
+      "hx_m": 1.2,
+      "douglas": 3,
+      "period_s": 4.9,
+      "direction": "E",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "60 NW",
+      "slot": "18:00-24:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 5.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "61 NE",
+      "slot": "18:00-24:00",
+      "hx_m": 0.5,
+      "douglas": 2,
+      "period_s": 3.9,
+      "direction": "NE",
+      "sea_state": "Poco mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "62 W",
+      "slot": "18:00-24:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 6.2,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "63 SE",
+      "slot": "18:00-24:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 4.5,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 S",
+      "slot": "18:00-24:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 6.5,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-14",
+      "zone": "64 SW",
+      "slot": "18:00-24:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 6.4,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 N",
+      "slot": "00:00-06:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 5.0,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 NW",
+      "slot": "00:00-06:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 5.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "61 NE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.5,
+      "douglas": 2,
+      "period_s": 3.3,
+      "direction": "E",
+      "sea_state": "Poco mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "62 W",
+      "slot": "00:00-06:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 6.1,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "63 SE",
+      "slot": "00:00-06:00",
+      "hx_m": 0.8,
+      "douglas": 3,
+      "period_s": 4.5,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 S",
+      "slot": "00:00-06:00",
+      "hx_m": 1.4,
+      "douglas": 4,
+      "period_s": 6.4,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 SW",
+      "slot": "00:00-06:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 6.3,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 N",
+      "slot": "06:00-12:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 5.0,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 NW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 5.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "61 NE",
+      "slot": "06:00-12:00",
+      "hx_m": 0.5,
+      "douglas": 2,
+      "period_s": 3.1,
+      "direction": "S",
+      "sea_state": "Poco mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "62 W",
+      "slot": "06:00-12:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 5.8,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "63 SE",
+      "slot": "06:00-12:00",
+      "hx_m": 0.9,
+      "douglas": 3,
+      "period_s": 4.3,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 S",
+      "slot": "06:00-12:00",
+      "hx_m": 1.4,
+      "douglas": 4,
+      "period_s": 5.8,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 SW",
+      "slot": "06:00-12:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 5.8,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 N",
+      "slot": "12:00-18:00",
+      "hx_m": 1.6,
+      "douglas": 4,
+      "period_s": 4.9,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 NW",
+      "slot": "12:00-18:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 5.7,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "61 NE",
+      "slot": "12:00-18:00",
+      "hx_m": 0.7,
+      "douglas": 3,
+      "period_s": 3.5,
+      "direction": "S",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "62 W",
+      "slot": "12:00-18:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 5.8,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "63 SE",
+      "slot": "12:00-18:00",
+      "hx_m": 1.1,
+      "douglas": 3,
+      "period_s": 4.3,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 S",
+      "slot": "12:00-18:00",
+      "hx_m": 1.2,
+      "douglas": 3,
+      "period_s": 5.6,
+      "direction": "O",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 SW",
+      "slot": "12:00-18:00",
+      "hx_m": 1.8,
+      "douglas": 4,
+      "period_s": 5.9,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 N",
+      "slot": "18:00-24:00",
+      "hx_m": 1.5,
+      "douglas": 4,
+      "period_s": 5.2,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "60 NW",
+      "slot": "18:00-24:00",
+      "hx_m": 2.0,
+      "douglas": 4,
+      "period_s": 6.3,
+      "direction": "SO",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "61 NE",
+      "slot": "18:00-24:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.0,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "62 W",
+      "slot": "18:00-24:00",
+      "hx_m": 1.9,
+      "douglas": 4,
+      "period_s": 6.2,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "63 SE",
+      "slot": "18:00-24:00",
+      "hx_m": 1.0,
+      "douglas": 3,
+      "period_s": 4.3,
+      "direction": "SO",
+      "sea_state": "Mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 S",
+      "slot": "18:00-24:00",
+      "hx_m": 1.3,
+      "douglas": 4,
+      "period_s": 6.0,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    },
+    {
+      "date": "2026-11-15",
+      "zone": "64 SW",
+      "slot": "18:00-24:00",
+      "hx_m": 1.7,
+      "douglas": 4,
+      "period_s": 6.1,
+      "direction": "O",
+      "sea_state": "Molto mosso"
+    }
+  ]
+}
