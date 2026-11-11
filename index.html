@@ -2477,5 +2477,37 @@ const shortcuts=[...document.querySelectorAll('#home .ll-quick button')];
 shortcuts.forEach(b=>{if(b.textContent.includes('Meteo & Pesca 3.1'))b.innerHTML='<span class="ll-ico">🛡️</span>Meteo & Pesca 3.3';});
 })();
 </script>
+
+<style id="ll332-date-style">
+#ll30advisor .ll33-date-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#ll30advisor .ll33-date-grid input{display:block!important;width:100%!important;min-width:0!important;min-height:52px!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;position:relative!important;z-index:2!important;color-scheme:dark;font-size:16px!important;-webkit-appearance:auto!important;appearance:auto!important}
+#ll30advisor .ll33-date-grid label{display:block;min-width:0}
+#ll30advisor .ll33-date-grid input::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer}
+#ll30advisor .ll33-original-date{display:none!important}
+@media(max-width:400px){#ll30advisor .ll33-date-grid{grid-template-columns:1fr}}
+</style>
+<script id="ll332-date-fix">
+(function(){
+const page=document.getElementById('ll30advisor');if(!page)return;
+const when=[...page.querySelectorAll('.ll33-step')].find(el=>el.querySelector('h2')?.textContent.includes('Quando vuoi uscire'));
+if(!when)return;
+const original=document.getElementById('ll30When'),trip=document.getElementById('ll32TripTime');
+if(!original||!trip)return;
+// Separate native date and time controls avoid unreliable datetime-local interaction on some iPhones.
+const grid=document.createElement('div');grid.className='ll33-date-grid';
+const dateLabel=document.createElement('label');dateLabel.textContent='📅 Data dell’uscita';
+const date=document.createElement('input');date.type='date';date.id='ll332Date';date.setAttribute('aria-label','Data dell’uscita');dateLabel.append(date);
+const timeLabel=document.createElement('label');timeLabel.textContent='🕒 Ora di partenza';
+const time=document.createElement('input');time.type='time';time.id='ll332Time';time.step=60;time.setAttribute('aria-label','Ora di partenza');timeLabel.append(time);
+grid.append(dateLabel,timeLabel);
+when.insertBefore(grid,when.firstElementChild.nextElementSibling);
+for(const old of [original,trip]){old.classList.add('ll33-original-date');const label=when.querySelector('label[for="'+old.id+'"]');if(label)label.classList.add('ll33-original-date');}
+const status=document.createElement('p');status.className='ll33-note';status.id='ll332DateStatus';status.setAttribute('role','status');grid.after(status);
+function fromOriginal(){const v=trip.value||original.value;if(v&&v.includes('T')){date.value=v.split('T')[0];time.value=v.split('T')[1].slice(0,5);}}
+function update(){if(!date.value||!time.value){status.textContent='Seleziona data e ora per cercare la fascia ARPAS.';return;}const v=date.value+'T'+time.value;original.value=v;trip.value=v;original.dispatchEvent(new Event('change',{bubbles:true}));trip.dispatchEvent(new Event('change',{bubbles:true}));status.textContent='Uscita prevista: '+date.value.split('-').reverse().join('/')+' alle '+time.value+' · ora locale.';}
+fromOriginal();if(!date.value){const d=new Date();date.value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');time.value='09:00';}
+date.addEventListener('change',update);date.addEventListener('input',update);time.addEventListener('change',update);time.addEventListener('input',update);update();
+})();
+</script>
 </body>
 </html>
