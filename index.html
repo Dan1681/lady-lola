@@ -2442,21 +2442,7 @@ const savedAir=localStorage.getItem('ll33_official_air'),savedSea=localStorage.g
 if(savedAir!==null)$('ll33OfficialAir').value=savedAir;
 if(savedSea!==null)$('ll33OfficialSea').value=savedSea;
 for(const [id,key] of [['ll33OfficialAir','ll33_official_air'],['ll33OfficialSea','ll33_official_sea']])$(id).addEventListener('change',()=>localStorage.setItem(key,$(id).value));
-function llZoneReference(){
- // Punti rappresentativi indicativi, NON poligoni ufficiali ARPAS.
- const refs={
- '64 S':[39.05,9.25,'Golfo di Cagliari'],
- '64 SW':[38.85,8.45,'mare sud-occidentale sardo'],
- '63 SE':[39.45,9.75,'mare sud-orientale sardo'],
- '62 W':[40.00,8.05,'mare occidentale sardo'],
- '61 NE':[40.75,9.95,'mare nord-orientale sardo'],
- '60 N':[41.15,9.45,'mare settentrionale sardo'],
- '60 NW':[40.85,8.10,'mare nord-occidentale sardo']
- };
- const key=document.getElementById('ll31Zone')?.value;
- const v=refs[key];
- return v?{lat:v[0],lon:v[1],label:'riferimento indicativo '+key+' · '+v[2]+' (Open-Meteo, non ARPAS)'}:null;
-}
+
 function position(){
  const mode=modeRadios.find(x=>x.checked)?.value;
  if(mode==='zone')return llZoneReference();
@@ -2556,6 +2542,23 @@ date.addEventListener('change',update);date.addEventListener('input',update);tim
 #ll30advisor .ll34-compact summary{cursor:pointer}
 @media(max-width:540px){#ll30advisor .ll34-controls{grid-template-columns:1fr}#ll30advisor .ll34-weather strong{font-size:1.1rem}}
 </style>
+<script id="ll347-zone-reference">
+function llZoneReference(){
+ // Punti rappresentativi indicativi, NON poligoni ufficiali ARPAS.
+ const refs={
+ '64 S':[39.05,9.25,'Golfo di Cagliari'],
+ '64 SW':[38.85,8.45,'mare sud-occidentale sardo'],
+ '63 SE':[39.45,9.75,'mare sud-orientale sardo'],
+ '62 W':[40.00,8.05,'mare occidentale sardo'],
+ '61 NE':[40.75,9.95,'mare nord-orientale sardo'],
+ '60 N':[41.15,9.45,'mare settentrionale sardo'],
+ '60 NW':[40.85,8.10,'mare nord-occidentale sardo']
+ };
+ const key=document.getElementById('ll31Zone')?.value;
+ const v=refs[key];
+ return v?{lat:v[0],lon:v[1],label:'riferimento indicativo '+key+' · '+v[2]+' (Open-Meteo, non ARPAS)'}:null;
+}
+</script>
 <script id="ll34-upgrade">
 (function(){
 'use strict';
@@ -2690,7 +2693,7 @@ $('ll34File').addEventListener('change',async e=>{
  }catch(err){$('ll34BackupStatus').textContent='Importazione non riuscita: '+err.message;}
 });
 const appHeader=document.querySelector('header');
-if(appHeader)appHeader.innerHTML=appHeader.innerHTML.replace(/v3\.3\.1|v2\.9|v3\.3\.2/g,'v3.4.7');
+if(appHeader)appHeader.innerHTML=appHeader.innerHTML.replace(/v3\.3\.1|v2\.9|v3\.3\.2/g,'v3.4.8');
 })();
 </script>
 <style id="ll344-css">
