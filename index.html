@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 3.1 - Meteo Marino & Fishing</title>
+<title>Lady Lola 3.2 - Meteo Marino & Fishing</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -293,10 +293,10 @@ e situazione reale prima di navigare.
 </section>
 
 <section id="ll30advisor">
-<div class="card ll30-head"><div class="ll-eyebrow">Lady Lola 3.1 · Meteo Marino & Fishing</div><h2>🧭 Pianifica un'uscita di pesca</h2><p>Confronta le previsioni che consulti su <b>ARPAS</b>, <b>Aeronautica Militare</b> e <b>iLMeteo.it</b>, poi scegli un punto di pesca. I dati delle onde ARPAS sono aggiornati automaticamente quando GitHub Actions è attivo; vento e altre fonti restano manuali.</p><p class="ll30-warning">⚠️ Il parere è un supporto prudenziale, non un bollettino ufficiale né un'autorizzazione a navigare. Verifica sempre avvisi, osservazioni reali, limiti e cartografia nautica.</p></div>
+<div class="card ll30-head"><div class="ll-eyebrow">Lady Lola 3.2 · Meteo Marino & Fishing</div><h2>🧭 Pianifica un'uscita di pesca</h2><p>Confronta le previsioni che consulti su <b>ARPAS</b>, <b>Aeronautica Militare</b> e <b>iLMeteo.it</b>, poi scegli un punto di pesca. I dati delle onde ARPAS sono aggiornati automaticamente quando GitHub Actions è attivo; vento e altre fonti restano manuali.</p><p class="ll30-warning">⚠️ Il parere è un supporto prudenziale, non un bollettino ufficiale né un'autorizzazione a navigare. Verifica sempre avvisi, osservazioni reali, limiti e cartografia nautica.</p></div>
 <div class="ll30-cols">
 <div class="card"><h2>🌊 Confronto delle tre fonti</h2><label for="ll30Zone">Zona / tratto di mare</label><input id="ll30Zone" value="Golfo di Cagliari – Torre delle Stelle" maxlength="120"><label for="ll30When">Data e ora previste dell'uscita</label><input type="datetime-local" id="ll30When"><p class="muted">Apri le fonti, controlla la stessa zona e fascia oraria e riporta qui i dati effettivamente disponibili. Lascia vuoto ciò che la fonte non pubblica.</p>
-<div class="ll30-source" id="ll31ArpasPanel"><h3>🌊 Bollettino ARPAS automatico</h3><label for="ll31Zone">Zona marina ARPAS</label><select id="ll31Zone"><option value="64 S">64 S · Sud Sardegna</option><option value="64 SW">64 SW · Sud-ovest</option><option value="63 SE">63 SE · Sud-est</option><option value="62 W">62 W · Ovest</option><option value="61 NE">61 NE · Nord-est</option><option value="60 N">60 N · Nord</option><option value="60 NW">60 NW · Nord-ovest</option></select><button type="button" id="ll31Update" class="primary">↻ Aggiorna ARPAS</button><div id="ll31Status" class="ll30-fish-info" role="status">In attesa del bollettino ARPAS…</div><label for="ll31Forecast">Fascia di previsione</label><select id="ll31Forecast"><option value="">Attendi il caricamento</option></select><p class="muted">ARPAS pubblica Hx (altezza <b>massima</b> dell’onda), non Hs. I valori di vento non sono forniti da questo bollettino. Il parere nautico resta prudenziale.</p></div><div class="ll30-sources">
+<div class="ll30-source" id="ll31ArpasPanel"><h3>🌊 Bollettino ARPAS automatico</h3><label for="ll31Zone">Zona marina ARPAS</label><select id="ll31Zone"><option value="64 S">64 S · Sud Sardegna</option><option value="64 SW">64 SW · Sud-ovest</option><option value="63 SE">63 SE · Sud-est</option><option value="62 W">62 W · Ovest</option><option value="61 NE">61 NE · Nord-est</option><option value="60 N">60 N · Nord</option><option value="60 NW">60 NW · Nord-ovest</option></select><button type="button" id="ll31Update" class="primary">↻ Aggiorna ARPAS</button><div class="ll32-controls"><button type="button" id="ll32GpsZone">📍 Rileva posizione GPS</button><button type="button" id="ll32FishZone">🎣 Usa punto pesca selezionato</button><div id="ll32GeoStatus" class="ll30-fish-info" role="status">Zona ARPAS da scegliere manualmente: i confini ufficiali non sono ancora disponibili nell'app.</div></div><div id="ll31Status" class="ll30-fish-info" role="status">In attesa del bollettino ARPAS…</div><label for="ll32TripTime">Orario previsto per l'uscita</label><input id="ll32TripTime" type="datetime-local"><button id="ll32MatchTime" type="button">🕒 Cerca fascia ARPAS corrispondente</button><div id="ll32TimeStatus" class="muted" role="status"></div><label for="ll31Forecast">Fascia di previsione</label><select id="ll31Forecast"><option value="">Attendi il caricamento</option></select><p class="muted">ARPAS pubblica Hx (altezza <b>massima</b> dell’onda), non Hs. I valori di vento non sono forniti da questo bollettino. Il parere nautico resta prudenziale.</p></div><div class="ll30-sources">
 <p class="ll-note"><strong>⚠️ ARPAS: aggiornamento automatico disponibile tramite GitHub Actions; altre fonti manuali.</strong> I dati ARPAS vengono letti dal file aggiornato nel repository; se il file non è disponibile o è vecchio, viene segnalato. Per i valori automatici già disponibili, usa la scheda Meteo (fonte distinta: Open-Meteo). Non confondere le due previsioni.</p><div class="ll30-source"><h3>ARPAS Sardegna</h3><a target="_blank" rel="noopener noreferrer" href="https://www.sar.sardegna.it/servizi/meteo/prevmare_new.asp">Apri previsioni mare ARPAS ↗</a><div class="ll30-inputs"><label>Vento (kn)<input type="number" min="0" max="150" step="0.1" data-source="arpas" data-metric="wind" placeholder="—"></label><label>Raffiche (kn)<input type="number" min="0" max="150" step="0.1" data-source="arpas" data-metric="gust" placeholder="—"></label><label>Onde (m)<input type="number" min="0" max="30" step="0.1" data-source="arpas" data-metric="wave" placeholder="—"></label></div><label>Orario emissione/consultazione<input type="datetime-local" data-source="arpas" data-metric="time"></label></div>
 <div class="ll30-source"><h3>Aeronautica Militare</h3><a target="_blank" rel="noopener noreferrer" href="https://www.meteoam.it/">Apri Meteo AM ↗</a><div class="ll30-inputs"><label>Vento (kn)<input type="number" min="0" max="150" step="0.1" data-source="am" data-metric="wind" placeholder="—"></label><label>Raffiche (kn)<input type="number" min="0" max="150" step="0.1" data-source="am" data-metric="gust" placeholder="—"></label><label>Onde (m)<input type="number" min="0" max="30" step="0.1" data-source="am" data-metric="wave" placeholder="—"></label></div><label>Orario emissione/consultazione<input type="datetime-local" data-source="am" data-metric="time"></label></div>
 <div class="ll30-source"><h3>iLMeteo.it</h3><a target="_blank" rel="noopener noreferrer" href="https://www.ilmeteo.it/">Apri iLMeteo.it ↗</a><div class="ll30-inputs"><label>Vento (kn)<input type="number" min="0" max="150" step="0.1" data-source="ilmeteo" data-metric="wind" placeholder="—"></label><label>Raffiche (kn)<input type="number" min="0" max="150" step="0.1" data-source="ilmeteo" data-metric="gust" placeholder="—"></label><label>Onde (m)<input type="number" min="0" max="30" step="0.1" data-source="ilmeteo" data-metric="wave" placeholder="—"></label></div><label>Orario emissione/consultazione<input type="datetime-local" data-source="ilmeteo" data-metric="time"></label></div>
@@ -2233,6 +2233,52 @@ $('ll30UseGps').addEventListener('click',()=>{if(!navigator.geolocation){$('ll30
 $('ll30Calculate').addEventListener('click',()=>{const p=points.find(p=>p.id===$('ll30FishSelect').value),out=$('ll30Route');if(!p){out.textContent='Seleziona un punto di pesca già salvato.';return;}const lat=Number($('ll30StartLat').value),lon=Number($('ll30StartLon').value),speed=Number($('ll30Speed').value),fuel=Number($('ll30Fuel').value);if(!Number.isFinite(lat)||Math.abs(lat)>90||!Number.isFinite(lon)||Math.abs(lon)>180||!Number.isFinite(speed)||speed<=0||!Number.isFinite(fuel)||fuel<=0||!$('ll30StartLat').value||!$('ll30StartLon').value){out.textContent='Controlla coordinate di partenza, velocità e consumo.';return;}const r=Math.PI/180,a=Math.sin((p.lat-lat)*r/2)**2+Math.cos(lat*r)*Math.cos(p.lat*r)*Math.sin((p.lon-lon)*r/2)**2,nm=3440.065*2*Math.asin(Math.min(1,Math.sqrt(a))),hours=nm*2/speed;out.textContent='🎣 '+p.name+'\nSolo andata: '+nm.toFixed(2)+' MN · Andata e ritorno: '+(nm*2).toFixed(2)+' MN\nTempo A/R teorico: '+Math.round(hours*60)+' min · Consumo teorico: '+(hours*fuel).toFixed(1)+' L\n⚠️ Linea d’aria, non rotta sicura. Riserva carburante esclusa.';});
 window.addEventListener('ll-fishing-points-updated',refreshPoints);
 restore();refreshPoints();
+})();
+</script>
+
+<style id="ll32-style">.ll32-controls{margin:12px 0}.ll32-controls button{margin:4px 5px 4px 0}.ll32-controls .ll30-fish-info{font-size:13px}#ll32MatchTime{margin:8px 0}#ll32TripTime{max-width:320px}</style>
+<script id="ll32-smart-gps">
+(function(){
+'use strict';
+const $=id=>document.getElementById(id), zone=$('ll31Zone'), choice=$('ll31Forecast'), fish=$('ll30FishSelect');
+if(!zone||!choice||!fish)return;
+const geo=$('ll32GeoStatus'), time=$('ll32TripTime'), timeStatus=$('ll32TimeStatus');
+function showLocation(lat,lon,kind){
+ if(!Number.isFinite(lat)||!Number.isFinite(lon)){geo.textContent='Coordinate non valide.';return;}
+ geo.textContent=kind+': '+lat.toFixed(6)+' N, '+lon.toFixed(6)+' E. ⚠️ La corrispondenza con le zone ARPAS non è automatica: non abbiamo confini ufficiali verificati. Seleziona la zona ARPAS corretta dal menu sopra, consultando il bollettino.';
+ const old=$('ll30Zone');if(old)old.value=kind+' ('+lat.toFixed(4)+', '+lon.toFixed(4)+')';
+}
+$('ll32GpsZone').addEventListener('click',()=>{
+ if(!navigator.geolocation){geo.textContent='GPS non disponibile.';return;}
+ geo.textContent='Richiesta posizione GPS…';
+ navigator.geolocation.getCurrentPosition(p=>showLocation(p.coords.latitude,p.coords.longitude,'Posizione GPS'),e=>geo.textContent='GPS non disponibile: '+e.message,{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+});
+$('ll32FishZone').addEventListener('click',()=>{
+ const key=fish.value;if(!key){geo.textContent='Seleziona prima un punto pesca.';return;}
+ let points=[];try{points=JSON.parse(localStorage.getItem('ll_poi_v28')||'[]');}catch(e){}
+ if(!Array.isArray(points))points=[];
+ let p=points.find(x=>String(x.id)===key);
+ if(!p){const keys=Object.keys(localStorage).filter(x=>x.startsWith('ll_'));for(const k of keys){try{const a=JSON.parse(localStorage.getItem(k));if(Array.isArray(a)){p=a.find(x=>x&&String(x.id)===key);if(p)break;}}catch(e){}}}
+ if(!p){geo.textContent='Punto non trovato: aggiorna elenco punti pesca.';return;}
+ showLocation(Number(p.lat),Number(p.lon),'Punto pesca '+(p.name||''));
+});
+function matchTime(){
+ const val=time.value||$('ll30When')?.value;if(!val){timeStatus.textContent='Inserisci data e ora dell’uscita.';return;}
+ const target=new Date(val);if(!Number.isFinite(target.getTime())){timeStatus.textContent='Data non valida.';return;}
+ const options=[...choice.options].filter(x=>x.value!=='');
+ const matched=options.find(opt=>{
+  const m=opt.textContent.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})-(\d{2}:\d{2})/);
+  if(!m)return false;
+  const start=new Date(m[1]+'T'+m[2]+':00'),end=new Date(m[1]+'T'+m[3]+':00');
+  if(end<=start)end.setDate(end.getDate()+1);
+  return target>=start&&target<end;
+ });
+ if(!matched){timeStatus.textContent='Nessuna fascia ARPAS disponibile per la data e ora selezionate, nella zona scelta.';return;}
+ choice.value=matched.value;choice.dispatchEvent(new Event('change'));
+ timeStatus.textContent='Fascia selezionata: '+matched.textContent+'. Controlla che la zona marina sia corretta e che il bollettino sia aggiornato.';
+}
+$('ll32MatchTime').addEventListener('click',matchTime);
+$('ll30When')?.addEventListener('change',()=>{if(!time.value)time.value=$('ll30When').value;});
 })();
 </script>
 </body>
