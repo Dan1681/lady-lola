@@ -2828,10 +2828,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* Home mobile-first. Old widgets stay in DOM to preserve their event handlers and data. */
 #home{display:flex;flex-direction:column;gap:12px}
 #home > :not(.ll-hero):not(#ll352-home){display:none!important}
-#home .ll-hero{padding:12px 15px;margin:0;min-height:0}
+#home .ll-hero{display:none!important}
 #home .ll-hero .ll-eyebrow,#home .ll-hero p,#home .ll-hero .ll-chips,#home .ll-hero .ll26-boat-specs{display:none!important}
 #home .ll-hero h2{font-size:1.12rem;margin:0;line-height:1.35}
-#ll352-home{background:#10283d;border:1px solid #31556b;border-radius:15px;padding:14px;color:#e4f3fa;margin:0}
+#ll352-home{display:block!important;background:#10283d;border:1px solid #31556b;border-radius:15px;padding:14px;color:#e4f3fa;margin:0}
 #ll352-home h2{font-size:1.1rem;margin:0 0 5px}
 #ll352-home p{font-size:.79rem;color:#b4cdd9;margin:7px 0;line-height:1.45}
 #ll353-main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
@@ -2858,8 +2858,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="ll353-home-compact">
 (function(){'use strict';
 const $=id=>document.getElementById(id),home=$('home');if(!home)return;
-const panel=document.createElement('section');panel.id='ll352-home';
-panel.innerHTML=`<h2>🌊 Meteo e mare</h2><p id="ll352-zone">Zona marina: —</p>
+const panel=document.createElement('div');panel.id='ll352-home';
+panel.innerHTML=`<h2>⚓ Lady Lola · Meteo e mare</h2><p id="ll352-zone">Zona marina: —</p>
 <div id="ll353-main"><div class="ll353-metric"><small>🌬 Vento</small><strong id="ll353-wind">— kn</strong></div><div class="ll353-metric"><small>🌊 Onde Hs</small><strong id="ll353-wave">— m</strong></div><div class="ll353-metric"><small>🌡 Aria</small><strong id="ll353-air">— °C</strong></div></div>
 <div id="ll353-advisor"><strong id="ll353-status">🛡️ DA VALUTARE</strong><span id="ll353-reason">Aggiorna le previsioni per la zona selezionata.</span></div>
 <div id="ll353-trend"><b>🕒 Evoluzione nelle prossime 12 ore</b><div id="ll353-trend-grid"><div><b>Adesso</b>—<span>Vento / onde</span></div><div><b>+6 ore</b>—<span>Vento / onde</span></div><div><b>+12 ore</b>—<span>Vento / onde</span></div></div><p id="ll353-trend-note">Tendenza non disponibile: aggiorna il meteo.</p></div>
@@ -2875,7 +2875,7 @@ function verdict(v){const w=Number(v.wind),g=Number(v.gust),h=Number(v.wave);if(
 document.addEventListener('ll352:meteo',e=>{const d=e.detail||{},v=d.vals||{};for(const [k,u] of [['wind','kn'],['wave','m'],['air','°C']])$('ll353-'+k).textContent=fmt(v[k],u);const [label,reason]=verdict(v);$('ll353-status').textContent='🛡️ '+label;$('ll353-reason').textContent=reason;$('ll352-info').textContent='Open-Meteo · '+(d.position||'punto di riferimento')+' · previsione '+(d.when||'n.d.')+' · aggiornato '+new Date(d.updatedAt).toLocaleString('it-IT')+'. ARPAS consultabile in Meteo.';zone();});
 $('ll31Zone')?.addEventListener('change',()=>{zone();clear();});
 $('ll352-update').addEventListener('click',()=>{const b=$('ll34Refresh');if(b)b.click();else $('ll352-info').textContent='Apri Meteo per aggiornare le previsioni.';updateTrend();});
-function nav(page){document.querySelector('#menu [data-page="'+page+'"]')?.click();}
+function nav(page){const btn=document.querySelector('#menu [data-page="'+page+'"]');if(btn)btn.click();else{const target=document.getElementById(page);if(target){document.querySelectorAll('main > section').forEach(el=>el.classList.remove('active'));target.classList.add('active');}}}
 $('ll352-details').addEventListener('click',()=>nav('meteo'));
 $('ll353-plan').addEventListener('click',()=>{const btn=document.querySelector('[data-go="planner"]');if(btn)btn.click();else nav('planner');});
 let run=0;
