@@ -2060,7 +2060,7 @@ document.getElementById('ll23-search').addEventListener('input',fillZones);
 document.getElementById('ll23-confirm').addEventListener('click',()=>{const zone=llZoneMap.get(zoneSelect.value);if(!zone)return;const names=llGetFavorites();if(names.includes(zone.name))return;names.push(zone.name);llSaveFavorites(names);lastFavorites=names.join('|');document.getElementById('ll23-search').value='';fillZones();renderManager();update();});
 document.getElementById('ll23-show').addEventListener('click',()=>{expanded=!expanded;render()});
 
-async function getZone(zone){const q={latitude:zone.lat,longitude:zone.lon,timezone:'Europe/Rome',forecast_days:'4'};const w=new URLSearchParams({...q,hourly:'wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,temperature_2m',wind_speed_unit:'kn'});const m=new URLSearchParams({...q,hourly:'wave_height,sea_surface_temperature'});const [a,b]=await Promise.all([fetch('https://api.open-meteo.com/v1/forecast?'+w),fetch('https://marine-api.open-meteo.com/v1/marine?'+m)]);if(!a.ok||!b.ok)throw Error('Previsioni non disponibili');const [weather,marine]=await Promise.all([a.json(),b.json()]);const waveIndex=new Map((marine.hourly?.time||[]).map((t,i)=>[t,i]));const map=new Map();(weather.hourly?.time||[]).forEach((t,i)=>{const j=waveIndex.get(t);if(j===undefined)return;map.set(t,{wind:weather.hourly.wind_speed_10m?.[i],gust:weather.hourly.wind_gusts_10m?.[i],direction:weather.hourly.wind_direction_10m?.[i],rain:weather.hourly.precipitation?.[i],wave:marine.hourly.wave_height?.[j],air:weather.hourly.temperature_2m?.[i],sea:marine.hourly.sea_surface_temperature?.[j]})});return map}
+async function getZone(zone){const q={latitude:zone.lat,longitude:zone.lon,timezone:'Europe/Rome',forecast_days:'4'};const w=new URLSearchParams({...q,hourly:'wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,temperature_2m',wind_speed_unit:'kn'});const m=new URLSearchParams({...q,hourly:'wave_height,wave_direction,sea_surface_temperature'});const [a,b]=await Promise.all([fetch('https://api.open-meteo.com/v1/forecast?'+w),fetch('https://marine-api.open-meteo.com/v1/marine?'+m)]);if(!a.ok||!b.ok)throw Error('Previsioni non disponibili');const [weather,marine]=await Promise.all([a.json(),b.json()]);const waveIndex=new Map((marine.hourly?.time||[]).map((t,i)=>[t,i]));const map=new Map();(weather.hourly?.time||[]).forEach((t,i)=>{const j=waveIndex.get(t);if(j===undefined)return;map.set(t,{wind:weather.hourly.wind_speed_10m?.[i],gust:weather.hourly.wind_gusts_10m?.[i],direction:weather.hourly.wind_direction_10m?.[i],rain:weather.hourly.precipitation?.[i],wave:marine.hourly.wave_height?.[j],air:weather.hourly.temperature_2m?.[i],sea:marine.hourly.sea_surface_temperature?.[j]})});return map}
 function render(){const grid=document.getElementById('ll22-grid');grid.replaceChildren();const target=dateOffset(+document.getElementById('ll22-day').value)+'T'+hour.value+':00';const names=llGetFavorites().filter(name=>llFindZoneKey(name));const visible=expanded?names:names.slice(0,5);document.getElementById('ll23-count').textContent=names.length+' preferite · '+visible.length+' visualizzate';const show=document.getElementById('ll23-show');show.hidden=names.length<=5;show.textContent=expanded?'Mostra solo 5':'Mostra tutte ('+names.length+')';if(!names.length){grid.textContent='Nessuna località preferita. Premi ＋ Aggiungi località.';return}for(const name of visible){const key=llFindZoneKey(name);const d=cache.get(key)?.get(target);const rating=d?marineRating(d.wind,d.gust,d.wave,d.rain):{label:'DATI NON DISPONIBILI'};const level=rating.label==='ESCO*'?'good':rating.label==='ATTENZIONE'?'warn':rating.label==='NON ESCO'?'bad':'none';const el=document.createElement('div');el.className='ll22-tile';const direction=d&&Number.isFinite(d.direction)?marineWindFrom(d.direction):'Direzione non disponibile';el.innerHTML=`<div class="ll23-tile-head"><h3>📍 ${safe(name)}</h3><button type="button" class="ll23-remove" aria-label="Rimuovi ${safe(name)} dai preferiti" title="Rimuovi dai preferiti">★ ×</button></div><div class="ll22-state ${level}">${safe(rating.label)}</div><p>🧭 ${safe(direction)}</p><div class="ll22-data"><span>🌬 Vento<b>${fmt(d?.wind,'kn')}</b></span><span>💨 Raffiche<b>${fmt(d?.gust,'kn')}</b></span><span>🌊 Onde<b>${fmt(d?.wave,'m')}</b></span><span>🌡️ Aria<b>${fmt(d?.air,'°C')}</b></span><span>🌊 Mare<b>${fmt(d?.sea,'°C')}</b></span><span>🌧 Pioggia<b>${fmt(d?.rain,'mm')}</b></span></div>`;el.querySelector('.ll23-remove').addEventListener('click',()=>{const updated=llGetFavorites().filter(n=>n!==name);llSaveFavorites(updated);lastFavorites=updated.join('|');cache.delete(key);fillZones();renderManager();if(typeof llRenderZones==='function')llRenderZones();render()});grid.append(el)}window.dispatchEvent(new CustomEvent('ll24:forecast',{detail:{target,values:names.map(name=>({name,data:cache.get(llFindZoneKey(name))?.get(target)}))}}))}
 async function update(){if(busy)return;busy=true;const button=document.getElementById('ll22-update');button.disabled=true;const status=document.getElementById('ll22-status');const zones=llGetFavorites().map(name=>({key:llFindZoneKey(name),name})).filter(z=>z.key);let failed=0;status.textContent='Aggiornamento delle '+zones.length+' località…';const next=new Map();for(let i=0;i<zones.length;i+=3){await Promise.all(zones.slice(i,i+3).map(async z=>{try{next.set(z.key,await getZone(marineZones[z.key]))}catch(e){failed++}}))}cache.clear();for(const [k,v] of next)cache.set(k,v);status.textContent='Previsioni richieste: '+new Date().toLocaleString('it-IT',{timeZone:'Europe/Rome'})+' · '+next.size+' località caricate'+(failed?' · '+failed+' non disponibili':'')+' · Fonte Open-Meteo';render();busy=false;button.disabled=false}
 document.getElementById('ll22-update').addEventListener('click',update);document.getElementById('ll22-day').addEventListener('change',render);hour.addEventListener('change',render);
@@ -2285,7 +2285,7 @@ function read(){try{const v=JSON.parse(localStorage.getItem(key)||'[]');return A
 function store(){try{localStorage.setItem(key,JSON.stringify(items));return true;}catch(e){msg('Salvataggio non riuscito: memoria del browser non disponibile.');return false;}}
 function msg(t){$('ll28PoiStatus').textContent=t;}
 function iconFor(cat){return ({pesca:'🎣',ormeggio:'⚓',porto:'🚤',altro:'📍'})[cat]||'📍';}
-function initMini(){if(mini||!window.L)return;if(!$('ll28HomeMap').offsetWidth)return;mini=L.map('ll40Map',{zoomControl:false,scrollWheelZoom:false,dragging:true}).setView([39.17,9.35],10);window.llMapTiles(mini);drawMarkers();}
+function initMini(){if(mini||!window.L)return;if(!$('ll28HomeMap').offsetWidth)return;mini=L.map('ll40Map',{zoomControl:false,scrollWheelZoom:false,dragging:true}).setView([39.17,9.35],10);window.ll40SharedMap=mini;window.llMapTiles(mini);drawMarkers();}
 function getFull(){if(!window.L)return null;const el=$('ll27Map');if(el&&el._leaflet_id){for(const k in L.Map.prototype){} try{return window.ll28FullMap||null;}catch(e){return null;}}return null;}
 function renderMarkers(map,arr){arr.forEach(m=>map.removeLayer(m));arr.length=0;items.forEach(p=>{const m=L.marker([p.lat,p.lon]).addTo(map);m.bindPopup(iconFor(p.category)+' '+p.name);arr.push(m);});}
 function drawMarkers(){if(mini)renderMarkers(mini,miniMarkers);if(full)renderMarkers(full,fullMarkers);}
@@ -2925,11 +2925,12 @@ async function load(lat,lon,name){
   const weather=new URL('https://api.open-meteo.com/v1/forecast');
   weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m',wind_speed_unit:'kmh'}).toString();
   const marine=new URL('https://marine-api.open-meteo.com/v1/marine');
-  marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'wave_height,sea_surface_temperature'}).toString();
+  marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'wave_height,wave_direction,sea_surface_temperature'}).toString();
   const [wr,mr]=await Promise.all([fetch(weather,{signal:abort.signal}),fetch(marine,{signal:abort.signal})]);
   if(!wr.ok||!mr.ok)throw new Error('Servizio meteo non disponibile');
   const [w,m]=await Promise.all([wr.json(),mr.json()]);
   if(token!==request)return;
+  window.dispatchEvent(new CustomEvent('ll41-weather',{detail:{w,m,lat,lon,name}}));
   const now=new Date();const target=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit'}).format(now).replace(' ','T').slice(0,13);
   const wh=w.hourly.time.findIndex(t=>t.slice(0,13)>=target);const wi=wh<0?0:wh;
   const mh=m.hourly.time.findIndex(t=>t.slice(0,13)>=target);const mi=mh<0?0:mh;
@@ -2959,9 +2960,9 @@ function setup(){
  $('ll40Area').addEventListener('change',()=>{try{localStorage.setItem('ll40_home_place',$('ll40Area').value);}catch(e){}});
  // Leaflet is supplied by the existing app; initialize only if available.
  function initMap(){if(!window.L){setText('ll40AreaInfo','Mappa non caricata (connessione necessaria). Usa il selettore delle località.');return;}
-  try{map=L.map('ll40Map',{zoomControl:true}).setView([40.02,9],7);
-   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
-   const p=places[$('ll40Area').value];marker=L.marker([p[0],p[1]]).addTo(map);
+  try{map=window.ll40SharedMap || L.map('ll40Map',{zoomControl:true}).setView([40.02,9],7);
+   if(!window.ll40SharedMap)L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
+   const p=places[$('ll40Area').value];marker=L.marker([p[0],p[1]]).addTo(map);window.ll40SharedMap=map;
    map.on('click',e=>{const k=nearest(e.latlng.lat,e.latlng.lng);selectPlace(k);});
    setTimeout(()=>map.invalidateSize(),500);
   }catch(e){/* The legacy map may already have initialized the same container. */map=null;}
@@ -3005,5 +3006,52 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script>
+<style id="ll41-style">
+#ll41Controls{display:grid;gap:9px;margin:12px 0;padding:12px;border:1px solid #41637a;border-radius:12px;background:#0c273b}
+#ll41Controls label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:650}
+#ll41Hour{width:100%;accent-color:#53cbd8}
+#ll41Legend{font-size:.85rem;color:#c4e2ee;line-height:1.5}
+.ll41-marker{display:flex;gap:5px;align-items:center;justify-content:center;white-space:nowrap;transform:translate(-50%,-50%);pointer-events:none}
+.ll41-pill{background:#092538ed;border:1px solid #9bd5e0;border-radius:9px;padding:5px 7px;color:white;font:700 12px system-ui;box-shadow:0 2px 6px #0008}
+.ll41-arrow{display:inline-block;font-size:25px;line-height:1;transform-origin:center}
+</style>
+<script id="ll41-wind-wave-layer">
+(function(){
+'use strict';
+let data=null,layer=null;
+const $=id=>document.getElementById(id);
+function init(){
+ const host=$('ll40MapHost');if(!host||$('ll41Controls'))return;
+ const div=document.createElement('div');div.id='ll41Controls';
+ div.innerHTML='<label for="ll41Hour">🌬️ Vento + 🌊 Onde <span id="ll41Time">Adesso</span></label><input id="ll41Hour" type="range" min="0" max="24" step="1" value="0" aria-label="Ore avanti nella previsione"><div id="ll41Legend">Le frecce indicano dove si dirigono vento e onde. Dati Open-Meteo puntuali, non una carta ufficiale ARPAS.</div>';
+ host.parentNode.insertBefore(div,host);
+ $('ll41Hour').addEventListener('input',render);
+ window.addEventListener('ll41-weather',e=>{data=e.detail;$('ll41Hour').value='0';render();});
+ let tries=0;const poll=setInterval(()=>{if(window.ll40SharedMap){clearInterval(poll);render();}else if(++tries>35)clearInterval(poll);},250);
+}
+function arrow(deg){return Number.isFinite(deg)?'<span class="ll41-arrow" style="transform:rotate('+((deg+180)%360)+'deg)">↑</span>':'—';}
+function num(v,d=1){return v==null||!Number.isFinite(Number(v))?'—':Number(v).toFixed(d);}
+function render(){
+ if(!data)return;
+ const {w,m,lat,lon}=data,offset=Number($('ll41Hour').value)||0;
+ const target=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit'}).format(new Date()).replace(' ','T').slice(0,13);
+ const wi0=Math.max(0,w.hourly.time.findIndex(t=>t.slice(0,13)>=target));
+ const mi0=Math.max(0,m.hourly.time.findIndex(t=>t.slice(0,13)>=target));
+ const wi=Math.min(w.hourly.time.length-1,wi0+offset),mi=Math.min(m.hourly.time.length-1,mi0+offset);
+ const wd=Number(w.hourly.wind_direction_10m?.[wi]),hd=m.hourly.wave_direction?.[mi]==null?NaN:Number(m.hourly.wave_direction[mi]);
+ const wind=w.hourly.wind_speed_10m?.[wi]==null?NaN:Number(w.hourly.wind_speed_10m[wi])*0.5399568;
+ const wave=m.hourly.wave_height?.[mi]==null?NaN:Number(m.hourly.wave_height[mi]);
+ $('ll41Time').textContent=offset===0?'Adesso':w.hourly.time[wi]?.replace('T',' · ')||('+'+offset+' h');
+ $('ll41Legend').textContent='Vento '+num(wind)+' kn · onde Hs '+num(wave)+' m · frecce verso la direzione di movimento. Previsione Open-Meteo nel punto selezionato; non rappresenta tutto il tratto di mare.';
+ const map=window.ll40SharedMap;
+ if(!map||!window.L)return;
+ if(layer)map.removeLayer(layer);
+ const html='<div class="ll41-marker"><span class="ll41-pill" style="border-color:#67d7eb">🌬️ '+arrow(wd)+' '+num(wind)+' kn</span><span class="ll41-pill" style="border-color:#ffc17c">🌊 '+arrow(hd)+' '+num(wave)+' m</span></div>';
+ layer=L.marker([lat,lon],{interactive:false,zIndexOffset:1000,icon:L.divIcon({className:'',html,iconSize:[0,0],iconAnchor:[0,0]})}).addTo(map);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
 </html>
