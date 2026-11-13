@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.3 – Avvisi compatti</title>
+<title>Lady Lola 4.2.4 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -336,6 +336,19 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #ll420MarineFishing .ll420-score{background:#12384d;border:1px solid #38667b;border-radius:12px;padding:13px;margin:8px 0}
 #ll420MarineFishing .ll420-score strong{font-size:28px;display:block}#ll420MarineFishing .ll420-score small{display:block}
 #ll420MarineFishing .ll420-windows{line-height:1.6}
+</style><style id="ll424-style">
+.ll424-time-panel{border:1px solid #365d73;border-radius:13px;padding:12px;margin:12px 0;background:rgba(10,40,60,.55)}
+.ll424-time-panel label{display:block;font-weight:700;margin-bottom:7px}
+#ll424FishingTime{max-width:165px;min-height:40px;padding:8px;border-radius:8px}
+.ll424-timeline{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));align-items:end;gap:3px;min-height:108px;padding:10px 2px 2px;border-bottom:1px solid #64869b}
+.ll424-bar{min-height:5px;border-radius:4px 4px 0 0;background:#4386a9;position:relative}
+.ll424-bar[data-grade="good"]{background:#4ac99a}
+.ll424-bar[data-grade="medium"]{background:#edc76a}
+.ll424-bar[data-grade="low"]{background:#7794a7}
+.ll424-bar.is-selected{outline:2px solid #fff;outline-offset:1px}
+.ll424-bar.is-missing{background:repeating-linear-gradient(45deg,#365063,#365063 3px,#253b4a 3px,#253b4a 6px);height:8px!important}
+.ll424-hours{display:flex;justify-content:space-between;font-size:11px;color:#a9c8d8;margin:5px 0 8px}
+.ll424-placeholder{grid-column:1/-1;align-self:center;text-align:center;color:#b8c9d4}
 </style></head>
 <body>
 <header>
@@ -419,6 +432,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <label for="ll420Technique">🎣 Tecnica di pesca</label>
 <select id="ll420Technique"><option value="traina">🚤 Traina</option><option value="spinning">🎣 Spinning</option><option value="bolentino">⚓ Bolentino</option><option value="calamari">🦑 Calamari</option><option value="seppie">🦑 Seppie</option><option value="jigging">🐟 Vertical jigging</option></select>
 <div class="ll420-score"><span>Indice orientativo di attività</span><strong id="ll420Score">—</strong><small id="ll420Level">In attesa dei dati</small></div>
+<div class="ll424-time-panel">
+<label for="ll424FishingTime">🕒 Orario in cui vuoi pescare</label>
+<input type="time" id="ll424FishingTime" value="07:00" step="3600" aria-describedby="ll424SelectedResult">
+<p id="ll424SelectedResult" class="ll40-hint" role="status">Seleziona un orario: la valutazione comparirà quando saranno disponibili le previsioni.</p>
+<h3 style="margin:12px 0 6px;font-size:15px">📊 Attività orientativa durante la giornata</h3>
+<div id="ll424Timeline" class="ll424-timeline" aria-label="Indice orario di attività di pesca"><div class="ll424-placeholder">In attesa delle previsioni orarie…</div></div>
+<div class="ll424-hours"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+<small>Barre: indice sperimentale per tecnica e orario · bordo chiaro: ora selezionata · non indica la probabilità di cattura.</small>
+</div>
 <div id="ll420Windows" class="ll420-windows">Finestre favorevoli da calcolare.</div><div id="ll423TideWindows" class="ll420-windows" style="margin-top:10px">Finestre di marea: inserisci gli orari di oggi.</div>
 <p class="ll-note" id="ll420Reason">Indice sperimentale basato su luce, vento, onde e nuvolosità; non è una probabilità di cattura. Non sostituisce l'Advisor di sicurezza.</p>
 </div>
@@ -3379,6 +3401,26 @@ for(let i=0;i<times.length;i++){
  score=Math.round(Math.max(0,Math.min(100,score)));
  choices.push({t,score});
 }
+const fishingTime=$('ll424FishingTime')?.value||'07:00';
+const requestedHour=Number(fishingTime.slice(0,2));
+const byHour=new Map(choices.map(x=>[Number(x.t.slice(11,13)),x]));
+const timeline=$('ll424Timeline');
+if(timeline){
+ timeline.replaceChildren();
+ for(let h=0;h<24;h++){
+  const entry=byHour.get(h),bar=document.createElement('div');
+  const value=entry?.score;
+  bar.className='ll424-bar'+(entry?'':' is-missing')+(h===requestedHour?' is-selected':'');
+  if(entry)bar.dataset.grade=value>=65?'good':value>=40?'medium':'low';
+  bar.style.height=entry?Math.max(6,value)+'%':'8px';
+  bar.title=String(h).padStart(2,'0')+':00 · '+(entry?value+'/100':'dato non disponibile');
+  timeline.appendChild(bar);
+ }
+}
+const selected=byHour.get(requestedHour);
+if($('ll424SelectedResult'))$('ll424SelectedResult').textContent=selected?
+ 'Alle '+String(requestedHour).padStart(2,'0')+':00: '+selected.score+'/100 · '+(selected.score>=75?'attività molto buona':selected.score>=60?'attività buona':selected.score>=40?'attività discreta':'attività bassa')+' (stima orientativa, non probabilità di cattura).':
+ 'Alle '+String(requestedHour).padStart(2,'0')+':00: previsione insufficiente per calcolare l’indice.';
 if(!choices.length){$('ll420Score').textContent='—';$('ll420Level').textContent='Dati insufficienti';$('ll420Windows').textContent='Non è possibile calcolare le finestre senza previsioni complete.';return;}
 const futureHour=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',hour:'2-digit',hourCycle:'h23'}).format(new Date());
 const future=choices.filter(x=>x.t.slice(11,13)>=futureHour);const pool=future.length?future:choices;
@@ -3389,7 +3431,7 @@ $('ll420Windows').textContent='Finestre migliori previste: '+top.map(x=>clock(x.
 $('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su luce, vento, raffiche, onde e nuvolosità. Non misura la probabilità di cattura, né tiene conto di presenza del pesce o correnti locali. '+(tideEvents.length?'Maree di Cagliari inserite manualmente: piccolo correttivo sperimentale vicino agli orari indicati.':'Maree non inserite: nessun correttivo di marea.')+' Rispetta sempre il verdetto dell’Advisor.';
 }
 window.addEventListener('ll41-weather',e=>{latest=e.detail;render();});
-function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
+function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});$('ll424FishingTime')?.addEventListener('change',render);syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
