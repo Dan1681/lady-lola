@@ -312,6 +312,7 @@ main > section.active{display:block!important}
 <div id="ll40Verdict" class="ll40-verdict" data-level="none"><strong>DA VALUTARE</strong><span>Caricamento dei dati essenziali...</span></div>
 </div>
 <div class="card ll40-alert"><div class="ll40-head"><h2>🔔 Avvisi e tendenza</h2><span class="ll40-tag">Previsioni</span></div>
+<div id="ll413Alerts" class="ll413-alerts" role="status" aria-live="polite">In attesa dei dati per gli avvisi meteo.</div>
 <p id="ll40Trend">Il confronto delle prossime 6 ore sarà disponibile dopo il caricamento.</p>
 <p class="ll-note">Gli avvisi automatici sono calcolati dalle previsioni, non sono allerte ufficiali. Consulta anche ARPAS e Protezione Civile.</p>
 <div class="ll40-links"><a href="https://www.sar.sardegna.it/" target="_blank" rel="noopener">ARPAS Sardegna</a><button type="button" data-go="meteo">Dettagli meteo</button></div>
@@ -2922,9 +2923,10 @@ async function load(lat,lon,name){
  setText('ll40Updated','Caricamento previsioni per '+name+'...');
  for(const id of ['ll40Wind','ll40Gust','ll40Wave','ll40Air','ll40Sea','ll40Direction'])setText(id,'—');
  verdict(NaN,NaN,NaN);
+ setText('ll413Alerts','⏳ Analisi avvisi meteo in corso…');
  try{
   const weather=new URL('https://api.open-meteo.com/v1/forecast');
-  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m',wind_speed_unit:'kmh'}).toString();
+  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code',wind_speed_unit:'kmh'}).toString();
   const marine=new URL('https://marine-api.open-meteo.com/v1/marine');
   marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'wave_height,wave_direction,sea_surface_temperature'}).toString();
   const [wr,mr]=await Promise.all([fetch(weather,{signal:abort.signal}),fetch(marine,{signal:abort.signal})]);
@@ -2944,9 +2946,30 @@ async function load(lat,lon,name){
   let maxW=0,maxG=0,maxH=0,missing=false;
   for(let i=0;i<=6;i++){const a=knots(w.hourly.wind_speed_10m?.[wi+i]),b=knots(w.hourly.wind_gusts_10m?.[wi+i]),c=m.hourly.wave_height?.[mi+i]==null?NaN:Number(m.hourly.wave_height[mi+i]);if(![a,b,c].every(Number.isFinite)){missing=true;break;}maxW=Math.max(maxW,a);maxG=Math.max(maxG,b);maxH=Math.max(maxH,c);}
   verdict(missing?NaN:maxW,missing?NaN:maxG,missing?NaN:maxH);
+  // Segnalazioni previsionali, distinte dalle allerte ufficiali regionali.
+  const alerts=[];let incomplete=false;
+  for(let i=0;i<=6;i++){
+   const idx=wi+i,code=w.hourly.weather_code?.[idx],prob=w.hourly.precipitation_probability?.[idx],rain=w.hourly.precipitation?.[idx];
+   if(code==null||prob==null||rain==null){incomplete=true;continue;}
+   if([95,96,99].includes(Number(code)))alerts.push('⛈️ Temporali previsti');
+   if(Number(rain)>=5)alerts.push('🌧️ Pioggia intensa prevista ('+fmt(rain)+' mm/h)');
+   else if(Number(prob)>=70&&Number(rain)>0)alerts.push('🌧️ Alta probabilità di pioggia ('+Math.round(prob)+'%)');
+  }
+  if(!missing){
+   if(maxG>17)alerts.push('💨 Raffiche oltre il limite ('+fmt(maxG)+' kn)');
+   if(maxW>12)alerts.push('🌬️ Vento oltre il limite ('+fmt(maxW)+' kn)');
+   if(maxH>0.5)alerts.push('🌊 Onde oltre il limite (Hs '+fmt(maxH)+' m)');
+  }else incomplete=true;
+  const unique=[...new Set(alerts)];
+  const alertBox=$('ll413Alerts');
+  if(alertBox){alertBox.dataset.level=unique.length?'bad':incomplete?'unknown':'ok';alertBox.textContent=unique.length?'⚠️ Segnalazioni nelle prossime 6 ore: '+unique.join(' · ')+(incomplete?' · Alcuni dati mancanti.':''):incomplete?'⚪ Avvisi non valutabili: dati previsionali incompleti.':'✅ Nessun superamento delle soglie o fenomeno avverso rilevato nelle prossime 6 ore. Non equivale ad assenza di allerte ufficiali.';}
+  if(alerts.some(a=>a.includes('Temporali'))){
+   const v=$('ll40Verdict');v.dataset.level='bad';v.querySelector('strong').textContent='NON ESCO';v.querySelector('span').textContent='Temporali previsti nelle prossime 6 ore: uscita sconsigliata.';
+  }
+
   if(!missing){const v=$('ll40Verdict');const label=v?.querySelector('strong')?.textContent;if(v&&label==='NON ESCO')v.querySelector('span').textContent='Almeno un valore supera i limiti nelle prossime 6 ore (vento 12 kn, raffiche 17 kn, onde Hs 0,5 m).';}
   setText('ll40Trend',missing?'Dati insufficienti per la tendenza delle prossime 6 ore.':'Prossime 6 ore · vento fino a '+fmt(maxW)+' kn, raffiche '+fmt(maxG)+' kn, onde Hs '+fmt(maxH)+' m. '+(maxW>12||maxG>17||maxH>0.5?'Possibile superamento dei tuoi limiti.':'Verifica comunque l’orario di rientro.'));
- }catch(e){if(e.name!=='AbortError'&&token===request){setText('ll40Updated','Impossibile aggiornare: '+e.message);setText('ll40Trend','Previsioni non disponibili. Verifica le fonti ufficiali.');verdict(NaN,NaN,NaN);}}
+ }catch(e){if(e.name!=='AbortError'&&token===request){setText('ll40Updated','Impossibile aggiornare: '+e.message);setText('ll40Trend','Previsioni non disponibili. Verifica le fonti ufficiali.');setText('ll413Alerts','⚪ Avvisi non valutabili: aggiornamento non riuscito.');verdict(NaN,NaN,NaN);}}
  finally{if(token===request)btn.disabled=false;}
 }
 function setup(){
@@ -3018,6 +3041,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll41-pill{background:#092538ed;border:1px solid #9bd5e0;border-radius:9px;padding:5px 7px;color:white;font:700 12px system-ui;box-shadow:0 2px 6px #0008}
 .ll41-arrow{display:inline-block;font-size:25px;line-height:1;transform-origin:center}
 </style>
+<style id="ll413-alert-style">#ll413Alerts{padding:12px;border:1px solid #66839a;border-radius:11px;background:#152e40;margin:9px 0;line-height:1.55;font-weight:600}#ll413Alerts[data-level="bad"]{background:#48262d;border-color:#d56a70}#ll413Alerts[data-level="ok"]{background:#133b32;border-color:#3b9d7c}#ll413Alerts[data-level="unknown"]{background:#35343b;border-color:#928b94}</style>
 <script id="ll41-wind-wave-layer">
 (function(){
 'use strict';
