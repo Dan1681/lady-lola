@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.1 – Avvisi compatti</title>
+<title>Lady Lola 4.2.2 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -403,6 +403,18 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </div>
 <p class="ll-note">Maree: servono dati astronomici verificati per la stazione locale. Il livello del mare modellato non equivale a una tavola di marea.</p>
 <p class="ll40-hint">🌊 <a href="https://it.tideschart.com/Italy/Sardinia/Provincia-di-Cagliari/Cagliari/" target="_blank" rel="noopener noreferrer">Consulta alta e bassa marea di Cagliari su Tideschart ↗</a><br><small>Orari e livelli aggiornati sul sito esterno. Non importati automaticamente: fonte e località di riferimento Cagliari.</small></p>
+<div class="ll422-tides" style="border:1px solid #355d72;border-radius:12px;padding:12px;margin:12px 0">
+<h3 style="margin:0 0 8px">🌊 Orari delle maree e finestre di pesca</h3>
+<p class="ll40-hint">Inserisci gli orari di oggi consultati su Tideschart (stazione di riferimento: Cagliari). Sono facoltativi e rimangono salvati solo su questo dispositivo.</p>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+<label>Alta marea 1 <input id="ll422High1" type="time" style="width:100%"></label>
+<label>Bassa marea 1 <input id="ll422Low1" type="time" style="width:100%"></label>
+<label>Alta marea 2 <input id="ll422High2" type="time" style="width:100%"></label>
+<label>Bassa marea 2 <input id="ll422Low2" type="time" style="width:100%"></label>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="ll422Save">Salva maree di oggi</button><button type="button" id="ll422Clear">Cancella orari</button></div>
+<p id="ll422Status" class="ll40-hint" role="status">Maree non inserite: indice calcolato senza fattore marea.</p>
+</div>
 <label for="ll420Technique">🎣 Tecnica di pesca</label>
 <select id="ll420Technique"><option value="traina">🚤 Traina</option><option value="spinning">🎣 Spinning</option><option value="bolentino">⚓ Bolentino</option><option value="calamari">🦑 Calamari</option><option value="seppie">🦑 Seppie</option><option value="jigging">🐟 Vertical jigging</option></select>
 <div class="ll420-score"><span>Indice orientativo di attività</span><strong id="ll420Score">—</strong><small id="ll420Level">In attesa dei dati</small></div>
@@ -3301,6 +3313,14 @@ else setTimeout(organize,0);
 const $=id=>document.getElementById(id);
 const names={traina:'Traina',spinning:'Spinning',bolentino:'Bolentino',calamari:'Calamari',seppie:'Seppie',jigging:'Vertical jigging'};
 let latest=null;
+const tideIds=['ll422High1','ll422Low1','ll422High2','ll422Low2'];
+const todayLocal=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+function tideKey(){return 'll422_tides_cagliari_'+todayLocal();}
+function getTides(){try{const v=JSON.parse(localStorage.getItem(tideKey())||'null');return Array.isArray(v)&&v.length===4?v:['','','',''];}catch(e){return ['','','',''];}}
+function syncTides(){const v=getTides();tideIds.forEach((id,i)=>{if($(id))$(id).value=v[i];});return v;}
+function saveTides(){const v=tideIds.map(id=>$(id)?.value||'');try{localStorage.setItem(tideKey(),JSON.stringify(v));}catch(e){}render();}
+function clearTides(){try{localStorage.removeItem(tideKey());}catch(e){}syncTides();render();}
+
 const clock=t=>typeof t==='string'&&t.includes('T')?t.split('T')[1].slice(0,5):'—';
 function moonPhase(date){const d=(date.getTime()-Date.UTC(2000,0,6,18,14))/86400000;const x=((d/29.530588853)%1+1)%1;return x<.04||x>.96?'🌑 Nuova':x<.21?'🌒 Crescente':x<.29?'🌓 Primo quarto':x<.46?'🌔 Gibbosa crescente':x<.54?'🌕 Piena':x<.71?'🌖 Gibbosa calante':x<.79?'🌗 Ultimo quarto':'🌘 Calante';}
 function render(){if(!latest)return;const {w,m,name}=latest,sel=$('ll420Technique');if(!sel)return;const tech=sel.value;
@@ -3308,7 +3328,10 @@ $('ll420Place').textContent=name+' · orari locali (Italia) · oggi';
 const daily=w.daily||{};const sunrise=daily.sunrise?.[0],sunset=daily.sunset?.[0];
 $('ll420Sunrise').textContent=clock(sunrise);$('ll420Sunset').textContent=clock(sunset);
 $('ll420Moon').textContent=moonPhase(new Date());
-$('ll420Tides').textContent='Consulta orari';
+const tides=getTides();
+const tideEvents=tides.map((v,i)=>({time:v,kind:i%2===0?'alta':'bassa'})).filter(x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x.time));
+$('ll420Tides').textContent=tideEvents.length?tideEvents.map(x=>x.kind+' '+x.time).join(' · '):'Consulta orari';
+if($('ll422Status'))$('ll422Status').textContent=tideEvents.length?'Orari inseriti per oggi ('+todayLocal()+') · stazione Cagliari · fattore marea sperimentale attivo.':'Maree non inserite: indice calcolato senza fattore marea.';
 const times=w.hourly?.time||[];const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const sunUp=sunrise?Date.parse(sunrise+':00'):NaN,sunDown=sunset?Date.parse(sunset+':00'):NaN;
 let choices=[];
@@ -3334,6 +3357,14 @@ for(let i=0;i<times.length;i++){
  score-=Math.max(0,Number(gust)-17)*.5;
  score-=Math.max(0,Number(wave)-.2)*19;
  if(cloud!=null){if(['spinning','seppie'].includes(tech)&&Number(cloud)>45)score+=5;if(tech==='calamari'&&night&&Number(cloud)>60)score+=3;}
+ // Modest, experimental tidal timing adjustment. This is not a measured bite probability.
+ // A 0-90 minute window around a reported high/low tide gets at most 6 points.
+ const minutes=h*60+Number(t.slice(14,16));
+ let tideBonus=0;
+ for(const ev of tideEvents){const [eh,em]=ev.time.split(':').map(Number);const dist=Math.abs(minutes-(eh*60+em));
+  if(dist<=90){const maxBonus=tech==='bolentino'?6:tech==='seppie'?5:tech==='calamari'?3:4;
+   tideBonus=Math.max(tideBonus,Math.round(maxBonus*(1-dist/120)));}}
+ score+=tideBonus;
  score=Math.round(Math.max(0,Math.min(100,score)));
  choices.push({t,score});
 }
@@ -3344,10 +3375,10 @@ const top=[...pool].sort((a,b)=>b.score-a.score).slice(0,3).sort((a,b)=>a.t.loca
 const avg=Math.round(top.reduce((sum,x)=>sum+x.score,0)/top.length);
 $('ll420Score').textContent=avg+'/100';$('ll420Level').textContent=avg>=75?'Molto buona (orientativa)':avg>=60?'Buona (orientativa)':avg>=40?'Discreta (orientativa)':'Bassa (orientativa)';
 $('ll420Windows').textContent='Finestre migliori previste: '+top.map(x=>clock(x.t)+' ('+x.score+'/100)').join(' · ');
-$('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su luce, vento, raffiche, onde e nuvolosità. Non misura la probabilità di cattura, né tiene conto di presenza del pesce, correnti locali o maree. Rispetta sempre il verdetto dell’Advisor.';
+$('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su luce, vento, raffiche, onde e nuvolosità. Non misura la probabilità di cattura, né tiene conto di presenza del pesce o correnti locali. '+(tideEvents.length?'Maree di Cagliari inserite manualmente: piccolo correttivo sperimentale vicino agli orari indicati.':'Maree non inserite: nessun correttivo di marea.')+' Rispetta sempre il verdetto dell’Advisor.';
 }
 window.addEventListener('ll41-weather',e=>{latest=e.detail;render();});
-function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});}
+function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
