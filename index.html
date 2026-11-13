@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.2 – Avvisi compatti</title>
+<title>Lady Lola 4.2.3 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -399,7 +399,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <p class="ll40-hint" id="ll420Place">Seleziona una località per aggiornare le informazioni.</p>
 <div class="ll420-facts">
 <div><span>🌅 Alba</span><strong id="ll420Sunrise">—</strong></div><div><span>🌇 Tramonto</span><strong id="ll420Sunset">—</strong></div>
-<div><span>🌙 Luna</span><strong id="ll420Moon">—</strong></div><div><span>🌊 Maree</span><strong id="ll420Tides">Consulta orari</strong><small>Alta/bassa marea: fonte esterna</small></div>
+<div><span>🌙 Luna</span><strong id="ll420Moon">—</strong><small id="ll423Illumination">Illuminazione da calcolare</small></div><div><span>🌊 Maree</span><strong id="ll420Tides">Consulta orari</strong><small>Alta/bassa marea: fonte esterna</small></div>
 </div>
 <p class="ll-note">Maree: servono dati astronomici verificati per la stazione locale. Il livello del mare modellato non equivale a una tavola di marea.</p>
 <p class="ll40-hint">🌊 <a href="https://it.tideschart.com/Italy/Sardinia/Provincia-di-Cagliari/Cagliari/" target="_blank" rel="noopener noreferrer">Consulta alta e bassa marea di Cagliari su Tideschart ↗</a><br><small>Orari e livelli aggiornati sul sito esterno. Non importati automaticamente: fonte e località di riferimento Cagliari.</small></p>
@@ -415,10 +415,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="ll422Save">Salva maree di oggi</button><button type="button" id="ll422Clear">Cancella orari</button></div>
 <p id="ll422Status" class="ll40-hint" role="status">Maree non inserite: indice calcolato senza fattore marea.</p>
 </div>
+<p class="ll40-hint">🔎 <a href="https://meteopesca.com/it/sardegna/cagliari" target="_blank" rel="noopener noreferrer">Confronta maree e periodi solunari su Meteopesca ↗</a>. I dati di questi siti non vengono importati automaticamente. Il calcolo solunare completo richiede una fonte o un modello astronomico verificato.</p>
 <label for="ll420Technique">🎣 Tecnica di pesca</label>
 <select id="ll420Technique"><option value="traina">🚤 Traina</option><option value="spinning">🎣 Spinning</option><option value="bolentino">⚓ Bolentino</option><option value="calamari">🦑 Calamari</option><option value="seppie">🦑 Seppie</option><option value="jigging">🐟 Vertical jigging</option></select>
 <div class="ll420-score"><span>Indice orientativo di attività</span><strong id="ll420Score">—</strong><small id="ll420Level">In attesa dei dati</small></div>
-<div id="ll420Windows" class="ll420-windows">Finestre favorevoli da calcolare.</div>
+<div id="ll420Windows" class="ll420-windows">Finestre favorevoli da calcolare.</div><div id="ll423TideWindows" class="ll420-windows" style="margin-top:10px">Finestre di marea: inserisci gli orari di oggi.</div>
 <p class="ll-note" id="ll420Reason">Indice sperimentale basato su luce, vento, onde e nuvolosità; non è una probabilità di cattura. Non sostituisce l'Advisor di sicurezza.</p>
 </div>
 <div class="card ll40-shortcuts"><h2>Accessi rapidi</h2><div class="ll-quick"><button type="button" data-go="planner">⚓ Pianifica uscita</button><button type="button" data-go="fishing">🎣 Punti pesca</button><button type="button" data-go="fuel">⛽ Autonomia</button><button type="button" data-go="more">☰ Altro</button></div></div>
@@ -3328,9 +3329,19 @@ $('ll420Place').textContent=name+' · orari locali (Italia) · oggi';
 const daily=w.daily||{};const sunrise=daily.sunrise?.[0],sunset=daily.sunset?.[0];
 $('ll420Sunrise').textContent=clock(sunrise);$('ll420Sunset').textContent=clock(sunset);
 $('ll420Moon').textContent=moonPhase(new Date());
+// Approximate synodic age and illuminated fraction: astronomical estimate, not a site-derived feed.
+const lunarAge=((new Date().getTime()-Date.UTC(2000,0,6,18,14))/86400000/29.530588853%1+1)%1;
+const illuminated=Math.round(50*(1-Math.cos(2*Math.PI*lunarAge)));
+if($('ll423Illumination'))$('ll423Illumination').textContent='Illuminazione stimata '+illuminated+'% · fase approssimata';
 const tides=getTides();
 const tideEvents=tides.map((v,i)=>({time:v,kind:i%2===0?'alta':'bassa'})).filter(x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x.time));
 $('ll420Tides').textContent=tideEvents.length?tideEvents.map(x=>x.kind+' '+x.time).join(' · '):'Consulta orari';
+const tideWindows=tideEvents.map(ev=>{
+ const [hh,mm]=ev.time.split(':').map(Number),center=hh*60+mm;
+ const fmtMin=n=>{n=(n+1440)%1440;return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');};
+ return (ev.kind==='alta'?'Alta':'Bassa')+' '+ev.time+' → '+fmtMin(center-90)+'–'+fmtMin(center+90);
+});
+if($('ll423TideWindows'))$('ll423TideWindows').textContent=tideWindows.length?'Finestre di marea (±90 min, orientative): '+tideWindows.join(' · '):'Finestre di marea: inserisci gli orari di oggi da Tideschart o Meteopesca.';
 if($('ll422Status'))$('ll422Status').textContent=tideEvents.length?'Orari inseriti per oggi ('+todayLocal()+') · stazione Cagliari · fattore marea sperimentale attivo.':'Maree non inserite: indice calcolato senza fattore marea.';
 const times=w.hourly?.time||[];const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const sunUp=sunrise?Date.parse(sunrise+':00'):NaN,sunDown=sunset?Date.parse(sunset+':00'):NaN;
