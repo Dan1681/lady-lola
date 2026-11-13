@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.0.2 – Meteo e mappa compatti</title>
+<title>Lady Lola 4.1.5 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -266,6 +266,14 @@ main > section.active{display:block!important}
 #home .ll402-direction strong{font-size:12px!important;line-height:1.3!important;min-height:35px;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere}
 #home .ll40-metrics>div{min-width:0}
 @media(max-width:540px){#home #ll40Map{height:260px!important;min-height:260px!important}#home .ll40-metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+</style><style id="ll415-compact-alerts">
+#home .ll40-alert{padding:14px!important}#home .ll40-alert .ll40-head{margin-bottom:8px}
+.ll415-current,.ll415-future{padding:10px 12px;border:1px solid #365c72;border-radius:11px;background:#0b273b;margin:8px 0;font-size:13px;line-height:1.5}
+.ll415-current strong,.ll415-future strong{display:block;color:#e9f8ff;font-size:14px;margin-bottom:3px}
+#ll415Now,#ll415Max{color:#c7e1eb;overflow-wrap:anywhere}
+#home #ll413Alerts{font-size:13px;font-weight:650;line-height:1.45;padding:10px 12px;margin:8px 0}
+#home #ll40Trend{font-size:12px;color:#b8d1df;margin:8px 0}
+#home .ll40-alert>.ll-note{font-size:11px;line-height:1.4;margin:8px 0}
 </style></head>
 <body>
 <header>
@@ -312,7 +320,7 @@ main > section.active{display:block!important}
 <div id="ll40Verdict" class="ll40-verdict" data-level="none"><strong>DA VALUTARE</strong><span>Caricamento dei dati essenziali...</span></div>
 </div>
 <div class="card ll40-alert"><div class="ll40-head"><h2>🔔 Avvisi e tendenza</h2><span class="ll40-tag">Previsioni</span></div>
-<div id="ll413Alerts" class="ll413-alerts" role="status" aria-live="polite">In attesa dei dati per gli avvisi meteo.</div>
+<div class="ll415-current"><strong>Adesso</strong><div id="ll415Now">Caricamento dei valori attuali…</div></div><div class="ll415-future"><strong>Prossime 6 ore · valori massimi previsti</strong><div id="ll415Max" class="ll415-values">In attesa delle previsioni…</div></div><div id="ll413Alerts" class="ll413-alerts" role="status" aria-live="polite">In attesa dei dati per gli avvisi meteo.</div>
 <p id="ll40Trend">Il confronto delle prossime 6 ore sarà disponibile dopo il caricamento.</p>
 <p class="ll-note">Gli avvisi automatici sono calcolati dalle previsioni, non sono allerte ufficiali. Consulta anche ARPAS e Protezione Civile.</p>
 <div class="ll40-links"><a href="https://www.sar.sardegna.it/" target="_blank" rel="noopener">ARPAS Sardegna</a><button type="button" data-go="meteo">Dettagli meteo</button></div>
@@ -2923,7 +2931,7 @@ async function load(lat,lon,name){
  setText('ll40Updated','Caricamento previsioni per '+name+'...');
  for(const id of ['ll40Wind','ll40Gust','ll40Wave','ll40Air','ll40Sea','ll40Direction'])setText(id,'—');
  verdict(NaN,NaN,NaN);
- setText('ll413Alerts','⏳ Analisi avvisi meteo in corso…');
+ setText('ll413Alerts','⏳ Analisi avvisi meteo in corso…');setText('ll415Now','Caricamento…');setText('ll415Max','Caricamento…');
  try{
   const weather=new URL('https://api.open-meteo.com/v1/forecast');
   weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code',wind_speed_unit:'kmh'}).toString();
@@ -2943,9 +2951,11 @@ async function load(lat,lon,name){
   setText('ll40Air',fmt(w.hourly.temperature_2m?.[wi],0));setText('ll40Sea',fmt(m.hourly.sea_surface_temperature?.[mi],0));
   const dir=w.hourly.wind_direction_10m?.[wi]==null?NaN:Number(w.hourly.wind_direction_10m[wi]);setText('ll40Direction',Number.isFinite(dir)?windRose(dir)+' · '+Math.round(dir)+'°':'—');
   setText('ll40Updated',name+' · '+w.hourly.time[wi]?.replace('T',' ore ')+' · Open-Meteo (previsione)');
+  setText('ll415Now','Vento '+fmt(wind)+' kn · raffiche '+fmt(gust)+' kn · onde Hs '+fmt(wave)+' m');
   let maxW=0,maxG=0,maxH=0,missing=false;
   for(let i=0;i<=6;i++){const a=knots(w.hourly.wind_speed_10m?.[wi+i]),b=knots(w.hourly.wind_gusts_10m?.[wi+i]),c=m.hourly.wave_height?.[mi+i]==null?NaN:Number(m.hourly.wave_height[mi+i]);if(![a,b,c].every(Number.isFinite)){missing=true;break;}maxW=Math.max(maxW,a);maxG=Math.max(maxG,b);maxH=Math.max(maxH,c);}
   verdict(missing?NaN:maxW,missing?NaN:maxG,missing?NaN:maxH);
+  setText('ll415Max',missing?'Dati insufficienti: nessun via libera.':'Vento '+fmt(maxW)+' kn '+(maxW>12?'⚠️':'✓')+' · raffiche '+fmt(maxG)+' kn '+(maxG>17?'⚠️':'✓')+' · onde Hs '+fmt(maxH)+' m '+(maxH>0.5?'⚠️':'✓'));
   // Segnalazioni previsionali, distinte dalle allerte ufficiali regionali.
   const alerts=[];let incomplete=false;
   for(let i=0;i<=6;i++){
@@ -2962,13 +2972,13 @@ async function load(lat,lon,name){
   }else incomplete=true;
   const unique=[...new Set(alerts)];
   const alertBox=$('ll413Alerts');
-  if(alertBox){alertBox.dataset.level=unique.length?'bad':incomplete?'unknown':'ok';alertBox.textContent=unique.length?'⚠️ Segnalazioni nelle prossime 6 ore: '+unique.join(' · ')+(incomplete?' · Alcuni dati mancanti.':''):incomplete?'⚪ Avvisi non valutabili: dati previsionali incompleti.':'✅ Nessun superamento delle soglie o fenomeno avverso rilevato nelle prossime 6 ore. Non equivale ad assenza di allerte ufficiali.';}
+  if(alertBox){alertBox.dataset.level=unique.length?'bad':incomplete?'unknown':'ok';alertBox.textContent=unique.length?'⚠️ '+unique.join(' · ')+(incomplete?' · Alcuni dati mancanti.':''):incomplete?'⚪ Avvisi non valutabili: dati previsionali incompleti.':'✅ Nessun superamento delle soglie o fenomeno avverso rilevato nelle prossime 6 ore. Non equivale ad assenza di allerte ufficiali.';}
   if(alerts.some(a=>a.includes('Temporali'))){
    const v=$('ll40Verdict');v.dataset.level='bad';v.querySelector('strong').textContent='NON ESCO';v.querySelector('span').textContent='Temporali previsti nelle prossime 6 ore: uscita sconsigliata.';
   }
 
   if(!missing){const v=$('ll40Verdict');const label=v?.querySelector('strong')?.textContent;if(v&&label==='NON ESCO')v.querySelector('span').textContent='Almeno un valore supera i limiti nelle prossime 6 ore (vento 12 kn, raffiche 17 kn, onde Hs 0,5 m).';}
-  setText('ll40Trend',missing?'Dati insufficienti per la tendenza delle prossime 6 ore.':'Prossime 6 ore · vento fino a '+fmt(maxW)+' kn, raffiche '+fmt(maxG)+' kn, onde Hs '+fmt(maxH)+' m. '+(maxW>12||maxG>17||maxH>0.5?'Possibile superamento dei tuoi limiti.':'Verifica comunque l’orario di rientro.'));
+  setText('ll40Trend',missing?'Dati previsionali incompleti.':'Soglie personali: vento 12 kn · raffiche 17 kn · onde Hs 0,5 m.');
  }catch(e){if(e.name!=='AbortError'&&token===request){setText('ll40Updated','Impossibile aggiornare: '+e.message);setText('ll40Trend','Previsioni non disponibili. Verifica le fonti ufficiali.');setText('ll413Alerts','⚪ Avvisi non valutabili: aggiornamento non riuscito.');verdict(NaN,NaN,NaN);}}
  finally{if(token===request)btn.disabled=false;}
 }
