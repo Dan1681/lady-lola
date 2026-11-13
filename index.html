@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.1.8 – Avvisi compatti</title>
+<title>Lady Lola 4.1.9 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -371,6 +371,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="ll402-direction"><span>🧭 Vento da</span><strong id="ll40Direction">—</strong><small>rosa dei venti</small></div>
 <div><span>🌤️ Cielo</span><strong id="ll418Sky">—</strong><small id="ll418SkyDetail">previsione</small></div>
 <div><span>☀️ Indice UV</span><strong id="ll418Uv">—</strong><small id="ll418UvDetail">previsione</small></div>
+<div><span>👁️ Visibilità</span><strong id="ll419Visibility">—</strong><small id="ll419VisibilityDetail">previsione</small></div>
 </div>
 <div id="ll40Verdict" class="ll40-verdict" data-level="none"><strong>DA VALUTARE</strong><span>Caricamento dei dati essenziali...</span></div>
 </div>
@@ -3018,13 +3019,13 @@ function selectPlace(key,pan=true){if(!places[key])return;const p=places[key];$(
 async function load(lat,lon,name){
  const token=++request;if(abort)abort.abort();abort=new AbortController();
  const btn=$('ll40Refresh');btn.disabled=true;
- setText('ll40Updated','Caricamento previsioni per '+name+'...');setText('ll418SkyDetail','Caricamento…');setText('ll418UvDetail','Caricamento…');
- for(const id of ['ll40Wind','ll40Gust','ll40Wave','ll40Air','ll40Sea','ll40Direction','ll418Sky','ll418Uv'])setText(id,'—');
+ setText('ll40Updated','Caricamento previsioni per '+name+'...');setText('ll418SkyDetail','Caricamento…');setText('ll418UvDetail','Caricamento…');setText('ll419VisibilityDetail','Caricamento…');
+ for(const id of ['ll40Wind','ll40Gust','ll40Wave','ll40Air','ll40Sea','ll40Direction','ll418Sky','ll418Uv','ll419Visibility'])setText(id,'—');
  verdict(NaN,NaN,NaN);
  setText('ll413Alerts','⏳ Analisi avvisi meteo in corso…');setText('ll415Now','Caricamento…');setText('ll415Max','Caricamento…');
  try{
   const weather=new URL('https://api.open-meteo.com/v1/forecast');
-  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code,cloud_cover,uv_index',wind_speed_unit:'kmh'}).toString();
+  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code,cloud_cover,uv_index,visibility',wind_speed_unit:'kmh'}).toString();
   const marine=new URL('https://marine-api.open-meteo.com/v1/marine');
   marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'wave_height,wave_direction,sea_surface_temperature'}).toString();
   const [wr,mr]=await Promise.all([fetch(weather,{signal:abort.signal}),fetch(marine,{signal:abort.signal})]);
@@ -3050,6 +3051,12 @@ async function load(lat,lon,name){
   const uvLevel=!Number.isFinite(uv)?'Dato non disponibile':uv<3?'Basso':uv<6?'Moderato':uv<8?'Alto':uv<11?'Molto alto':'Estremo';
   setText('ll418Uv',Number.isFinite(uv)?fmt(uv,1):'—');setText('ll418UvDetail',uvLevel);
   const uvNode=$('ll418Uv');if(uvNode)uvNode.style.color=!Number.isFinite(uv)?'':uv<3?'#9de5b9':uv<6?'#ffe68b':uv<8?'#ffb45d':'#ff868e';
+  const visibilityRaw=w.hourly.visibility?.[wi];
+  const visibility=visibilityRaw==null?NaN:Number(visibilityRaw)/1000;
+  const visibilityLevel=!Number.isFinite(visibility)?'Dato non disponibile':visibility<1?'Molto scarsa':visibility<4?'Scarsa':visibility<10?'Moderata':'Buona';
+  setText('ll419Visibility',Number.isFinite(visibility)?fmt(visibility,1)+' km':'—');
+  setText('ll419VisibilityDetail',visibilityLevel+' · previsione');
+  const visibilityNode=$('ll419Visibility');if(visibilityNode)visibilityNode.style.color=!Number.isFinite(visibility)?'':visibility<1?'#ff868e':visibility<4?'#ffb45d':visibility<10?'#ffe68b':'#9de5b9';
   setText('ll40Updated',name+' · '+w.hourly.time[wi]?.replace('T',' ore ')+' · Open-Meteo (previsione)');
   setText('ll415Now','Vento '+fmt(wind)+' kn · raffiche '+fmt(gust)+' kn · onde Hs '+fmt(wave)+' m');
   let maxW=0,maxG=0,maxH=0,missing=false;
@@ -3079,7 +3086,7 @@ async function load(lat,lon,name){
 
   if(!missing){const v=$('ll40Verdict');const label=v?.querySelector('strong')?.textContent;if(v&&label==='NON ESCO')v.querySelector('span').textContent='Almeno un valore supera i limiti personalizzati nelle prossime 6 ore.';}
   setText('ll40Trend',missing?'Dati previsionali incompleti.':'Soglie NON ESCO: vento '+limits.windBad+' kn · raffiche '+limits.gustBad+' kn · onde Hs '+limits.waveBad+' m.');
- }catch(e){if(e.name!=='AbortError'&&token===request){setText('ll40Updated','Impossibile aggiornare: '+e.message);setText('ll418SkyDetail','Non disponibile');setText('ll418UvDetail','Non disponibile');setText('ll40Trend','Previsioni non disponibili. Verifica le fonti ufficiali.');setText('ll413Alerts','⚪ Avvisi non valutabili: aggiornamento non riuscito.');verdict(NaN,NaN,NaN);}}
+ }catch(e){if(e.name!=='AbortError'&&token===request){setText('ll40Updated','Impossibile aggiornare: '+e.message);setText('ll418SkyDetail','Non disponibile');setText('ll418UvDetail','Non disponibile');setText('ll419VisibilityDetail','Non disponibile');setText('ll40Trend','Previsioni non disponibili. Verifica le fonti ufficiali.');setText('ll413Alerts','⚪ Avvisi non valutabili: aggiornamento non riuscito.');verdict(NaN,NaN,NaN);}}
  finally{if(token===request)btn.disabled=false;}
 }
 function setup(){
