@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.5 – Avvisi compatti</title>
+<title>Lady Lola 4.2.6 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -358,6 +358,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll424-time-panel{margin-top:9px}
 .ll424-timeline{gap:6px}
 @media(max-width:440px){.ll425-score-row{grid-template-columns:1fr 1fr;gap:6px}.ll425-slot{padding:8px}.ll425-slot select{font-size:12px;padding:8px 2px}.ll425-slot label{font-size:11px}}
+</style><style id="ll426-map-style">
+.ll426-layers{background:#102e43;border:1px solid #406b81;border-radius:12px;padding:12px;margin:10px 0}
+.ll426-layers strong{display:block;font-size:14px;margin-bottom:9px}
+.ll426-options{display:flex;flex-wrap:wrap;gap:10px}
+.ll426-options label{display:flex;align-items:center;gap:7px;background:#19445b;border:1px solid #45758c;border-radius:9px;padding:10px 12px;cursor:pointer;font-size:13px}
+.ll426-options input{width:17px;height:17px;accent-color:#64c7c2}
+.ll426-status{font-size:12px;color:#b5d5e4;margin:9px 0 5px}
+.ll426-layers small{display:block;color:#a6c0cf;line-height:1.45}
+@media(max-width:520px){.ll426-options{display:grid;grid-template-columns:1fr}.ll426-options label{padding:9px}}
 </style></head>
 <body>
 <header>
@@ -387,6 +396,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </div>
 <p class="ll40-hint" id="ll40AreaInfo">Torre delle Stelle · Costa sud-orientale della Sardegna</p>
 <div id="ll40MapHost"><div id="ll40Map" aria-label="Mappa interattiva della Sardegna"></div></div>
+<div class="ll426-layers" id="ll426Layers">
+<strong>🧭 Livelli cartografici · Sardegna</strong>
+<div class="ll426-options">
+<label><input type="checkbox" id="ll426Depth"> 🌊 Fondali EMODnet</label>
+<label><input type="checkbox" id="ll426Seamarks"> ⚓ Segnalamenti OpenSeaMap</label>
+</div>
+<div id="ll426LayerStatus" role="status" class="ll426-status">Attiva i livelli per esplorare la cartografia.</div>
+<small>Livelli informativi, non carte nautiche ufficiali. Non usare per valutare bassi fondali o evitare ostacoli.</small>
+</div>
 <div class="ll40-map-actions"><button type="button" id="ll40ResetMap">🌍 Tutta la Sardegna</button><button type="button" id="ll40MyPosition">📍 La mia posizione</button><button type="button" data-go="gpsmap">Apri mappa completa</button></div>
 <p class="ll-note">Base OpenStreetMap: non è una carta nautica. I settori ARPAS sono indicativi, non poligoni ufficiali.</p>
 </div>
@@ -3451,6 +3469,53 @@ $('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su l
 }
 window.addEventListener('ll41-weather',e=>{latest=e.detail;render();});
 function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});$('ll424FishingTime')?.addEventListener('change',render);syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script><script id="ll426-sardinia-map-layers">
+/* Modulo cartografico neutro: riutilizzabile in Marea – Boat Companion.
+   Non dipende da profili di barca o punti di pesca privati. */
+(function(){
+'use strict';
+const key='ll_sardinia_map_layers_v1';
+const $=id=>document.getElementById(id);
+let map=null,depth=null,seamarks=null;
+function status(message){if($('ll426LayerStatus'))$('ll426LayerStatus').textContent=message;}
+function restore(){
+ try{const v=JSON.parse(localStorage.getItem(key)||'{}');$('ll426Depth').checked=!!v.depth;$('ll426Seamarks').checked=!!v.seamarks;}catch(e){}
+}
+function save(){try{localStorage.setItem(key,JSON.stringify({depth:$('ll426Depth').checked,seamarks:$('ll426Seamarks').checked}));}catch(e){}}
+function setLayers(){
+ if(!map)return;
+ try{
+  if($('ll426Depth').checked){
+   if(!depth)depth=L.tileLayer.wms('https://ows.emodnet-bathymetry.eu/wms',{
+    layers:'emodnet:mean_multicolour',version:'1.1.1',format:'image/png',transparent:true,
+    opacity:0.65,attribution:'Bathymetry © EMODnet',maxZoom:18
+   });
+   if(!map.hasLayer(depth))depth.addTo(map);
+  }else if(depth&&map.hasLayer(depth))map.removeLayer(depth);
+  if($('ll426Seamarks').checked){
+   if(!seamarks)seamarks=L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',{
+    maxZoom:18,opacity:0.95,attribution:'Seamarks © OpenSeaMap / OpenStreetMap contributors'
+   });
+   if(!map.hasLayer(seamarks))seamarks.addTo(map);
+  }else if(seamarks&&map.hasLayer(seamarks))map.removeLayer(seamarks);
+  status('Livelli selezionati: '+[$('ll426Depth').checked?'fondali':'',$('ll426Seamarks').checked?'segnalamenti':''].filter(Boolean).join(' + ').replace(/^$/,'nessuno')+'. Le immagini richiedono Internet.');
+  save();
+ }catch(e){status('Impossibile attivare i livelli: '+e.message);}
+}
+function init(){
+ if(!$('ll426Depth')||!$('ll426Seamarks'))return;
+ restore();
+ $('ll426Depth').addEventListener('change',setLayers);
+ $('ll426Seamarks').addEventListener('change',setLayers);
+ let attempts=0;
+ const interval=setInterval(()=>{
+  if(window.ll40SharedMap&&window.L){
+   clearInterval(interval);map=window.ll40SharedMap;setLayers();
+  }else if(++attempts>=100){clearInterval(interval);status('Mappa non disponibile: verifica la connessione e ricarica.');}
+ },300);
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
