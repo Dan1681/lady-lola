@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.9 – Meteo per fasce orarie</title>
+<title>Lady Lola 4.2.10 – Layout meteo iPhone</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -404,6 +404,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll429-slot h4{margin:0 0 8px;font-size:15px}.ll429-slot p{margin:4px 0;font-size:13px;line-height:1.5}
 .ll429-slot .ll429-flag{display:inline-block;padding:3px 7px;border-radius:6px;background:rgba(230,160,70,.17);font-size:12px;margin-bottom:7px}
 .ll429-hourly small{display:block;line-height:1.5;margin-top:9px}
+</style><style id="ll4210-weather-layout">
+/* Twelve weather values form complete rows before the full-width warning. */
+.ll40-metrics > div:not(.ll428-weather-truth){min-width:0;overflow-wrap:anywhere}
+.ll40-metrics > div:not(.ll428-weather-truth) strong{overflow-wrap:anywhere;word-break:normal;line-height:1.25}
+.ll428-weather-truth{grid-column:1/-1!important;font-size:12px!important;font-weight:400!important;text-align:left!important}
+.ll428-weather-truth strong{display:inline!important;font-size:inherit!important;font-weight:700!important;line-height:inherit!important}
+@media(max-width:600px){.ll40-metrics > div:not(.ll428-weather-truth) strong{font-size:clamp(15px,4.2vw,25px)!important}.ll40-metrics > div:not(.ll428-weather-truth) small{overflow-wrap:anywhere}}
 </style></head>
 <body>
 <header>
@@ -457,10 +464,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="ll402-direction"><span>🧭 Vento da</span><strong id="ll40Direction">—</strong><small>rosa dei venti</small></div>
 <div><span>🌤️ Cielo</span><strong id="ll418Sky">—</strong><small id="ll418SkyDetail">previsione</small></div>
 <div><span>☀️ Indice UV</span><strong id="ll418Uv">—</strong><small id="ll418UvDetail">previsione</small></div>
-<div class="ll428-weather-truth" role="note">⚠️ <strong>Previsioni, non osservazioni in tempo reale.</strong> Anche con 0 mm previsti può piovere localmente. Prima di uscire verifica <a href="https://www.sar.sardegna.it/servizi/meteo/imgradar_it.asp" target="_blank" rel="noopener noreferrer">radar ARPAS</a> e <a href="https://www.sar.sardegna.it/servizi/meteo/bollsardegna_new_it.asp" target="_blank" rel="noopener noreferrer">bollettino Sardegna</a>.</div><div><span>🌧️ Prob. pioggia (modello)</span><strong id="ll421RainProb">—</strong><small>previsione oraria</small></div>
+<div><span>🌧️ Prob. pioggia (modello)</span><strong id="ll421RainProb">—</strong><small>previsione oraria</small></div>
 <div><span>🌦️ Pioggia prevista</span><strong id="ll421RainAmount">—</strong><small>mm nell’ora</small></div>
 <div><span>⛈️ Temporali</span><strong id="ll421Storm">—</strong><small id="ll421StormDetail">previsione, non allerta ufficiale</small></div>
 <div><span>👁️ Visibilità</span><strong id="ll419Visibility">—</strong><small id="ll419VisibilityDetail">previsione</small></div>
+<div class="ll428-weather-truth" role="note">⚠️ <strong>Previsioni, non osservazioni in tempo reale.</strong> Anche con 0 mm previsti può piovere localmente. Prima di uscire verifica <a href="https://www.sar.sardegna.it/servizi/meteo/imgradar_it.asp" target="_blank" rel="noopener noreferrer">radar ARPAS</a> e <a href="https://www.sar.sardegna.it/servizi/meteo/bollsardegna_new_it.asp" target="_blank" rel="noopener noreferrer">bollettino Sardegna</a>.</div>
 </div>
 <div id="ll40Verdict" class="ll40-verdict" data-level="none"><strong>DA VALUTARE</strong><span>Caricamento dei dati essenziali...</span></div>
 </div>
@@ -3186,9 +3194,9 @@ async function load(lat,lon,name){
   const rp=w.hourly.precipitation_probability?.[wi],ra=w.hourly.precipitation?.[wi],wc=w.hourly.weather_code?.[wi];
   setText('ll421RainProb',rp==null?'—':Math.round(Number(rp))+'%');
   setText('ll421RainAmount',ra==null?'—':Number(ra).toFixed(1)+' mm');
-  const storm=wc==null?'Non valutabile':([95,96,99].includes(Number(wc))?'Temporale previsto':'Temporali non previsti dal modello');
+  const storm=wc==null?'Non valutabile':([95,96,99].includes(Number(wc))?'Temporale previsto':'Non previsti');
   setText('ll421Storm',storm);
-  setText('ll421StormDetail',wc==null?'Dati mancanti':([95,96,99].includes(Number(wc))?'Codice meteo temporalesco · controlla gli avvisi ufficiali':'Non esclude temporali locali · verifica radar e avvisi ARPAS'));
+  setText('ll421StormDetail',wc==null?'Dati mancanti':([95,96,99].includes(Number(wc))?'Codice meteo temporalesco · controlla gli avvisi ufficiali':'Possibili fenomeni locali · verifica ARPAS'));
   const visibilityRaw=w.hourly.visibility?.[wi];
   const visibility=visibilityRaw==null?NaN:Number(visibilityRaw)/1000;
   const visibilityLevel=!Number.isFinite(visibility)?'Dato non disponibile':visibility<1?'Molto scarsa':visibility<4?'Scarsa':visibility<10?'Moderata':'Buona';
