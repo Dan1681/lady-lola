@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.10 – Layout meteo iPhone</title>
+<title>Lady Lola 4.2.11 – Layout meteo iPhone</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -3138,7 +3138,7 @@ oristano:[39.904,8.593,'62 W','Oristano'],carloforte:[39.146,8.305,'64 SW','Carl
 stintino:[40.939,8.229,'60 NW','Stintino']
 };
 const sectorNames={'64 S':'Sud Sardegna','64 SW':'Sud-ovest','63 SE':'Sud-est','62 W':'Ovest','61 NE':'Nord-est','60 N':'Nord','60 NW':'Nord-ovest'};
-let map=null,marker=null,abort=null,request=0,debounce=null;
+let map=null,marker=null,gpsMarker=null,gpsAccuracy=null,abort=null,request=0,debounce=null;
 const knots=v=>v==null?NaN:Number(v)*0.5399568;
 const windRose=deg=>{const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];return dirs[Math.round((((deg%360)+360)%360)/22.5)%16];};
 const fmt=(v,n=1)=>v!=null&&Number.isFinite(Number(v))?Number(v).toFixed(n):'—';
@@ -3243,7 +3243,17 @@ function setup(){
  $('ll40Sector').addEventListener('change',()=>{const zone=$('ll40Sector').value;const found=Object.keys(places).find(k=>places[k][2]===zone);if(found)selectPlace(found);});
  $('ll40Refresh').addEventListener('click',()=>selectPlace($('ll40Area').value,false));
  $('ll40ResetMap').addEventListener('click',()=>{(map||window.ll40SharedMap)?.setView([40.02,9.0],7);});
- $('ll40MyPosition').addEventListener('click',()=>{if(!navigator.geolocation){setText('ll40AreaInfo','GPS non disponibile');return;}navigator.geolocation.getCurrentPosition(pos=>{const {latitude,longitude}=pos.coords;centerMap(latitude,longitude,12);const k=nearest(latitude,longitude);setText('ll40AreaInfo','GPS attivo · località vicina: '+places[k][3]+'. Tocca la località per caricare le previsioni.');},()=>setText('ll40AreaInfo','Posizione non disponibile: controlla i permessi GPS.'),{enableHighAccuracy:false,timeout:12000});});
+ $('ll40MyPosition').addEventListener('click',()=>{if(!navigator.geolocation){setText('ll40AreaInfo','GPS non disponibile');return;}navigator.geolocation.getCurrentPosition(pos=>{const {latitude,longitude}=pos.coords;const active=map||window.ll40SharedMap;
+ if(active&&window.L){
+  const point=[latitude,longitude];
+  if(!gpsMarker){gpsMarker=L.circleMarker(point,{radius:9,color:'#ffffff',weight:3,fillColor:'#178bff',fillOpacity:1,bubblingMouseEvents:false}).addTo(active).bindPopup('📍 La tua posizione GPS');}
+  else gpsMarker.setLatLng(point);
+  const accuracy=Math.max(0,Number(pos.coords.accuracy)||0);
+  if(!gpsAccuracy)gpsAccuracy=L.circle(point,{radius:accuracy,color:'#178bff',weight:1,fillColor:'#178bff',fillOpacity:0.12,interactive:false}).addTo(active);
+  else gpsAccuracy.setLatLng(point).setRadius(accuracy);
+  gpsMarker.bringToFront();active.setView(point,12);setTimeout(()=>active.invalidateSize(),80);
+ }
+ const k=nearest(latitude,longitude);setText('ll40AreaInfo','📍 Posizione GPS indicata dal punto blu'+(Number.isFinite(pos.coords.accuracy)?' · precisione ±'+Math.round(pos.coords.accuracy)+' m':'')+' · località vicina: '+places[k][3]+'. Tocca la località per caricare le previsioni.');},()=>setText('ll40AreaInfo','Posizione non disponibile: controlla i permessi GPS.'),{enableHighAccuracy:false,timeout:12000});});
  try{const saved=localStorage.getItem('ll40_home_place');if(places[saved])$('ll40Area').value=saved;}catch(e){}
  $('ll40Area').addEventListener('change',()=>{try{localStorage.setItem('ll40_home_place',$('ll40Area').value);}catch(e){}});
  // Leaflet is supplied by the existing app; initialize only if available.
