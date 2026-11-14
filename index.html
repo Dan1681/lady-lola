@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.12 – Grafico maree Home</title>
+<title>Lady Lola 4.2.13 – Grafico maree Home</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -434,13 +434,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </nav>
 <main>
 <section id="home" class="active">
-<section class="card ll412-tide-card" id="ll412TideCard" aria-label="Maree della giornata">
+<section class="card ll412-tide-card" id="ll412TideCard" aria-label="Andamento automatico del livello del mare">
 <h2>🌊 Maree · oggi</h2>
-<p class="ll40-hint" id="ll412TidePlace">Cagliari · orari inseriti manualmente · ora italiana</p>
-<div id="ll412TideGraphic" class="ll412-tide-graphic" role="img" aria-label="Linea temporale delle alte e basse maree"></div>
-<div id="ll412TideLegend" class="ll412-tide-legend">Inserisci gli orari nella sezione Pesca per visualizzare il grafico.</div>
-<p class="ll40-hint">Grafico temporale indicativo: mostra gli orari inseriti, <strong>non</strong> le altezze in metri né una curva di marea misurata o prevista. Fonte automatica non ancora integrata.</p>
-<button type="button" id="ll412TideGoFishing">✏️ Inserisci / modifica orari maree</button>
+<p class="ll40-hint" id="ll412TidePlace">Costa di Cagliari · previsione automatica</p>
+<div id="ll412TideGraphic" class="ll412-tide-graphic" role="img" aria-label="Grafico del livello del mare previsto nelle 24 ore">Caricamento della previsione…</div>
+<div id="ll412TideLegend" class="ll412-tide-legend" aria-live="polite">Fonte: Open-Meteo Marine</div>
+<p class="ll40-hint">Livello del mare previsto rispetto al livello medio globale (MSL), comprende anche la componente di marea. <strong>Non è una tavola di marea ufficiale</strong>: precisione limitata presso la costa; non usare per navigazione, ancoraggio o valutare i fondali. © Open-Meteo (CC BY 4.0).</p>
 </section>
 <div class="ll40-intro"><div><span class="ll40-eyebrow">⚓ LADY LOLA · BOAT COMPANION</span><h2>Il mare, a colpo d'occhio</h2><p>Seleziona una località o tocca la mappa: le previsioni si aggiornano automaticamente.</p></div></div>
 <div class="ll40-layout">
@@ -3643,38 +3642,47 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script><script id="ll412-tide-home-script">
 (function(){'use strict';
 const $=id=>document.getElementById(id);
-const day=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let last='';
-function render(){
+let position={lat:39.17,lon:9.16,name:'Costa di Cagliari'},lastKey='',controller=null;
+const localDate=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const num=v=>Number.isFinite(Number(v))?Number(v):null;
+function setStatus(msg){const e=$('ll412TideLegend');if(e)e.textContent=msg;}
+function draw(times,values,unit){
  const root=$('ll412TideGraphic');if(!root)return;
- let vals=[];try{vals=JSON.parse(localStorage.getItem('ll422_tides_cagliari_'+day())||'[]');}catch(e){}
- const events=(Array.isArray(vals)?vals:[]).map((v,i)=>{
-  if(typeof v!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(v))return null;
-  const [h,m]=v.split(':').map(Number);return {time:h*60+m,label:v,high:i===0||i===2};
- }).filter(Boolean).sort((a,b)=>a.time-b.time);
- const width=640,left=35,right=605,baseline=96;
- let markup='<svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
- markup+='<line x1="35" y1="96" x2="605" y2="96" stroke="#8baab9" stroke-width="2"/>';
- for(let h=0;h<=24;h+=3){const x=left+(right-left)*h/24;markup+=`<line x1="${x}" y1="91" x2="${x}" y2="102" stroke="#7799aa"/><text x="${x}" y="123" text-anchor="middle" fill="#bdd6e4" font-size="14">${String(h).padStart(2,'0')}</text>`;}
- if(!events.length)markup+='<text x="320" y="63" fill="#d1e6f0" text-anchor="middle" font-size="16">Orari delle maree non ancora inseriti</text>';
- for(const e of events){const x=left+(right-left)*e.time/1440,y=e.high?49:78,color=e.high?'#65dfdb':'#ffc57c';
-  markup+=`<line x1="${x}" y1="${y+9}" x2="${x}" y2="96" stroke="${color}" stroke-dasharray="4 4"/><circle cx="${x}" cy="${y}" r="8" fill="${color}"/><text x="${x}" y="${y-17}" text-anchor="middle" font-size="15" fill="#ffffff">${esc(e.label)}</text>`;
+ const date=localDate(),rows=times.map((t,i)=>({t,v:num(values[i])})).filter(r=>r.t.startsWith(date)&&r.v!==null);
+ if(rows.length<18){root.textContent='Dati insufficienti per il grafico di oggi.';setStatus('Previsione non disponibile per questa zona.');return;}
+ const min=Math.min(...rows.map(r=>r.v)),max=Math.max(...rows.map(r=>r.v)),span=Math.max(.05,max-min),w=340,h=142,pad=22;
+ const x=i=>pad+i*(w-2*pad)/(rows.length-1),y=v=>h-pad-(v-min)/span*(h-2*pad);
+ const path=rows.map((r,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(r.v).toFixed(1)).join(' ');
+ const extrema=[];
+ for(let i=1;i<rows.length-1;i++){
+  if(rows[i].v>rows[i-1].v&&rows[i].v>=rows[i+1].v)extrema.push({i,type:'Alta'});
+  if(rows[i].v<rows[i-1].v&&rows[i].v<=rows[i+1].v)extrema.push({i,type:'Bassa'});
  }
- markup+='</svg>';root.innerHTML=markup;
- const legend=$('ll412TideLegend');if(legend)legend.textContent=events.length?events.map(e=>(e.high?'🔼 Alta ':'🔽 Bassa ')+e.label).join('  ·  '):'Nessun orario salvato per oggi. Apri Pesca per inserirli.';
+ const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const ticks=[0,6,12,18,23].map(hour=>{let i=rows.findIndex(r=>Number(r.t.slice(11,13))>=hour);if(i<0)i=rows.length-1;return '<text x="'+x(i)+'" y="140" text-anchor="middle" font-size="10" fill="currentColor">'+hour.toString().padStart(2,'0')+'</text>';}).join('');
+ const points=extrema.map(e=>'<circle cx="'+x(e.i)+'" cy="'+y(rows[e.i].v)+'" r="3.5" fill="'+(e.type==='Alta'?'#5bd8ba':'#ffcc70')+'"/>').join('');
+ root.innerHTML='<svg viewBox="0 0 340 150" width="100%" role="img" aria-label="Livello del mare previsto dalle 00 alle 24">'+
+ '<line x1="22" x2="318" y1="120" y2="120" stroke="currentColor" opacity=".25"/>'+
+ '<path d="'+path+'" fill="none" stroke="#5bd8ba" stroke-width="2.8" stroke-linejoin="round"/>'+points+ticks+'</svg>';
+ const info=extrema.map(e=>e.type+' '+rows[e.i].t.slice(11,16)+' ('+rows[e.i].v.toFixed(2)+' '+unit+')');
+ setStatus((info.length?info.join(' · '):'Andamento previsto disponibile; estremi non identificabili con certezza')+' · Open-Meteo Marine · '+date);
 }
-function init(){render();$('ll412TideGoFishing')?.addEventListener('click',()=>{
- const btn=document.querySelector('[data-page="home"]');
- const target=document.getElementById('ll422High1');
- const fishing=document.getElementById('fishing');
- // Navigate using existing app navigation if available; otherwise scroll to the tide editor.
- const nav=document.querySelector('[data-page="fishing"]');if(nav)nav.click();
- if(target)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'center'}),120);
- });
- ['ll422Save','ll422Clear'].forEach(id=>$(id)?.addEventListener('click',()=>setTimeout(render,30)));
- window.addEventListener('storage',render);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+async function refresh(){
+ const date=localDate(),key=[position.lat.toFixed(3),position.lon.toFixed(3),date].join('|');if(key===lastKey)return;lastKey=key;
+ if(controller)controller.abort();controller=new AbortController();
+ const root=$('ll412TideGraphic');if(root)root.textContent='Caricamento del livello del mare…';
+ $('ll412TidePlace').textContent=position.name+' · '+date+' · previsione automatica';
+ try{
+  const url=new URL('https://marine-api.open-meteo.com/v1/marine');
+  url.search=new URLSearchParams({latitude:String(position.lat),longitude:String(position.lon),hourly:'sea_level_height_msl',timezone:'Europe/Rome',forecast_days:'2',cell_selection:'sea'}).toString();
+  const res=await fetch(url,{signal:controller.signal,cache:'no-store'});if(!res.ok)throw new Error('HTTP '+res.status);
+  const data=await res.json();if(data.error)throw new Error(data.reason||'API non disponibile');
+  if(key!==lastKey)return;
+  draw(data.hourly?.time||[],data.hourly?.sea_level_height_msl||[],data.hourly_units?.sea_level_height_msl||'m');
+ }catch(e){if(e.name==='AbortError')return;if(root)root.textContent='Grafico non disponibile';setStatus('Impossibile recuperare le previsioni automatiche: '+e.message);lastKey='';}
+}
+function init(){refresh();document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastKey='';refresh();}});
+ window.addEventListener('ll41-weather',e=>{const d=e.detail;if(Number.isFinite(Number(d?.lat))&&Number.isFinite(Number(d?.lon))){position={lat:Number(d.lat),lon:Number(d.lon),name:d.name||'Zona selezionata'};refresh();}});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
