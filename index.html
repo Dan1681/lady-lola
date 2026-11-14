@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.6 – Avvisi compatti</title>
+<title>Lady Lola 4.2.7 – Avvisi compatti</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -158,7 +158,7 @@ button:active:not(:disabled){transform:translateY(1px)}
       calc(8px + env(safe-area-inset-bottom))
       max(8px,env(safe-area-inset-left))!important;
     z-index:2147483000!important;
-    -webkit-transform:translateZ(0);
+    -webkit-transform:none!important;
   }
   #menu button {flex:1 1 0!important;min-width:0!important;padding:9px 4px!important;font-size:12px!important;}
   main {padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;}
@@ -367,6 +367,33 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll426-status{font-size:12px;color:#b5d5e4;margin:9px 0 5px}
 .ll426-layers small{display:block;color:#a6c0cf;line-height:1.45}
 @media(max-width:520px){.ll426-options{display:grid;grid-template-columns:1fr}.ll426-options label{padding:9px}}
+</style><style id="ll427-ios-nav-stability">
+/* iPhone Safari: fixed bar must not be composited or trapped in a scroll container. */
+@media (max-width:700px) {
+ html {overflow-x:hidden!important;scroll-behavior:auto!important}
+ body {overflow-x:hidden!important;transform:none!important;filter:none!important;perspective:none!important}
+ #menu {
+  position:fixed!important;
+  inset:auto 0 0 0!important;
+  bottom:0!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  transform:none!important;
+  -webkit-transform:none!important;
+  will-change:auto!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  isolation:isolate;
+  z-index:2147483000!important;
+  padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;
+ }
+ #menu button {transform:none!important;min-height:48px!important;touch-action:manipulation}
+ main {padding-bottom:calc(125px + env(safe-area-inset-bottom,0px))!important}
+}
 </style></head>
 <body>
 <header>
