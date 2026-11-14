@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.7 – Avvisi compatti</title>
+<title>Lady Lola 4.2.9 –Aggiornamento Meteo</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -397,6 +397,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style><style id="ll428-weather-reliability">
 .ll428-weather-truth{grid-column:1/-1;padding:11px 12px;background:rgba(250,188,68,.11);border:1px solid rgba(250,188,68,.42);border-radius:10px;color:inherit;font-size:12px;line-height:1.5}
 .ll428-weather-truth a{text-decoration:underline;color:inherit;font-weight:700}
+</style><style id="ll429-style">
+.ll429-hourly{margin-top:20px;padding-top:14px;border-top:1px solid rgba(130,160,180,.3)}
+.ll429-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:10px;margin:12px 0}
+.ll429-slot{padding:13px;border-radius:12px;border:1px solid rgba(130,160,180,.4);background:rgba(90,140,165,.09)}
+.ll429-slot h4{margin:0 0 8px;font-size:15px}.ll429-slot p{margin:4px 0;font-size:13px;line-height:1.5}
+.ll429-slot .ll429-flag{display:inline-block;padding:3px 7px;border-radius:6px;background:rgba(230,160,70,.17);font-size:12px;margin-bottom:7px}
+.ll429-hourly small{display:block;line-height:1.5;margin-top:9px}
 </style></head>
 <body>
 <header>
@@ -546,7 +553,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <p id="marineStatus" class="muted">
 Premi Aggiorna previsioni.
 </p>
-<div id="marineResult"></div>
+<div id="marineResult"></div><div class="ll429-hourly"><h3>🕒 Dettaglio per fasce di 3 ore</h3><p class="muted">Previsioni modellistiche Open-Meteo, non osservazioni in tempo reale. Seleziona zona e giorno; le fasce sono riferite all’ora locale della Sardegna.</p><div id="ll429Status" role="status" class="muted">Caricamento delle fasce…</div><div id="ll429Slots" class="ll429-grid"></div><small>⚠️ Per uscire in mare confronta queste previsioni con avvisi ARPAS, radar e condizioni osservate. Le onde Hs non indicano l’altezza massima.</small></div>
 </div>
 
 <div class="card">
@@ -3546,6 +3553,59 @@ function init(){
   }else if(++attempts>=100){clearInterval(interval);status('Mappa non disponibile: verifica la connessione e ricarica.');}
  },300);
 }
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script><script id="ll429-hourly-forecast">
+(function(){'use strict';
+const el=id=>document.getElementById(id);
+const safe=(v,d=0,unit='')=>v==null||!Number.isFinite(Number(v))?'—':Number(v).toFixed(d)+unit;
+const codes={0:'Sereno',1:'Prevalentemente sereno',2:'Parzialmente nuvoloso',3:'Coperto',45:'Nebbia',48:'Nebbia',51:'Pioviggine',53:'Pioviggine',55:'Pioviggine intensa',61:'Pioggia debole',63:'Pioggia moderata',65:'Pioggia forte',80:'Rovesci',81:'Rovesci',82:'Rovesci forti',95:'Temporale',96:'Temporale con grandine',99:'Temporale con grandine'};
+let request=0;
+async function render(){
+ const zoneKey=el('marineZone')?.value, day=Number(el('marineDay')?.value||0);
+ const zone=typeof marineZones!=='undefined'?marineZones[zoneKey]:null;
+ const output=el('ll429Slots'),status=el('ll429Status');if(!zone||!output||!status)return;
+ const token=++request;status.textContent='Caricamento previsioni orarie…';output.replaceChildren();
+ const base={latitude:String(zone.lat),longitude:String(zone.lon),timezone:'Europe/Rome',forecast_days:'4'};
+ const a=new URLSearchParams({...base,wind_speed_unit:'kn',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code,visibility'});
+ const b=new URLSearchParams({...base,hourly:'wave_height,wave_direction'});
+ try{
+  const [wr,mr]=await Promise.all([fetch('https://api.open-meteo.com/v1/forecast?'+a),fetch('https://marine-api.open-meteo.com/v1/marine?'+b)]);
+  if(!wr.ok||!mr.ok)throw Error('Servizio non disponibile');
+  const [w,m]=await Promise.all([wr.json(),mr.json()]);if(token!==request)return;
+  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const date=new Date(today+'T12:00:00Z');date.setUTCDate(date.getUTCDate()+day);
+  const dayKey=date.toISOString().slice(0,10);
+  const waveIndex=new Map((m.hourly?.time||[]).map((t,i)=>[t,i]));
+  const rows=(w.hourly?.time||[]).map((t,i)=>({t,i})).filter(o=>o.t.slice(0,10)===dayKey);
+  if(!rows.length)throw Error('Nessuna previsione per il giorno selezionato');
+  for(let start=0;start<24;start+=3){
+   const group=rows.filter(o=>Number(o.t.slice(11,13))>=start&&Number(o.t.slice(11,13))<start+3);
+   if(!group.length)continue;
+   const max=key=>{const vals=group.map(o=>w.hourly?.[key]?.[o.i]).filter(v=>v!=null&&Number.isFinite(Number(v)));return vals.length?Math.max(...vals.map(Number)):null};
+   const avg=key=>{const vals=group.map(o=>w.hourly?.[key]?.[o.i]).filter(v=>v!=null&&Number.isFinite(Number(v)));return vals.length?vals.reduce((a,b)=>a+Number(b),0)/vals.length:null};
+   const waves=group.map(o=>m.hourly?.wave_height?.[waveIndex.get(o.t)]).filter(v=>v!=null&&Number.isFinite(Number(v)));
+   const wave=waves.length?Math.max(...waves.map(Number)):null;
+   const first=group[0].i, code=w.hourly?.weather_code?.[first],wind=max('wind_speed_10m'),gust=max('wind_gusts_10m');
+   const card=document.createElement('article');card.className='ll429-slot';
+   const h=document.createElement('h4');h.textContent=String(start).padStart(2,'0')+':00 – '+String(start+3).padStart(2,'0')+':00';card.append(h);
+   const flag=document.createElement('span');flag.className='ll429-flag';flag.textContent=wind==null||gust==null||wave==null?'Dati essenziali incompleti':wind>12||gust>17||wave>0.5?'⚠️ Condizioni oltre soglia ATTENZIONE':wind>8||gust>12||wave>0.3?'⚠️ Condizioni da valutare':'Valori entro soglie meteo prudenti (non autorizza uscita)';card.append(flag);
+   const lines=[
+    '🌤 Cielo: '+(code==null?'—':codes[code]||'Codice '+code),
+    '🌬 Vento massimo: '+safe(wind,1,' kn')+' · raffiche '+safe(gust,1,' kn'),
+    '🧭 Direzione vento (inizio fascia): '+safe(w.hourly?.wind_direction_10m?.[first],0,'°'),
+    '🌊 Onde Hs massime previste: '+safe(wave,2,' m'),
+    '🌧 Prob. pioggia massima: '+safe(max('precipitation_probability'),0,'%'),
+    '💧 Pioggia totale prevista (3 h): '+(group.every(o=>w.hourly?.precipitation?.[o.i]!=null)?safe(group.reduce((sum,o)=>sum+Number(w.hourly.precipitation[o.i]),0),1,' mm'):'—'),
+    '🌡 Temperatura media: '+safe(avg('temperature_2m'),1,' °C'),
+    '👁 Visibilità minima: '+(max('visibility')==null?'—':safe(Math.min(...group.map(o=>w.hourly?.visibility?.[o.i]).filter(v=>v!=null))/1000,1,' km'))
+   ];
+   for(const line of lines){const p=document.createElement('p');p.textContent=line;card.append(p)}output.append(card);
+  }
+  status.textContent='Previsioni '+dayKey+' · '+(zoneKey||'zona')+' · aggiornate al caricamento. Fonte: Open-Meteo Forecast e Marine.';
+ }catch(e){if(token===request)status.textContent='Impossibile caricare le fasce: '+e.message;}
+}
+function init(){for(const id of ['marineZone','marineDay'])el(id)?.addEventListener('change',render);render()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
