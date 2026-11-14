@@ -394,6 +394,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  #menu button {transform:none!important;min-height:48px!important;touch-action:manipulation}
  main {padding-bottom:calc(125px + env(safe-area-inset-bottom,0px))!important}
 }
+</style><style id="ll428-weather-reliability">
+.ll428-weather-truth{grid-column:1/-1;padding:11px 12px;background:rgba(250,188,68,.11);border:1px solid rgba(250,188,68,.42);border-radius:10px;color:inherit;font-size:12px;line-height:1.5}
+.ll428-weather-truth a{text-decoration:underline;color:inherit;font-weight:700}
 </style></head>
 <body>
 <header>
@@ -447,8 +450,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="ll402-direction"><span>🧭 Vento da</span><strong id="ll40Direction">—</strong><small>rosa dei venti</small></div>
 <div><span>🌤️ Cielo</span><strong id="ll418Sky">—</strong><small id="ll418SkyDetail">previsione</small></div>
 <div><span>☀️ Indice UV</span><strong id="ll418Uv">—</strong><small id="ll418UvDetail">previsione</small></div>
-<div><span>🌧️ Prob. pioggia</span><strong id="ll421RainProb">—</strong><small>previsione oraria</small></div>
-<div><span>🌦️ Precipitazioni</span><strong id="ll421RainAmount">—</strong><small>mm nell’ora</small></div>
+<div class="ll428-weather-truth" role="note">⚠️ <strong>Previsioni, non osservazioni in tempo reale.</strong> Anche con 0 mm previsti può piovere localmente. Prima di uscire verifica <a href="https://www.sar.sardegna.it/servizi/meteo/imgradar_it.asp" target="_blank" rel="noopener noreferrer">radar ARPAS</a> e <a href="https://www.sar.sardegna.it/servizi/meteo/bollsardegna_new_it.asp" target="_blank" rel="noopener noreferrer">bollettino Sardegna</a>.</div><div><span>🌧️ Prob. pioggia (modello)</span><strong id="ll421RainProb">—</strong><small>previsione oraria</small></div>
+<div><span>🌦️ Pioggia prevista</span><strong id="ll421RainAmount">—</strong><small>mm nell’ora</small></div>
 <div><span>⛈️ Temporali</span><strong id="ll421Storm">—</strong><small id="ll421StormDetail">previsione, non allerta ufficiale</small></div>
 <div><span>👁️ Visibilità</span><strong id="ll419Visibility">—</strong><small id="ll419VisibilityDetail">previsione</small></div>
 </div>
@@ -3176,9 +3179,9 @@ async function load(lat,lon,name){
   const rp=w.hourly.precipitation_probability?.[wi],ra=w.hourly.precipitation?.[wi],wc=w.hourly.weather_code?.[wi];
   setText('ll421RainProb',rp==null?'—':Math.round(Number(rp))+'%');
   setText('ll421RainAmount',ra==null?'—':Number(ra).toFixed(1)+' mm');
-  const storm=wc==null?'Non valutabile':([95,96,99].includes(Number(wc))?'Temporale previsto':'Nessun temporale indicato');
+  const storm=wc==null?'Non valutabile':([95,96,99].includes(Number(wc))?'Temporale previsto':'Temporali non previsti dal modello');
   setText('ll421Storm',storm);
-  setText('ll421StormDetail',wc==null?'Dati mancanti':([95,96,99].includes(Number(wc))?'Codice meteo temporalesco · controlla gli avvisi ufficiali':'Solo previsione modellistica · controlla gli avvisi ufficiali'));
+  setText('ll421StormDetail',wc==null?'Dati mancanti':([95,96,99].includes(Number(wc))?'Codice meteo temporalesco · controlla gli avvisi ufficiali':'Non esclude temporali locali · verifica radar e avvisi ARPAS'));
   const visibilityRaw=w.hourly.visibility?.[wi];
   const visibility=visibilityRaw==null?NaN:Number(visibilityRaw)/1000;
   const visibilityLevel=!Number.isFinite(visibility)?'Dato non disponibile':visibility<1?'Molto scarsa':visibility<4?'Scarsa':visibility<10?'Moderata':'Buona';
