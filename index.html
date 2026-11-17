@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.12 – Maree automatiche Sardegna</title>
+<title>Lady Lola 4.2.13 – Maree automatiche Sardegna</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -424,6 +424,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #ll4211Tide .ll4211-chart svg{display:block;width:100%;min-width:300px;height:auto}
 .ll4211-manual{margin-top:14px;opacity:.82}
 @media(max-width:520px){#ll4211Tide{padding:12px!important}#ll4211Tide .ll4211-controls{grid-template-columns:1fr 1fr}#ll4211Tide .ll4211-now{grid-template-columns:1fr 1fr}}
+</style><style id="ll4213-tides-layout">
+#ll4211Tide{margin-top:16px!important;scroll-margin-top:24px}
+#ll4211Chart{min-height:180px}
+#ll4211Status{overflow-wrap:anywhere}
+@media(max-width:600px){#ll4211Tide{padding:12px!important}#ll4211Chart{min-height:155px}}
 </style></head>
 <body>
 <header>
@@ -495,6 +500,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="card ll420-card" id="ll420MarineFishing">
 <div class="ll40-head"><h2>🌅 Mare, sole e pesca</h2><span class="ll40-tag">Previsioni orientative</span></div>
 <p class="ll40-hint" id="ll420Place">Seleziona una località per aggiornare le informazioni.</p>
+
+<div class="ll420-facts">
+<div><span>🌅 Alba</span><strong id="ll420Sunrise">—</strong></div><div><span>🌇 Tramonto</span><strong id="ll420Sunset">—</strong></div>
+<div><span>🌙 Luna</span><strong id="ll420Moon">—</strong><small id="ll423Illumination">Illuminazione da calcolare</small></div><div><span>🌊 Maree</span><strong>Automatiche</strong><small>Grafico aggiornato qui sotto</small><span id="ll420Tides" hidden>Consulta orari</span></div>
+</div>
 <section class="ll4211-tide" id="ll4211Tide" aria-label="Maree automatiche Sardegna">
 <div class="ll4211-head"><h3>🌊 Maree automatiche · Sardegna</h3><span class="ll4211-pill">Stima modellistica</span></div>
 <div class="ll4211-controls"><label>Zona costiera<select id="ll4211Place"><option value="cagliari">Golfo di Cagliari</option><option value="villasimius">Villasimius</option><option value="teulada">Teulada</option><option value="carloforte">Carloforte</option><option value="oristano">Golfo di Oristano</option><option value="bosa">Bosa</option><option value="alghero">Alghero</option><option value="stintino">Stintino</option><option value="castelsardo">Castelsardo</option><option value="olbia">Olbia</option><option value="tavolara">Tavolara</option><option value="orosei">Golfo di Orosei</option><option value="arbatax">Arbatax</option><option value="muravera">Costa Rei / Muravera</option></select></label><label>Giorno<input type="date" id="ll4211Date"></label></div>
@@ -505,10 +515,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <p class="ll4211-warning">⚠️ <strong>Stima del livello del mare rispetto al livello medio globale (MSL)</strong>, non altezza di marea rispetto allo zero nautico. Il modello Open-Meteo ha risoluzione circa 8 km e precisione limitata lungo le coste. Orari ed estremi sono indicativi, non utilizzabili per fondali, accessi portuali o sicurezza della navigazione.</p>
 <small class="ll4211-credit">Fonte: Open-Meteo Marine · modello numerico. Non sono dati osservati ARPAS/ISPRA.</small>
 </section>
-<div class="ll420-facts">
-<div><span>🌅 Alba</span><strong id="ll420Sunrise">—</strong></div><div><span>🌇 Tramonto</span><strong id="ll420Sunset">—</strong></div>
-<div><span>🌙 Luna</span><strong id="ll420Moon">—</strong><small id="ll423Illumination">Illuminazione da calcolare</small></div><div><span>🌊 Maree</span><strong><a href="#ll4211Tide" style="color:inherit;text-decoration:underline">Vedi grafico ↑</a></strong><small>Automatiche · nessun orario da inserire</small><span id="ll420Tides" hidden>Consulta orari</span></div>
-</div>
 
 
 
