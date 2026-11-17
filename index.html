@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.18 – Preferiti Meteo</title>
+<title>Lady Lola 4.2.19 – Preferiti Meteo</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -441,6 +441,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll4218-fav-remove{background:rgba(255,255,255,.08);color:#ffcfb9;padding:6px 12px;font-size:20px!important;font-weight:700}
 #llFavoriteButton{display:block!important;width:100%;margin:10px 0 16px!important;border:1px solid #68bfd3!important;border-radius:10px!important;background:#164c65!important;color:#f1f9fc!important;min-height:44px}
 @media(max-width:480px){.ll4218-fav-open{max-width:220px}}
+</style><style id="ll4219-arpas-style">
+.ll4219-arpas{border:1px solid rgba(105,197,213,.35)}
+.ll4219-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0}
+.ll4219-head span{font-size:12px;color:#c1dce7}
+.ll4219-head button{font-size:12px;padding:9px 12px}
+.ll4219-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.ll4219-links a{padding:11px 10px;border:1px solid #426c80;border-radius:10px;color:#92e4ee;text-decoration:none;font-size:13px;line-height:1.3;background:rgba(27,78,100,.32)}
+.ll4219-alert{padding:11px;border-radius:10px;background:rgba(255,189,83,.10);border:1px solid rgba(255,189,83,.3);font-size:12px;line-height:1.5}
+#ll4219ArpasSummary{font-size:12px;line-height:1.5;color:#c0d8e2}
+@media(max-width:390px){.ll4219-links{grid-template-columns:1fr}}
 </style></head>
 <body>
 <header>
@@ -614,16 +624,21 @@ Premi Aggiorna previsioni.
 <div id="marineResult"></div><div class="ll429-hourly"><h3>🕒 Dettaglio per fasce di 3 ore</h3><p class="muted">Previsioni modellistiche Open-Meteo, non osservazioni in tempo reale. Seleziona zona e giorno; le fasce sono riferite all’ora locale della Sardegna.</p><div id="ll429Status" role="status" class="muted">Caricamento delle fasce…</div><div id="ll429Slots" class="ll429-grid"></div><small>⚠️ Per uscire in mare confronta queste previsioni con avvisi ARPAS, radar e condizioni osservate. Le onde Hs non indicano l’altezza massima.</small></div>
 </div>
 
-<div class="card">
-<h3>Fonti ufficiali da verificare</h3>
-<p><a href="https://www.sar.sardegna.it/" target="_blank">ARPAS Sardegna</a></p>
-<p><a href="https://www.meteoam.it/it/meteo-citta/cagliari" target="_blank">Aeronautica Militare</a></p>
-<p><a href="https://www.ilmeteo.it/meteo/cagliari" target="_blank">ilMeteo</a></p>
-<p class="muted">
-Previsioni automatiche: Open-Meteo.
-Controlla anche avvisi, raffiche, condizioni locali
-e situazione reale prima di navigare.
-</p>
+<div class="card ll4219-arpas" id="ll4219Arpas">
+<h3>🛡️ ARPAS · Verifica meteo Sardegna</h3>
+<p class="muted">Bollettini ufficiali regionali, radar e osservazioni. I valori numerici nelle fasce di 3 ore restano previsioni Open-Meteo: non sono misure ARPAS.</p>
+<div class="ll4219-head"><span id="ll4219ArpasState">Fonte ufficiale da consultare</span><button type="button" id="ll4219Refresh">↻ Verifica aggiornamento</button></div>
+<div id="ll4219ArpasSummary" role="status" aria-live="polite">Caricamento automatico dei bollettini ARPAS non ancora verificato su questo dispositivo.</div>
+<div class="ll4219-links">
+<a href="https://www.sar.sardegna.it/servizi/meteo/bollsardegna_new_it.asp" target="_blank" rel="noopener noreferrer">☁️ Bollettino Sardegna</a>
+<a href="https://www.sar.sardegna.it/servizi/meteo/prevzone_new_it.asp" target="_blank" rel="noopener noreferrer">🗺️ Previsioni per 5 zone</a>
+<a href="https://www.sar.sardegna.it/servizi/meteo/bollettinomare_it.asp" target="_blank" rel="noopener noreferrer">🌊 Bollettino del mare</a>
+<a href="https://www.sar.sardegna.it/servizi/meteo/imgradar_it.asp" target="_blank" rel="noopener noreferrer">🌧️ Radar precipitazioni</a>
+<a href="https://www.sar.sardegna.it/servizi/dati/datirilevati.asp" target="_blank" rel="noopener noreferrer">🌡️ Dati stazioni ARPAS</a>
+<a href="https://www.sar.sardegna.it/servizi/meteo/previsioni.asp" target="_blank" rel="noopener noreferrer">⚠️ Avvisi e previsioni</a>
+</div>
+<p class="ll4219-alert">⚠️ <b>Advisor:</b> la previsione favorevole del modello non equivale a conferma ARPAS né a osservazione delle condizioni reali. In caso di avvisi, dati mancanti o discordanti, verifica prima di uscire. Il radar Monte Rasu può avere problemi di calibrazione.</p>
+<details><summary>Come vengono confrontate le fonti?</summary><p class="muted">ARPAS pubblica bollettini regionali e marini; Open-Meteo fornisce valori puntuali e orari. Una verifica automatica è possibile solo quando i dati ufficiali sono accessibili in formato riutilizzabile. Se il browser blocca l'accesso diretto per CORS, non vengono inventati confronti o avvisi.</p></details>
 </div>
 </section>
 
@@ -3765,6 +3780,41 @@ try{const res=await fetch(url,{signal:controller.signal});if(!res.ok){let detail
 function init(){if(!el('ll4211Place'))return;const now=today();el('ll4211Date').value=now;el('ll4211Date').min=now;const max=new Date(Date.now()+9*86400000);el('ll4211Date').max=dayKey(max);
 try{const saved=localStorage.getItem('ll_tide_place_v1');if(places[saved])el('ll4211Place').value=saved;}catch(e){}
 el('ll4211Place').addEventListener('change',load);el('ll4211Date').addEventListener('change',load);el('ll4211Reload').addEventListener('click',()=>{loadedKey='';load();});el('ll4211GPS').addEventListener('click',()=>{if(!navigator.geolocation){message('GPS non disponibile. Seleziona la zona manualmente.');return;}message('Richiesta posizione GPS…');navigator.geolocation.getCurrentPosition(pos=>{const {latitude:lat,longitude:lon}=pos.coords;const keys=Object.keys(places);keys.sort((a,b)=>{const dist=k=>{const p=places[k],dy=(lat-p[1])*111,dx=(lon-p[2])*111*Math.cos(lat*Math.PI/180);return dy*dy+dx*dx};return dist(a)-dist(b)});el('ll4211Place').value=keys[0];load();},()=>message('Posizione non disponibile: scegli una zona costiera.'),{timeout:10000,maximumAge:600000});});load();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script><script id="ll4219-arpas-check">
+(function(){
+'use strict';
+const byId=id=>document.getElementById(id);
+const url='https://www.sar.sardegna.it/servizi/meteo/bollsardegna_new_it.asp';
+let busy=false;
+async function check(){
+ if(busy)return;
+ busy=true;
+ const btn=byId('ll4219Refresh'),state=byId('ll4219ArpasState'),summary=byId('ll4219ArpasSummary');
+ if(!state||!summary){busy=false;return;}
+ if(btn)btn.disabled=true;
+ state.textContent='Verifica accesso ARPAS…';
+ const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),8000);
+ try{
+  const response=await fetch(url,{signal:ctl.signal,cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const html=await response.text();
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const text=(doc.body?.textContent||'').replace(/\s+/g,' ').trim();
+  const match=text.match(/Emissione\s+(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/i);
+  if(!match)throw Error('data di emissione non riconosciuta');
+  const [d,m,y]=match[1].split('/').map(Number);
+  const issue=new Date(y,m-1,d,Number(match[2].slice(0,2)),Number(match[2].slice(3)));
+  const age=(Date.now()-issue.getTime())/3600000;
+  state.textContent=age>=0&&age<=36?'Bollettino ARPAS consultabile':'Bollettino ARPAS: controllare aggiornamento';
+  summary.textContent='Bollettino generale ARPAS emesso il '+match[1]+' alle '+match[2]+'. I dettagli sono disponibili nel collegamento ufficiale. I dati orari Open-Meteo non sono stati sostituiti.';
+ }catch(e){
+  state.textContent='Accesso automatico ARPAS non disponibile';
+  summary.textContent='Safari può impedire la lettura diretta dei bollettini ARPAS (restrizioni tra siti/CORS), oppure il servizio potrebbe non rispondere. Apri i collegamenti ufficiali per controllare bollettini, radar e osservazioni. Nessun confronto automatico è stato effettuato.';
+ }finally{clearTimeout(timer);if(btn)btn.disabled=false;busy=false;}
+}
+function init(){const b=byId('ll4219Refresh');if(b)b.addEventListener('click',check);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
