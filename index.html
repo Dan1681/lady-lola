@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.19 – Preferiti Meteo</title>
+<title>Lady Lola 4.2.20 – Windy Meteo</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -451,6 +451,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll4219-alert{padding:11px;border-radius:10px;background:rgba(255,189,83,.10);border:1px solid rgba(255,189,83,.3);font-size:12px;line-height:1.5}
 #ll4219ArpasSummary{font-size:12px;line-height:1.5;color:#c0d8e2}
 @media(max-width:390px){.ll4219-links{grid-template-columns:1fr}}
+</style><style id="ll4220-windy-css">
+.ll4220-controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.ll4220-controls button{flex:1;min-width:75px;padding:10px 8px;border-radius:10px;border:1px solid #52768b;background:rgba(27,78,100,.22);color:inherit;font-size:13px}
+.ll4220-controls button.ll4220-active{background:#176985;border-color:#63b9cc;color:white;font-weight:700}
+.ll4220-frame{width:100%;height:380px;overflow:hidden;border-radius:12px;background:#142f3e;border:1px solid #41697d}
+.ll4220-frame iframe{width:100%;height:100%;border:0;display:block}
+.ll4220-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;font-size:12px}
+.ll4220-footer a{color:#8bdeed}
+.ll4220-note{font-size:12px;line-height:1.5}
+@media(max-width:420px){.ll4220-frame{height:330px}}
 </style></head>
 <body>
 <header>
@@ -624,6 +634,19 @@ Premi Aggiorna previsioni.
 <div id="marineResult"></div><div class="ll429-hourly"><h3>🕒 Dettaglio per fasce di 3 ore</h3><p class="muted">Previsioni modellistiche Open-Meteo, non osservazioni in tempo reale. Seleziona zona e giorno; le fasce sono riferite all’ora locale della Sardegna.</p><div id="ll429Status" role="status" class="muted">Caricamento delle fasce…</div><div id="ll429Slots" class="ll429-grid"></div><small>⚠️ Per uscire in mare confronta queste previsioni con avvisi ARPAS, radar e condizioni osservate. Le onde Hs non indicano l’altezza massima.</small></div>
 </div>
 
+
+<div class="card ll4220-windy" id="ll4220Windy">
+<h3>🌀 Windy · Mappa meteo interattiva</h3>
+<p class="muted">Mappa Windy gratuita per confrontare visivamente vento, onde e pioggia. È una visualizzazione esterna, non una fonte numerica acquisita dall’Advisor.</p>
+<div class="ll4220-controls" role="group" aria-label="Livello meteo Windy">
+<button type="button" class="ll4220-active" data-ll4220-overlay="wind" aria-pressed="true">💨 Vento</button>
+<button type="button" data-ll4220-overlay="waves" aria-pressed="false">🌊 Onde</button>
+<button type="button" data-ll4220-overlay="rain" aria-pressed="false">🌧️ Pioggia</button>
+</div>
+<div class="ll4220-frame"><iframe id="ll4220Frame" title="Mappa meteo Windy" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+<div class="ll4220-footer"><span id="ll4220Location">Zona: Torre delle Stelle</span><a id="ll4220Open" href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">Apri su Windy</a></div>
+<p class="muted ll4220-note">Seleziona una località nella sezione Meteo per centrare la mappa. Windy richiede connessione Internet; livelli e disponibilità dipendono dal servizio esterno. Prima di navigare verifica sempre bollettini e osservazioni ufficiali.</p>
+</div>
 <div class="card ll4219-arpas" id="ll4219Arpas">
 <h3>🛡️ ARPAS · Verifica meteo Sardegna</h3>
 <p class="muted">Bollettini ufficiali regionali, radar e osservazioni. I valori numerici nelle fasce di 3 ore restano previsioni Open-Meteo: non sono misure ARPAS.</p>
@@ -3815,6 +3838,39 @@ async function check(){
  }finally{clearTimeout(timer);if(btn)btn.disabled=false;busy=false;}
 }
 function init(){const b=byId('ll4219Refresh');if(b)b.addEventListener('click',check);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script><script id="ll4220-windy-script">
+(function(){
+'use strict';
+const coords={foxi:[39.19,9.29],capitana:[39.19,9.33],torre:[39.14,9.40],solanas:[39.13,9.43],cagliari:[39.22,9.12],poetto:[39.20,9.17],geremeas:[39.15,9.36],mari_pintau:[39.15,9.34],margine_rosso:[39.21,9.22],calareg:[39.17,9.30]};
+let overlay='wind';
+const $=id=>document.getElementById(id);
+function selected(){
+ const zone=$('marineZone');const key=zone&&zone.value||'torre';
+ const pair=coords[key];
+ if(pair)return pair;
+ const option=zone&&zone.selectedOptions&&zone.selectedOptions[0];
+ if(option){const t=option.textContent.toLowerCase();if(t.includes('foxi'))return coords.foxi;if(t.includes('capitana'))return coords.capitana;if(t.includes('torre'))return coords.torre;if(t.includes('solanas'))return coords.solanas;if(t.includes('poetto'))return coords.poetto;}
+ return coords.torre;
+}
+function update(){
+ const frame=$('ll4220Frame'),link=$('ll4220Open');if(!frame)return;
+ const [lat,lon]=selected();
+ const params=new URLSearchParams({lat:String(lat),lon:String(lon),detailLat:String(lat),detailLon:String(lon),width:'650',height:'450',zoom:'9',level:'surface',overlay:overlay,product:'ecmwf',menu:'',message:'true',marker:'true',calendar:'now',pressure:'',type:'map',location:'coordinates',detail:'',metricWind:'kt',metricTemp:'°C',radarRange:'-1'});
+ const src='https://embed.windy.com/embed2?'+params.toString();
+ if(frame.getAttribute('src')!==src)frame.setAttribute('src',src);
+ if(link)link.href='https://www.windy.com/?'+lat+','+lon+',9';
+ const zone=$('marineZone');const opt=zone&&zone.selectedOptions&&zone.selectedOptions[0];
+ const label=$('ll4220Location');if(label)label.textContent='Zona: '+(opt?opt.textContent:'Torre delle Stelle');
+ document.querySelectorAll('[data-ll4220-overlay]').forEach(b=>{const active=b.dataset.ll4220Overlay===overlay;b.classList.toggle('ll4220-active',active);b.setAttribute('aria-pressed',String(active));});
+}
+function init(){
+ document.querySelectorAll('[data-ll4220-overlay]').forEach(b=>b.addEventListener('click',()=>{overlay=b.dataset.ll4220Overlay;update();}));
+ const z=$('marineZone');if(z)z.addEventListener('change',update);
+ const section=$('meteo');if(section&&'MutationObserver' in window){const observer=new MutationObserver(()=>{if(section.classList.contains('active')){observer.disconnect();update();}});observer.observe(section,{attributes:true,attributeFilter:['class']});}
+ update();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body>
