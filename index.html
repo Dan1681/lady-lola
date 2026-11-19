@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.20 – Windy Meteo</title>
+<title>Lady Lola 4.2.21 – Windy integrato</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -461,6 +461,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll4220-footer a{color:#8bdeed}
 .ll4220-note{font-size:12px;line-height:1.5}
 @media(max-width:420px){.ll4220-frame{height:330px}}
+</style><style id="ll4221-css">
+.ll4221-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.ll4221-actions button{flex:1 1 140px;font-size:13px}
+.ll4220-frame.ll4221-expanded{height:min(78vh,780px)!important}
+#ll4221State{margin:5px 0 8px}
+@media(max-width:500px){.ll4220-frame{height:390px}.ll4220-frame.ll4221-expanded{height:70vh!important}}
 </style></head>
 <body>
 <header>
@@ -643,9 +648,9 @@ Premi Aggiorna previsioni.
 <button type="button" data-ll4220-overlay="waves" aria-pressed="false">🌊 Onde</button>
 <button type="button" data-ll4220-overlay="rain" aria-pressed="false">🌧️ Pioggia</button>
 </div>
-<div class="ll4220-frame"><iframe id="ll4220Frame" title="Mappa meteo Windy" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+<div class="ll4220-frame" id="ll4221FrameHost"><iframe id="ll4220Frame" title="Mappa meteo Windy" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
 <div class="ll4220-footer"><span id="ll4220Location">Zona: Torre delle Stelle</span><a id="ll4220Open" href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">Apri su Windy</a></div>
-<p class="muted ll4220-note">Seleziona una località nella sezione Meteo per centrare la mappa. Windy richiede connessione Internet; livelli e disponibilità dipendono dal servizio esterno. Prima di navigare verifica sempre bollettini e osservazioni ufficiali.</p>
+<div class="ll4221-actions"><button type="button" id="ll4221Reload">↻ Ricarica mappa</button><button type="button" id="ll4221Expand" aria-expanded="false">⛶ Ingrandisci mappa</button></div><p id="ll4221State" class="muted ll4220-note" role="status">Mappa Windy incorporata · connessione necessaria.</p><p class="muted ll4220-note">Seleziona una località nella sezione Meteo per centrare la mappa. Windy richiede connessione Internet; livelli e disponibilità dipendono dal servizio esterno. Prima di navigare verifica sempre bollettini e osservazioni ufficiali.</p>
 </div>
 <div class="card ll4219-arpas" id="ll4219Arpas">
 <h3>🛡️ ARPAS · Verifica meteo Sardegna</h3>
@@ -3844,31 +3849,38 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
 'use strict';
 const coords={foxi:[39.19,9.29],capitana:[39.19,9.33],torre:[39.14,9.40],solanas:[39.13,9.43],cagliari:[39.22,9.12],poetto:[39.20,9.17],geremeas:[39.15,9.36],mari_pintau:[39.15,9.34],margine_rosso:[39.21,9.22],calareg:[39.17,9.30]};
-let overlay='wind';
 const $=id=>document.getElementById(id);
+let overlay='wind',lastZone='',lastOverlay='',loaded=false;
 function selected(){
- const zone=$('marineZone');const key=zone&&zone.value||'torre';
+ const z=$('marineZone'),key=z?.value||'torre',opt=z?.selectedOptions?.[0];
  const pair=coords[key];
- if(pair)return pair;
- const option=zone&&zone.selectedOptions&&zone.selectedOptions[0];
- if(option){const t=option.textContent.toLowerCase();if(t.includes('foxi'))return coords.foxi;if(t.includes('capitana'))return coords.capitana;if(t.includes('torre'))return coords.torre;if(t.includes('solanas'))return coords.solanas;if(t.includes('poetto'))return coords.poetto;}
- return coords.torre;
+ if(pair)return {pair,name:opt?.textContent||'Torre delle Stelle',key};
+ const label=opt?.textContent?.toLowerCase()||'';
+ const found=Object.keys(coords).find(k=>label.includes(k.replace('_',' ')));
+ return {pair:coords[found]||coords.torre,name:opt?.textContent||'Torre delle Stelle',key};
 }
-function update(){
- const frame=$('ll4220Frame'),link=$('ll4220Open');if(!frame)return;
- const [lat,lon]=selected();
- const params=new URLSearchParams({lat:String(lat),lon:String(lon),detailLat:String(lat),detailLon:String(lon),width:'650',height:'450',zoom:'9',level:'surface',overlay:overlay,product:'ecmwf',menu:'',message:'true',marker:'true',calendar:'now',pressure:'',type:'map',location:'coordinates',detail:'',metricWind:'kt',metricTemp:'°C',radarRange:'-1'});
- const src='https://embed.windy.com/embed2?'+params.toString();
- if(frame.getAttribute('src')!==src)frame.setAttribute('src',src);
+function update(force=false){
+ const frame=$('ll4220Frame'),link=$('ll4220Open'),status=$('ll4221State');if(!frame)return;
+ const {pair:[lat,lon],name,key}=selected();
+ if(!force&&loaded&&lastZone===key&&lastOverlay===overlay)return;
+ lastZone=key;lastOverlay=overlay;loaded=true;
+ const params=new URLSearchParams({lat:String(lat),lon:String(lon),detailLat:String(lat),detailLon:String(lon),width:'650',height:'450',zoom:'9',level:'surface',overlay,product:'ecmwf',menu:'',message:'true',marker:'true',calendar:'now',pressure:'',type:'map',location:'coordinates',detail:'',metricWind:'kt',metricTemp:'°C',radarRange:'-1'});
+ frame.src='https://embed.windy.com/embed2?'+params.toString();
  if(link)link.href='https://www.windy.com/?'+lat+','+lon+',9';
- const zone=$('marineZone');const opt=zone&&zone.selectedOptions&&zone.selectedOptions[0];
- const label=$('ll4220Location');if(label)label.textContent='Zona: '+(opt?opt.textContent:'Torre delle Stelle');
- document.querySelectorAll('[data-ll4220-overlay]').forEach(b=>{const active=b.dataset.ll4220Overlay===overlay;b.classList.toggle('ll4220-active',active);b.setAttribute('aria-pressed',String(active));});
+ const label=$('ll4220Location');if(label)label.textContent='Zona: '+name;
+ if(status)status.textContent='Caricamento mappa Windy: '+name+' · '+({wind:'vento',waves:'onde',rain:'pioggia'}[overlay]||overlay);
+ document.querySelectorAll('[data-ll4220-overlay]').forEach(btn=>{const on=btn.dataset.ll4220Overlay===overlay;btn.classList.toggle('ll4220-active',on);btn.setAttribute('aria-pressed',String(on));});
 }
 function init(){
+ const frame=$('ll4220Frame');if(!frame)return;
+ frame.addEventListener('load',()=>{const status=$('ll4221State');if(status)status.textContent='Mappa Windy caricata nel riquadro. Se resta vuota, prova «Apri su Windy».';});
  document.querySelectorAll('[data-ll4220-overlay]').forEach(b=>b.addEventListener('click',()=>{overlay=b.dataset.ll4220Overlay;update();}));
- const z=$('marineZone');if(z)z.addEventListener('change',update);
- const section=$('meteo');if(section&&'MutationObserver' in window){const observer=new MutationObserver(()=>{if(section.classList.contains('active')){observer.disconnect();update();}});observer.observe(section,{attributes:true,attributeFilter:['class']});}
+ $('marineZone')?.addEventListener('change',()=>update());
+ $('ll4221Reload')?.addEventListener('click',()=>update(true));
+ $('ll4221Expand')?.addEventListener('click',()=>{const host=$('ll4221FrameHost'),btn=$('ll4221Expand');if(!host||!btn)return;const on=host.classList.toggle('ll4221-expanded');btn.setAttribute('aria-expanded',String(on));btn.textContent=on?'↙ Riduci mappa':'⛶ Ingrandisci mappa';});
+ const section=$('meteo');if(section&&'MutationObserver'in window){const observer=new MutationObserver(()=>{if(section.classList.contains('active'))update();});observer.observe(section,{attributes:true,attributeFilter:['class']});}
+ // Watch for changes to the chosen favorite even when other modules update the select programmatically.
+ const zone=$('marineZone');if(zone&&'MutationObserver'in window){new MutationObserver(()=>{if(section?.classList.contains('active'))update();}).observe(zone,{childList:true,subtree:true,attributes:true,attributeFilter:['selected']});}
  update();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
