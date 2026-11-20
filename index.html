@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.21 – Windy integrato</title>
+<title>Lady Lola 4.2.22 – Windy integrato</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -1472,6 +1472,7 @@ function ll4218RenderFavorites() {
         llUpdateStar();
         document.getElementById('ll4218FavMessage').textContent = 'Località selezionata: ' + name;
         if (typeof loadMarineWeather === 'function') loadMarineWeather();
+        window.dispatchEvent(new Event('ll4222:zone-changed'));
         select.scrollIntoView({behavior:'smooth',block:'nearest'});
       }
     });
@@ -3848,20 +3849,21 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script><script id="ll4220-windy-script">
 (function(){
 'use strict';
-const coords={foxi:[39.19,9.29],capitana:[39.19,9.33],torre:[39.14,9.40],solanas:[39.13,9.43],cagliari:[39.22,9.12],poetto:[39.20,9.17],geremeas:[39.15,9.36],mari_pintau:[39.15,9.34],margine_rosso:[39.21,9.22],calareg:[39.17,9.30]};
 const $=id=>document.getElementById(id);
 let overlay='wind',lastZone='',lastOverlay='',loaded=false;
 function selected(){
  const z=$('marineZone'),key=z?.value||'torre',opt=z?.selectedOptions?.[0];
- const pair=coords[key];
- if(pair)return {pair,name:opt?.textContent||'Torre delle Stelle',key};
- const label=opt?.textContent?.toLowerCase()||'';
- const found=Object.keys(coords).find(k=>label.includes(k.replace('_',' ')));
- return {pair:coords[found]||coords.torre,name:opt?.textContent||'Torre delle Stelle',key};
+ const zone=(typeof marineZones!=='undefined'&&marineZones[key])||null;
+ if(zone&&Number.isFinite(Number(zone.lat))&&Number.isFinite(Number(zone.lon))){
+  return {pair:[Number(zone.lat),Number(zone.lon)],name:zone.name||opt?.textContent||key,key};
+ }
+ return {pair:null,name:opt?.textContent||'Località non disponibile',key};
 }
 function update(force=false){
  const frame=$('ll4220Frame'),link=$('ll4220Open'),status=$('ll4221State');if(!frame)return;
- const {pair:[lat,lon],name,key}=selected();
+ const {pair,name,key}=selected();
+ if(!pair){if(status)status.textContent='Coordinate non disponibili per la località selezionata.';return;}
+ const [lat,lon]=pair;
  if(!force&&loaded&&lastZone===key&&lastOverlay===overlay)return;
  lastZone=key;lastOverlay=overlay;loaded=true;
  const params=new URLSearchParams({lat:String(lat),lon:String(lon),detailLat:String(lat),detailLon:String(lon),width:'650',height:'450',zoom:'9',level:'surface',overlay,product:'ecmwf',menu:'',message:'true',marker:'true',calendar:'now',pressure:'',type:'map',location:'coordinates',detail:'',metricWind:'kt',metricTemp:'°C',radarRange:'-1'});
@@ -3876,6 +3878,7 @@ function init(){
  frame.addEventListener('load',()=>{const status=$('ll4221State');if(status)status.textContent='Mappa Windy caricata nel riquadro. Se resta vuota, prova «Apri su Windy».';});
  document.querySelectorAll('[data-ll4220-overlay]').forEach(b=>b.addEventListener('click',()=>{overlay=b.dataset.ll4220Overlay;update();}));
  $('marineZone')?.addEventListener('change',()=>update());
+ window.addEventListener('ll4222:zone-changed',()=>update());
  $('ll4221Reload')?.addEventListener('click',()=>update(true));
  $('ll4221Expand')?.addEventListener('click',()=>{const host=$('ll4221FrameHost'),btn=$('ll4221Expand');if(!host||!btn)return;const on=host.classList.toggle('ll4221-expanded');btn.setAttribute('aria-expanded',String(on));btn.textContent=on?'↙ Riduci mappa':'⛶ Ingrandisci mappa';});
  const section=$('meteo');if(section&&'MutationObserver'in window){const observer=new MutationObserver(()=>{if(section.classList.contains('active'))update();});observer.observe(section,{attributes:true,attributeFilter:['class']});}
