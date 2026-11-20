@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.2.24 – Windy integrato</title>
+<title>Lady Lola 4.2.25 – Windy integrato</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -476,6 +476,50 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ll4224-coords{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:10px 0}
 .ll4224-coords input{min-width:0;padding:8px;font-size:13px}
 @media(max-width:420px){.ll4224-row{flex-wrap:wrap}.ll4224-row button{width:100%}.ll4224-coords{grid-template-columns:1fr}}
+</style><style id="ll4225-home-redesign">
+#home .ll40-intro{padding:17px 17px 14px;margin:0 0 12px;border:1px solid #3c7589;border-radius:19px;background:linear-gradient(120deg,#18576a,#11364b 55%,#10263b);box-shadow:0 12px 26px #0003}
+#home .ll40-intro h2{font-size:clamp(24px,4vw,31px);letter-spacing:-.04em;margin:5px 0}
+#home .ll40-intro p{font-size:12px}
+#home .ll4225-top-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 0}
+#home .ll4225-top-actions button{min-height:46px;padding:9px 5px;font-size:12px;background:#174b61;border-color:#4b8095;border-radius:12px}
+#home .ll4225-headline{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0 0}
+#home .ll4225-headline strong{font-size:12px;color:#c9e9f2}
+#home .ll4225-headline span{font-size:12px;color:#d7e7f0}
+#home .ll40-weather{padding:15px!important}
+#home .ll40-weather .ll40-head{margin-bottom:3px}
+#home .ll40-weather .ll40-metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px}
+#home .ll40-metrics>div:not(.ll428-weather-truth){padding:11px 5px!important;border-radius:12px;background:#163b51}
+#home .ll40-metrics>div:nth-child(n+4):not(.ll428-weather-truth){display:none}
+#home.ll4225-expanded .ll40-metrics>div:nth-child(n+4):not(.ll428-weather-truth){display:block}
+#home .ll428-weather-truth{display:none!important}
+#home.ll4225-expanded .ll428-weather-truth{display:block!important}
+#home .ll4225-more-weather{width:100%;margin-top:9px;min-height:40px;background:#163e55;font-size:13px}
+#home .ll40-verdict{margin-top:10px}
+#home .ll40-verdict strong{font-size:20px}
+#home .ll40-mapcard{padding:15px!important}
+#home .ll40-mapcard .ll40-controls{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#home .ll40-mapcard .ll40-controls label{font-size:12px}
+#home .ll40-mapcard .ll40-controls select{min-height:42px}
+#home #ll40Map{height:290px!important;min-height:290px!important}
+#home .ll426-layers{margin:10px 0}
+#home .ll4225-layerdetails{border:1px solid #375c73;border-radius:12px;padding:0 10px;margin:10px 0}
+#home .ll4225-layerdetails summary{cursor:pointer;padding:10px 2px;font-weight:700;font-size:13px}
+#home .ll4225-layerdetails .ll426-layers{border:0;margin:0;padding:3px 0 10px;background:transparent}
+#home .ll40-alert{padding:15px!important}
+#home .ll420-card{padding:15px!important}
+#home .ll40-head h2{font-size:17px}
+#home .ll40-map-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#home .ll40-map-actions button{padding:8px 4px;min-height:42px;font-size:11px}
+#home .ll4225-bottomnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 13px}
+#home .ll4225-bottomnav button{flex:1 1 130px;font-size:12px;background:#153c52}
+@media(max-width:480px){
+ #home .ll40-intro{padding:14px}
+ #home .ll4225-top-actions button{font-size:11px}
+ #home .ll40-mapcard .ll40-controls{grid-template-columns:1fr!important}
+ #home #ll40Map{height:250px!important;min-height:250px!important}
+ #home .ll40-map-actions{grid-template-columns:1fr 1fr}
+ #home .ll40-map-actions button:last-child{grid-column:1/-1}
+}
 </style></head>
 <body>
 <header>
@@ -4034,6 +4078,55 @@ function init(){
  $('ll4224Find').addEventListener('click',find);
  $('ll4224Query').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();find()}});
  $('ll4224ManualAdd').addEventListener('click',()=>choose({name:$('ll4224ManualName').value,lat:$('ll4224Lat').value,lon:$('ll4224Lon').value}));
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script><script id="ll4225-home-redesign-js">
+(function(){
+'use strict';
+function init(){
+ const home=document.getElementById('home');
+ if(!home||document.getElementById('ll4225MoreWeather'))return;
+ const intro=home.querySelector('.ll40-intro');
+ if(intro){
+  const actions=document.createElement('div');
+  actions.className='ll4225-top-actions';
+  [['🌦️ Meteo','meteo'],['🧭 Pianifica','planner'],['🎣 Pesca','fishing']].forEach(([label,dest])=>{
+   const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.go=dest;actions.append(b);
+  });
+  intro.append(actions);
+ }
+ const weather=home.querySelector('.ll40-weather');
+ if(weather){
+  const button=document.createElement('button');button.type='button';
+  button.id='ll4225MoreWeather';button.className='ll4225-more-weather';
+  button.textContent='Mostra tutti i dati meteo ↓';
+  button.setAttribute('aria-expanded','false');
+  const metrics=weather.querySelector('.ll40-metrics');
+  if(metrics){
+   metrics.insertAdjacentElement('afterend',button);
+   button.addEventListener('click',()=>{
+    const expanded=home.classList.toggle('ll4225-expanded');
+    button.setAttribute('aria-expanded',String(expanded));
+    button.textContent=expanded?'Riduci i dati meteo ↑':'Mostra tutti i dati meteo ↓';
+   });
+  }
+ }
+ const map=home.querySelector('.ll40-mapcard');
+ const layers=map&&map.querySelector('#ll426Layers');
+ if(layers){
+  const details=document.createElement('details');details.className='ll4225-layerdetails';
+  const summary=document.createElement('summary');summary.textContent='🗺️ Livelli cartografici e fondali';
+  layers.parentNode.insertBefore(details,layers);details.append(summary,layers);
+ }
+ const fishing=home.querySelector('#ll420MarineFishing');
+ if(fishing){
+  const nav=document.createElement('div');nav.className='ll4225-bottomnav';
+  [['🌦️ Previsioni complete','meteo'],['📍 Punti pesca','fishing'],['⚓ Pianifica rotta','planner']].forEach(([label,dest])=>{
+   const b=document.createElement('button');b.type='button';b.dataset.go=dest;b.textContent=label;nav.append(b);
+  });
+  fishing.parentNode.insertBefore(nav,fishing);
+ }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
