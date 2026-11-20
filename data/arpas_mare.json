@@ -2,7 +2,7 @@
   "source": "ARPAS Sardegna",
   "source_url": "https://www.sar.sardegna.it/servizi/meteo/prevmare_new.asp",
   "issued_at": "2026-11-20T08:12:55",
-  "fetched_at": "2026-11-20T10:12:02.248335+00:00",
+  "fetched_at": "2026-11-20T13:19:24.054268+00:00",
   "note": "Hx = altezza massima dell’onda, NON altezza significativa; zone marine ampie.",
   "forecasts": [
     {
