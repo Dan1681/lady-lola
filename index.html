@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.4.1 – Windy integrato</title>
+<title>Lady Lola 4.4.2 – Windy integrato</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -4219,19 +4219,19 @@ function slots(container,data,date){
  const localTime=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
  const start=today?data.rows.findIndex(x=>x.time.slice(11,16)>=localTime):0;
  const index=Math.max(0,start);
- const selected=data.rows.slice(index,index+7);
+ const selected=(start<0?[]:data.rows.slice(index,index+6));
  const wrap=document.createElement('div');wrap.className='ll441-slots';
- const h=document.createElement('div');h.className='ll441-slots-title';h.textContent=today?'Onde previste dalle prossime ore':'Onde previste per il giorno selezionato';wrap.append(h);
- for(let i=0;i<selected.length;i+=3){const group=selected.slice(i,i+3);const box=document.createElement('div');box.className='ll441-slot';const label=document.createElement('span');label.textContent=group[0].time.slice(11,16)+'–'+group[group.length-1].time.slice(11,16);const val=document.createElement('strong');val.textContent=fmt(Math.max(...group.map(x=>x.value)))+' m';box.append(label,val);wrap.append(box);}
+ const h=document.createElement('div');h.className='ll441-slots-title';h.textContent=today?'Onde previste prossime ore · ECMWF':'Onde previste giorno selezionato · ECMWF';wrap.append(h);
+ for(let i=0;i<selected.length;i+=3){const group=selected.slice(i,i+3);const box=document.createElement('div');box.className='ll441-slot';const label=document.createElement('span');label.textContent=group[0].time.slice(11,16)+(group.length>1?'–'+group[group.length-1].time.slice(11,16):'');const val=document.createElement('strong');val.textContent=fmt(Math.max(...group.map(x=>x.value)))+' m';box.append(label,val);wrap.append(box);}
  container.append(wrap);
 }
 async function update(){
  const token=++request;controller?.abort();controller=new AbortController();const signal=controller.signal;
  const c=coord(),date=dateForDay(day()),state=$('ll440State'),results=$('ll440Results');if(!state||!results)return;
- results.replaceChildren();if(!c){state.textContent='Coordinate della località non disponibili.';return;}
+ results.replaceChildren();$('ll441Hours')?.replaceChildren();if(!c){state.textContent='Coordinate della località non disponibili.';return;}
  state.textContent='Verifica onde per '+c.name+' · '+date+'…';
  // GFS Wave can be unavailable on this API/location. Never substitute another model under its name.
- const names=[['ecmwf_wam','ECMWF WAM'],['gfs_wave','NOAA GFS Wave']];
+ const names=[['ecmwf_wam','ECMWF WAM'],['ncep_gfswave016','NOAA GFS Wave 0,16°']];
  const values=await Promise.all(names.map(async ([key,name])=>{try{return {name,data:await getModel(key,c.lat,c.lon,date,signal)}}catch(e){return {name,error:e.name==='AbortError'?'Richiesta annullata':String(e.message||e)}}}));
  if(token!==request)return;
  for(const v of values){
