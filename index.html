@@ -2611,24 +2611,6 @@ document.getElementById('ll23-show').addEventListener('click',()=>{expanded=!exp
 
 async function getZone(zone){const q={latitude:zone.lat,longitude:zone.lon,timezone:'Europe/Rome',forecast_days:'4'};const w=new URLSearchParams({...q,hourly:'wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,temperature_2m',wind_speed_unit:'kn'});const m=new URLSearchParams({...q,hourly:'wave_height,wave_direction,sea_surface_temperature'});const [a,b]=await Promise.all([fetch('https://api.open-meteo.com/v1/forecast?'+w),fetch('https://marine-api.open-meteo.com/v1/marine?'+m)]);if(!a.ok||!b.ok)throw Error('Previsioni non disponibili');const [weather,marine]=await Promise.all([a.json(),b.json()]);const waveIndex=new Map((marine.hourly?.time||[]).map((t,i)=>[t,i]));const map=new Map();(weather.hourly?.time||[]).forEach((t,i)=>{const j=waveIndex.get(t);if(j===undefined)return;map.set(t,{wind:weather.hourly.wind_speed_10m?.[i],gust:weather.hourly.wind_gusts_10m?.[i],direction:weather.hourly.wind_direction_10m?.[i],rain:weather.hourly.precipitation?.[i],wave:marine.hourly.wave_height?.[j],air:weather.hourly.temperature_2m?.[i],sea:marine.hourly.sea_surface_temperature?.[j]})});return map}
 function render(){const grid=document.getElementById('ll22-grid');grid.replaceChildren();const target=dateOffset(+document.getElementById('ll22-day').value)+'T'+hour.value+':00';const names=llGetFavorites().filter(name=>llFindZoneKey(name));const visible=expanded?names:names.slice(0,5);document.getElementById('ll23-count').textContent=names.length+' preferite · '+visible.length+' visualizzate';const show=document.getElementById('ll23-show');show.hidden=names.length<=5;show.textContent=expanded?'Mostra solo 5':'Mostra tutte ('+names.length+')';if(!names.length){grid.textContent='Nessuna località preferita. Premi ＋ Aggiungi località.';return}for(const name of visible){const key=llFindZoneKey(name);const d=cache.get(key)?.get(target);const rating=d?marineRating(d.wind,d.gust,d.wave,d.rain):{label:'DATI NON DISPONIBILI'};const level=rating.label==='ESCO*'?'good':rating.label==='ATTENZIONE'?'warn':rating.label==='NON ESCO'?'bad':'none';const el=document.createElement('div');el.className='ll22-tile';const direction=d&&Number.isFinite(d.direction)?marineWindFrom(d.direction):'Direzione non disponibile';el.innerHTML=`<div class="ll23-tile-head"><h3>📍 ${safe(name)}</h3><button type="button" class="ll23-remove" aria-label="Rimuovi ${safe(name)} dai preferiti" title="Rimuovi dai preferiti">★ ×</button></div><div class="ll22-state ${level}">${safe(rating.label)}</div><p>🧭 ${safe(direction)}</p><div class="ll22-data"><span>🌬 Vento<b>${fmt(d?.wind,'kn')}</b></span><span>💨 Raffiche<b>${fmt(d?.gust,'kn')}</b></span><span>🌊 Onde<b>${fmt(d?.wave,'m')}</b></span><span>🌡️ Aria<b>${fmt(d?.air,'°C')}</b></span><span>🌊 Mare<b>${fmt(d?.sea,'°C')}</b></span><span>🌧 Pioggia<b>${fmt(d?.rain,'mm')}</b></span></div>`;el.querySelector('.ll23-remove').addEventListener('click',()=>{const updated=llGetFavorites().filter(n=>n!==name);llSaveFavorites(updated);lastFavorites=updated.join('|');cache.delete(key);fillZones();renderManager();if(typeof llRenderZones==='function')llRenderZones();render()});grid.append(el)}window.dispatchEvent(new CustomEvent('ll24:forecast',{detail:{target,values:names.map(name=>({name,data:cache.get(llFindZoneKey(name))?.get(target)}))}}))}
-async function windModel(model,c,date,signal){
- const u=new URL('https://api.open-meteo.com/v1/forecast');u.search=new URLSearchParams({latitude:String(c.lat),longitude:String(c.lon),hourly:'wind_speed_10m,wind_gusts_10m',models:model,wind_speed_unit:'kn',timezone:'Europe/Rome',start_date:date,end_date:date,cell_selection:'sea'}).toString();
- const r=await fetch(u,{signal});const d=await r.json();if(!r.ok||d.error)throw Error(d.reason||'HTTP '+r.status);
- const h=d.hourly||{},rows=(h.time||[]).map((t,i)=>({time:t,wind:h.wind_speed_10m?.[i],gust:h.wind_gusts_10m?.[i]})).filter(x=>Number.isFinite(x.wind)&&Number.isFinite(x.gust));
- if(!rows.length)throw Error('Vento o raffiche non disponibili');return rows;
-}
-async function compareWind(c,date,signal,token){
- const state=$('ll443State'),host=$('ll443Results'),hours=$('ll443Hours');if(!state||!host||!hours)return;
- const models=[['ecmwf_ifs025','ECMWF IFS'],['gfs_global','NOAA GFS']];
- const values=await Promise.all(models.map(async ([id,name])=>{try{return {name,rows:await windModel(id,c,date,signal)}}catch(e){return {name,error:String(e.message||e)}}}));
- if(token!==request)return;
- const max=(rows,k)=>Math.max(...rows.map(x=>x[k]));
- for(const v of values){host.append(tile(v.name,v.rows?fmt(max(v.rows,'wind'))+' kn':'Non disponibile',v.rows?'Raffiche max '+fmt(max(v.rows,'gust'))+' kn · '+v.rows.length+' ore valide':v.error));}
- const good=values.filter(v=>v.rows),over=good.some(v=>max(v.rows,'wind')>8||max(v.rows,'gust')>12);
- const complete=good.length===2&&good.every(v=>v.rows.length>=24);
- state.textContent=(over?'🔴 Soglie di vento o raffiche superate nel giorno. ': 'Nessuna conferma di condizioni favorevoli. ')+(complete?'Due modelli disponibili. ':'Confronto incompleto. ')+'Soglie di riferimento: 8 / 12 kn.';
- if(good.length===2){const a=good[0].rows,b=new Map(good[1].rows.map(x=>[x.time,x]));const pairs=a.filter(x=>b.has(x.time));if(pairs.length){const dw=Math.max(...pairs.map(x=>Math.abs(x.wind-b.get(x.time).wind))),dg=Math.max(...pairs.map(x=>Math.abs(x.gust-b.get(x.time).gust)));const p=document.createElement('p');p.className='muted';p.textContent='Scarto massimo alla stessa ora: vento '+fmt(dw)+' kn · raffiche '+fmt(dg)+' kn.';hours.append(p);}}
-}
 async function update(){if(busy)return;busy=true;const button=document.getElementById('ll22-update');button.disabled=true;const status=document.getElementById('ll22-status');const zones=llGetFavorites().map(name=>({key:llFindZoneKey(name),name})).filter(z=>z.key);let failed=0;status.textContent='Aggiornamento delle '+zones.length+' località…';const next=new Map();for(let i=0;i<zones.length;i+=3){await Promise.all(zones.slice(i,i+3).map(async z=>{try{next.set(z.key,await getZone(marineZones[z.key]))}catch(e){failed++}}))}cache.clear();for(const [k,v] of next)cache.set(k,v);status.textContent='Previsioni richieste: '+new Date().toLocaleString('it-IT',{timeZone:'Europe/Rome'})+' · '+next.size+' località caricate'+(failed?' · '+failed+' non disponibili':'')+' · Fonte Open-Meteo';render();busy=false;button.disabled=false}
 document.getElementById('ll22-update').addEventListener('click',update);document.getElementById('ll22-day').addEventListener('change',render);hour.addEventListener('change',render);
 // Quando si torna alla Home, aggiornare l'elenco se i preferiti sono cambiati.
@@ -4242,6 +4224,24 @@ function slots(container,data,date){
  const h=document.createElement('div');h.className='ll441-slots-title';h.textContent=today?'Onde previste prossime ore · ECMWF':'Onde previste giorno selezionato · ECMWF';wrap.append(h);
  for(let i=0;i<selected.length;i+=3){const group=selected.slice(i,i+3);const box=document.createElement('div');box.className='ll441-slot';const label=document.createElement('span');label.textContent=group[0].time.slice(11,16)+(group.length>1?'–'+group[group.length-1].time.slice(11,16):'');const val=document.createElement('strong');val.textContent=fmt(Math.max(...group.map(x=>x.value)))+' m';box.append(label,val);wrap.append(box);}
  container.append(wrap);
+}
+async function windModel(model,c,date,signal){
+const u=new URL('https://api.open-meteo.com/v1/forecast');u.search=new URLSearchParams({latitude:String(c.lat),longitude:String(c.lon),hourly:'wind_speed_10m,wind_gusts_10m',models:model,wind_speed_unit:'kn',timezone:'Europe/Rome',start_date:date,end_date:date,cell_selection:'sea'}).toString();
+const r=await fetch(u,{signal});const d=await r.json();if(!r.ok||d.error)throw Error(d.reason||'HTTP '+r.status);
+const h=d.hourly||{},rows=(h.time||[]).map((t,i)=>({time:t,wind:h.wind_speed_10m?.[i],gust:h.wind_gusts_10m?.[i]})).filter(x=>Number.isFinite(x.wind)&&Number.isFinite(x.gust));
+if(!rows.length)throw Error('Vento o raffiche non disponibili');return rows;
+}
+async function compareWind(c,date,signal,token){
+const state=$('ll443State'),host=$('ll443Results'),hours=$('ll443Hours');if(!state||!host||!hours)return;
+const models=[['ecmwf_ifs025','ECMWF IFS'],['gfs_global','NOAA GFS']];
+const values=await Promise.all(models.map(async ([id,name])=>{try{return {name,rows:await windModel(id,c,date,signal)}}catch(e){return {name,error:String(e.message||e)}}}));
+if(token!==request)return;
+const max=(rows,k)=>Math.max(...rows.map(x=>x[k]));
+for(const v of values){host.append(tile(v.name,v.rows?fmt(max(v.rows,'wind'))+' kn':'Non disponibile',v.rows?'Raffiche max '+fmt(max(v.rows,'gust'))+' kn · '+v.rows.length+' ore valide':v.error));}
+const good=values.filter(v=>v.rows),over=good.some(v=>max(v.rows,'wind')>8||max(v.rows,'gust')>12);
+const complete=good.length===2&&good.every(v=>v.rows.length>=24);
+state.textContent=(over?'🔴 Soglie di vento o raffiche superate nel giorno. ': 'Nessuna conferma di condizioni favorevoli. ')+(complete?'Due modelli disponibili. ':'Confronto incompleto. ')+'Soglie di riferimento: 8 / 12 kn.';
+if(good.length===2){const a=good[0].rows,b=new Map(good[1].rows.map(x=>[x.time,x]));const pairs=a.filter(x=>b.has(x.time));if(pairs.length){const dw=Math.max(...pairs.map(x=>Math.abs(x.wind-b.get(x.time).wind))),dg=Math.max(...pairs.map(x=>Math.abs(x.gust-b.get(x.time).gust)));const p=document.createElement('p');p.className='muted';p.textContent='Scarto massimo alla stessa ora: vento '+fmt(dw)+' kn · raffiche '+fmt(dg)+' kn.';hours.append(p);}}
 }
 async function update(){
  const token=++request;controller?.abort();controller=new AbortController();const signal=controller.signal;
