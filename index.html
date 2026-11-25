@@ -682,7 +682,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </details>
 <p class="ll40-hint">🔎 <a href="https://meteopesca.com/it/sardegna/cagliari" target="_blank" rel="noopener noreferrer">Confronta maree e periodi solunari su Meteopesca ↗</a>. I dati di questi siti non vengono importati automaticamente. Il calcolo solunare completo richiede una fonte o un modello astronomico verificato.</p>
 <label for="ll420Technique">🎣 Tecnica di pesca</label>
-<label for="ll443FishingDate">Giorno attività pesca</label><select id="ll443FishingDate"></select><select id="ll420Technique"><option value="traina">🚤 Traina</option><option value="spinning">🎣 Spinning</option><option value="bolentino">⚓ Bolentino</option><option value="calamari">🦑 Calamari</option><option value="seppie">🦑 Seppie</option><option value="jigging">🐟 Vertical jigging</option><option value="polpi">🐙 Polpi</option></select>
+<select id="ll420Technique"><option value="traina">🚤 Traina</option><option value="spinning">🎣 Spinning</option><option value="bolentino">⚓ Bolentino</option><option value="calamari">🦑 Calamari</option><option value="seppie">🦑 Seppie</option><option value="jigging">🐟 Vertical jigging</option></select>
 <div class="ll425-score-row">
 <div class="ll420-score"><span>Indice orientativo di attività</span><strong id="ll420Score">—</strong><small id="ll420Level">In attesa dei dati</small></div>
 <div class="ll425-slot"><label for="ll424FishingTime">🕒 Fascia di pesca (3 ore)</label>
@@ -775,9 +775,9 @@ Premi Aggiorna previsioni.
 
 <div class="card" id="ll440Compare" style="border:1px solid #4d8497;margin:14px 0">
 <h3>🧭 Confronto meteo · Controllo incrociato</h3>
-<p class="muted">Confronto automatico fra <strong>due modelli di onde, quando disponibili</strong> tramite Open-Meteo Marine. ARPAS, Aeronautica Militare e ilMeteo.it sono fonti da consultare separatamente: non vengono spacciate per dati confrontati automaticamente.</p>
+<p class="muted">Confronto automatico fra <strong>modelli di onde, vento e raffiche, quando disponibili</strong> tramite Open-Meteo Marine. ARPAS, Aeronautica Militare e ilMeteo.it sono fonti da consultare separatamente: non sono acquisite automaticamente.</p>
 <div id="ll440State" role="status" aria-live="polite">In attesa della località…</div>
-<div id="ll440Results"></div><div id="ll441Hours"></div>
+<div id="ll440Results"></div><div id="ll441Hours"></div><h4>💨 Vento e raffiche · confronto modelli</h4><div id="ll443State" role="status" aria-live="polite"></div><div id="ll443Results" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0"></div><div id="ll443Hours"></div>
 <div class="ll440-links"><a href="https://www.sar.sardegna.it/servizi/meteo/prevmare_new.asp" target="_blank" rel="noopener">🛡️ ARPAS · Stato del mare</a><a href="https://www.meteoam.it/" target="_blank" rel="noopener">✈️ Aeronautica Militare</a><a href="https://www.ilmeteo.it/" target="_blank" rel="noopener">🌤️ ilMeteo.it</a></div>
 <button type="button" id="ll440Refresh">↻ Aggiorna confronto</button>
 <small>⚠️ Modelli numerici, non misure locali. I modelli possono condividere dati o assimilazioni: non sono fonti indipendenti. Questo controllo non autorizza l'uscita in mare e non sostituisce bollettini, osservazioni e valutazione del comandante.</small>
@@ -2611,6 +2611,24 @@ document.getElementById('ll23-show').addEventListener('click',()=>{expanded=!exp
 
 async function getZone(zone){const q={latitude:zone.lat,longitude:zone.lon,timezone:'Europe/Rome',forecast_days:'4'};const w=new URLSearchParams({...q,hourly:'wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,temperature_2m',wind_speed_unit:'kn'});const m=new URLSearchParams({...q,hourly:'wave_height,wave_direction,sea_surface_temperature'});const [a,b]=await Promise.all([fetch('https://api.open-meteo.com/v1/forecast?'+w),fetch('https://marine-api.open-meteo.com/v1/marine?'+m)]);if(!a.ok||!b.ok)throw Error('Previsioni non disponibili');const [weather,marine]=await Promise.all([a.json(),b.json()]);const waveIndex=new Map((marine.hourly?.time||[]).map((t,i)=>[t,i]));const map=new Map();(weather.hourly?.time||[]).forEach((t,i)=>{const j=waveIndex.get(t);if(j===undefined)return;map.set(t,{wind:weather.hourly.wind_speed_10m?.[i],gust:weather.hourly.wind_gusts_10m?.[i],direction:weather.hourly.wind_direction_10m?.[i],rain:weather.hourly.precipitation?.[i],wave:marine.hourly.wave_height?.[j],air:weather.hourly.temperature_2m?.[i],sea:marine.hourly.sea_surface_temperature?.[j]})});return map}
 function render(){const grid=document.getElementById('ll22-grid');grid.replaceChildren();const target=dateOffset(+document.getElementById('ll22-day').value)+'T'+hour.value+':00';const names=llGetFavorites().filter(name=>llFindZoneKey(name));const visible=expanded?names:names.slice(0,5);document.getElementById('ll23-count').textContent=names.length+' preferite · '+visible.length+' visualizzate';const show=document.getElementById('ll23-show');show.hidden=names.length<=5;show.textContent=expanded?'Mostra solo 5':'Mostra tutte ('+names.length+')';if(!names.length){grid.textContent='Nessuna località preferita. Premi ＋ Aggiungi località.';return}for(const name of visible){const key=llFindZoneKey(name);const d=cache.get(key)?.get(target);const rating=d?marineRating(d.wind,d.gust,d.wave,d.rain):{label:'DATI NON DISPONIBILI'};const level=rating.label==='ESCO*'?'good':rating.label==='ATTENZIONE'?'warn':rating.label==='NON ESCO'?'bad':'none';const el=document.createElement('div');el.className='ll22-tile';const direction=d&&Number.isFinite(d.direction)?marineWindFrom(d.direction):'Direzione non disponibile';el.innerHTML=`<div class="ll23-tile-head"><h3>📍 ${safe(name)}</h3><button type="button" class="ll23-remove" aria-label="Rimuovi ${safe(name)} dai preferiti" title="Rimuovi dai preferiti">★ ×</button></div><div class="ll22-state ${level}">${safe(rating.label)}</div><p>🧭 ${safe(direction)}</p><div class="ll22-data"><span>🌬 Vento<b>${fmt(d?.wind,'kn')}</b></span><span>💨 Raffiche<b>${fmt(d?.gust,'kn')}</b></span><span>🌊 Onde<b>${fmt(d?.wave,'m')}</b></span><span>🌡️ Aria<b>${fmt(d?.air,'°C')}</b></span><span>🌊 Mare<b>${fmt(d?.sea,'°C')}</b></span><span>🌧 Pioggia<b>${fmt(d?.rain,'mm')}</b></span></div>`;el.querySelector('.ll23-remove').addEventListener('click',()=>{const updated=llGetFavorites().filter(n=>n!==name);llSaveFavorites(updated);lastFavorites=updated.join('|');cache.delete(key);fillZones();renderManager();if(typeof llRenderZones==='function')llRenderZones();render()});grid.append(el)}window.dispatchEvent(new CustomEvent('ll24:forecast',{detail:{target,values:names.map(name=>({name,data:cache.get(llFindZoneKey(name))?.get(target)}))}}))}
+async function windModel(model,c,date,signal){
+ const u=new URL('https://api.open-meteo.com/v1/forecast');u.search=new URLSearchParams({latitude:String(c.lat),longitude:String(c.lon),hourly:'wind_speed_10m,wind_gusts_10m',models:model,wind_speed_unit:'kn',timezone:'Europe/Rome',start_date:date,end_date:date,cell_selection:'sea'}).toString();
+ const r=await fetch(u,{signal});const d=await r.json();if(!r.ok||d.error)throw Error(d.reason||'HTTP '+r.status);
+ const h=d.hourly||{},rows=(h.time||[]).map((t,i)=>({time:t,wind:h.wind_speed_10m?.[i],gust:h.wind_gusts_10m?.[i]})).filter(x=>Number.isFinite(x.wind)&&Number.isFinite(x.gust));
+ if(!rows.length)throw Error('Vento o raffiche non disponibili');return rows;
+}
+async function compareWind(c,date,signal,token){
+ const state=$('ll443State'),host=$('ll443Results'),hours=$('ll443Hours');if(!state||!host||!hours)return;
+ const models=[['ecmwf_ifs025','ECMWF IFS'],['gfs_global','NOAA GFS']];
+ const values=await Promise.all(models.map(async ([id,name])=>{try{return {name,rows:await windModel(id,c,date,signal)}}catch(e){return {name,error:String(e.message||e)}}}));
+ if(token!==request)return;
+ const max=(rows,k)=>Math.max(...rows.map(x=>x[k]));
+ for(const v of values){host.append(tile(v.name,v.rows?fmt(max(v.rows,'wind'))+' kn':'Non disponibile',v.rows?'Raffiche max '+fmt(max(v.rows,'gust'))+' kn · '+v.rows.length+' ore valide':v.error));}
+ const good=values.filter(v=>v.rows),over=good.some(v=>max(v.rows,'wind')>8||max(v.rows,'gust')>12);
+ const complete=good.length===2&&good.every(v=>v.rows.length>=24);
+ state.textContent=(over?'🔴 Soglie di vento o raffiche superate nel giorno. ': 'Nessuna conferma di condizioni favorevoli. ')+(complete?'Due modelli disponibili. ':'Confronto incompleto. ')+'Soglie di riferimento: 8 / 12 kn.';
+ if(good.length===2){const a=good[0].rows,b=new Map(good[1].rows.map(x=>[x.time,x]));const pairs=a.filter(x=>b.has(x.time));if(pairs.length){const dw=Math.max(...pairs.map(x=>Math.abs(x.wind-b.get(x.time).wind))),dg=Math.max(...pairs.map(x=>Math.abs(x.gust-b.get(x.time).gust)));const p=document.createElement('p');p.className='muted';p.textContent='Scarto massimo alla stessa ora: vento '+fmt(dw)+' kn · raffiche '+fmt(dg)+' kn.';hours.append(p);}}
+}
 async function update(){if(busy)return;busy=true;const button=document.getElementById('ll22-update');button.disabled=true;const status=document.getElementById('ll22-status');const zones=llGetFavorites().map(name=>({key:llFindZoneKey(name),name})).filter(z=>z.key);let failed=0;status.textContent='Aggiornamento delle '+zones.length+' località…';const next=new Map();for(let i=0;i<zones.length;i+=3){await Promise.all(zones.slice(i,i+3).map(async z=>{try{next.set(z.key,await getZone(marineZones[z.key]))}catch(e){failed++}}))}cache.clear();for(const [k,v] of next)cache.set(k,v);status.textContent='Previsioni richieste: '+new Date().toLocaleString('it-IT',{timeZone:'Europe/Rome'})+' · '+next.size+' località caricate'+(failed?' · '+failed+' non disponibili':'')+' · Fonte Open-Meteo';render();busy=false;button.disabled=false}
 document.getElementById('ll22-update').addEventListener('click',update);document.getElementById('ll22-day').addEventListener('change',render);hour.addEventListener('change',render);
 // Quando si torna alla Home, aggiornare l'elenco se i preferiti sono cambiati.
@@ -3474,9 +3492,9 @@ async function load(lat,lon,name){
  setText('ll413Alerts','⏳ Analisi avvisi meteo in corso…');setText('ll415Now','Caricamento…');setText('ll415Max','Caricamento…');
  try{
   const weather=new URL('https://api.open-meteo.com/v1/forecast');
-  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'4',daily:'sunrise,sunset',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code,cloud_cover,uv_index,visibility',wind_speed_unit:'kmh'}).toString();
+  weather.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',daily:'sunrise,sunset',hourly:'temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation_probability,precipitation,weather_code,cloud_cover,uv_index,visibility',wind_speed_unit:'kmh'}).toString();
   const marine=new URL('https://marine-api.open-meteo.com/v1/marine');
-  marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'4',hourly:'wave_height,wave_direction,sea_surface_temperature'}).toString();
+  marine.search=new URLSearchParams({latitude:lat,longitude:lon,timezone:'Europe/Rome',forecast_days:'2',hourly:'wave_height,wave_direction,sea_surface_temperature'}).toString();
   const [wr,mr]=await Promise.all([fetch(weather,{signal:abort.signal}),fetch(marine,{signal:abort.signal})]);
   if(!wr.ok||!mr.ok)throw new Error('Servizio meteo non disponibile');
   const [w,m]=await Promise.all([wr.json(),mr.json()]);
@@ -3721,12 +3739,11 @@ else setTimeout(organize,0);
 </script><script id="ll420-fishing-script">
 (function(){'use strict';
 const $=id=>document.getElementById(id);
-const names={traina:'Traina',spinning:'Spinning',bolentino:'Bolentino',calamari:'Calamari',seppie:'Seppie',jigging:'Vertical jigging',polpi:'Polpi'};
+const names={traina:'Traina',spinning:'Spinning',bolentino:'Bolentino',calamari:'Calamari',seppie:'Seppie',jigging:'Vertical jigging'};
 let latest=null;
 const tideIds=['ll422High1','ll422Low1','ll422High2','ll422Low2'];
 const todayLocal=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-function fishingDate(){return $('ll443FishingDate')?.value||todayLocal();}
-function tideKey(){return 'll422_tides_cagliari_'+fishingDate();}
+function tideKey(){return 'll422_tides_cagliari_'+todayLocal();}
 function getTides(){try{const v=JSON.parse(localStorage.getItem(tideKey())||'null');return Array.isArray(v)&&v.length===4?v:['','','',''];}catch(e){return ['','','',''];}}
 function syncTides(){const v=getTides();tideIds.forEach((id,i)=>{if($(id))$(id).value=v[i];});return v;}
 function saveTides(){const v=tideIds.map(id=>$(id)?.value||'');try{localStorage.setItem(tideKey(),JSON.stringify(v));}catch(e){}render();}
@@ -3735,12 +3752,12 @@ function clearTides(){try{localStorage.removeItem(tideKey());}catch(e){}syncTide
 const clock=t=>typeof t==='string'&&t.includes('T')?t.split('T')[1].slice(0,5):'—';
 function moonPhase(date){const d=(date.getTime()-Date.UTC(2000,0,6,18,14))/86400000;const x=((d/29.530588853)%1+1)%1;return x<.04||x>.96?'🌑 Nuova':x<.21?'🌒 Crescente':x<.29?'🌓 Primo quarto':x<.46?'🌔 Gibbosa crescente':x<.54?'🌕 Piena':x<.71?'🌖 Gibbosa calante':x<.79?'🌗 Ultimo quarto':'🌘 Calante';}
 function render(){if(!latest)return;const {w,m,name}=latest,sel=$('ll420Technique');if(!sel)return;const tech=sel.value;
-$('ll420Place').textContent=name+' · orari locali (Italia) · '+fishingDate();
-const daily=w.daily||{};const di=(daily.time||[]).indexOf(fishingDate());const sunrise=daily.sunrise?.[di],sunset=daily.sunset?.[di];const selectedDate=new Date(fishingDate()+'T12:00:00');
+$('ll420Place').textContent=name+' · orari locali (Italia) · oggi';
+const daily=w.daily||{};const sunrise=daily.sunrise?.[0],sunset=daily.sunset?.[0];
 $('ll420Sunrise').textContent=clock(sunrise);$('ll420Sunset').textContent=clock(sunset);
-$('ll420Moon').textContent=moonPhase(selectedDate);
+$('ll420Moon').textContent=moonPhase(new Date());
 // Approximate synodic age and illuminated fraction: astronomical estimate, not a site-derived feed.
-const lunarAge=((selectedDate.getTime()-Date.UTC(2000,0,6,18,14))/86400000/29.530588853%1+1)%1;
+const lunarAge=((new Date().getTime()-Date.UTC(2000,0,6,18,14))/86400000/29.530588853%1+1)%1;
 const illuminated=Math.round(50*(1-Math.cos(2*Math.PI*lunarAge)));
 if($('ll423Illumination'))$('ll423Illumination').textContent='Illuminazione stimata '+illuminated+'% · fase approssimata';
 const tides=getTides();
@@ -3751,9 +3768,9 @@ const tideWindows=tideEvents.map(ev=>{
  const fmtMin=n=>{n=(n+1440)%1440;return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');};
  return (ev.kind==='alta'?'Alta':'Bassa')+' '+ev.time+' → '+fmtMin(center-90)+'–'+fmtMin(center+90);
 });
-if($('ll423TideWindows'))$('ll423TideWindows').textContent=tideWindows.length?'Finestre di marea (±90 min, orientative): '+tideWindows.join(' · '):'Finestre di marea: inserisci gli orari del giorno selezionato da Tideschart o Meteopesca.';
-if($('ll422Status'))$('ll422Status').textContent=tideEvents.length?'Orari inseriti per il giorno ('+fishingDate()+') · stazione Cagliari · fattore marea sperimentale attivo.':'Maree non inserite: indice calcolato senza fattore marea.';
-const times=w.hourly?.time||[];const today=fishingDate();
+if($('ll423TideWindows'))$('ll423TideWindows').textContent=tideWindows.length?'Finestre di marea (±90 min, orientative): '+tideWindows.join(' · '):'Finestre di marea: inserisci gli orari di oggi da Tideschart o Meteopesca.';
+if($('ll422Status'))$('ll422Status').textContent=tideEvents.length?'Orari inseriti per oggi ('+todayLocal()+') · stazione Cagliari · fattore marea sperimentale attivo.':'Maree non inserite: indice calcolato senza fattore marea.';
+const times=w.hourly?.time||[];const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const sunUp=sunrise?Date.parse(sunrise+':00'):NaN,sunDown=sunset?Date.parse(sunset+':00'):NaN;
 let choices=[];
 for(let i=0;i<times.length;i++){
@@ -3774,7 +3791,6 @@ for(let i=0;i<times.length;i++){
  if(tech==='calamari')score+=night?28:light?14:-17;
  if(tech==='seppie')score+=light?15:night?8:5;
  if(tech==='jigging')score+=light?13:night?-10:10;
- if(tech==='polpi')score+=light?18:night?12:5;
  score-=Math.max(0,Number(wind)-10)*.9;
  score-=Math.max(0,Number(gust)-17)*.5;
  score-=Math.max(0,Number(wave)-.2)*19;
@@ -3816,7 +3832,7 @@ if($('ll424SelectedResult'))$('ll424SelectedResult').textContent=selected?.score
  'Fascia '+range+': previsioni insufficienti per calcolare l’indice.';
 if(!choices.length){$('ll420Score').textContent='—';$('ll420Level').textContent='Dati insufficienti';$('ll420Windows').textContent='Non è possibile calcolare le finestre senza previsioni complete.';return;}
 const futureHour=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',hour:'2-digit',hourCycle:'h23'}).format(new Date());
-const future=today===todayLocal()?choices.filter(x=>x.t.slice(11,13)>=futureHour):choices;const pool=future.length?future:choices;
+const future=choices.filter(x=>x.t.slice(11,13)>=futureHour);const pool=future.length?future:choices;
 const top=[...pool].sort((a,b)=>b.score-a.score).slice(0,3).sort((a,b)=>a.t.localeCompare(b.t));
 const avg=Math.round(top.reduce((sum,x)=>sum+x.score,0)/top.length);
 // Il valore principale segue la fascia selezionata, non le tre ore migliori del giorno.
@@ -3824,10 +3840,10 @@ const shown=selected?.score;
 $('ll420Score').textContent=shown==null?'—':shown+'/100';
 $('ll420Level').textContent=shown==null?'Dati insufficienti per questa fascia':shown>=75?'Molto buona (orientativa)':shown>=60?'Buona (orientativa)':shown>=40?'Discreta (orientativa)':'Bassa (orientativa)';
 $('ll420Windows').textContent='Migliori ore della giornata (distinte dalla fascia selezionata): '+top.map(x=>clock(x.t)+' ('+x.score+'/100)').join(' · ');
-$('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su luce, vento, raffiche, onde e nuvolosità. Non misura la probabilità di cattura, né tiene conto di fondale, presenza del pesce o correnti locali. '+(tideEvents.length?'Maree di Cagliari inserite manualmente: piccolo correttivo sperimentale vicino agli orari indicati.':'Maree non inserite: nessun correttivo di marea.')+' Rispetta sempre il verdetto dell’Advisor.';
+$('ll420Reason').textContent='Stima sperimentale per '+names[tech]+' basata su luce, vento, raffiche, onde e nuvolosità. Non misura la probabilità di cattura, né tiene conto di presenza del pesce o correnti locali. '+(tideEvents.length?'Maree di Cagliari inserite manualmente: piccolo correttivo sperimentale vicino agli orari indicati.':'Maree non inserite: nessun correttivo di marea.')+' Rispetta sempre il verdetto dell’Advisor.';
 }
 window.addEventListener('ll41-weather',e=>{latest=e.detail;render();});
-function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});$('ll424FishingTime')?.addEventListener('change',render);const ds=$('ll443FishingDate');if(ds){for(let i=0;i<3;i++){const d=new Date(todayLocal()+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+i);const o=document.createElement('option');o.value=d.toISOString().slice(0,10);o.textContent=['Oggi','Domani','Dopodomani'][i]+' · '+o.value;ds.append(o);}ds.addEventListener('change',()=>{syncTides();render();});}syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
+function init(){const sel=$('ll420Technique');if(!sel)return;try{const saved=localStorage.getItem('ll420_fishing_technique');if(names[saved])sel.value=saved;}catch(e){}sel.addEventListener('change',()=>{try{localStorage.setItem('ll420_fishing_technique',sel.value);}catch(e){}render();});$('ll424FishingTime')?.addEventListener('change',render);syncTides();$('ll422Save')?.addEventListener('click',saveTides);$('ll422Clear')?.addEventListener('click',clearTides);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script><script id="ll426-sardinia-map-layers">
@@ -4209,10 +4225,10 @@ function day(){const v=Number($('marineDay')?.value||0);return Number.isInteger(
 function dateForDay(n){const d=new Date();const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);const v=k=>parts.find(x=>x.type===k).value;return new Date(Date.UTC(+v('year'),+v('month')-1,+v('day')+n)).toISOString().slice(0,10);}
 function tile(name,value,detail){const e=document.createElement('div');e.className='ll440-tile';const h=document.createElement('span');h.textContent=name;const b=document.createElement('strong');b.textContent=value;const d=document.createElement('small');d.textContent=detail;e.append(h,b,d);return e;}
 async function getModel(model,lat,lon,date,signal){
- const u=new URL('https://marine-api.open-meteo.com/v1/marine');u.search=new URLSearchParams({latitude:String(lat),longitude:String(lon),hourly:'wave_height',models:model,timezone:'Europe/Rome',forecast_days:'4',cell_selection:'sea'}).toString();
+ const u=new URL('https://marine-api.open-meteo.com/v1/marine');u.search=new URLSearchParams({latitude:String(lat),longitude:String(lon),hourly:'wave_height',models:model,timezone:'Europe/Rome',start_date:date,end_date:date,cell_selection:'sea'}).toString();
  const r=await fetch(u,{signal});const data=await r.json();if(!r.ok||data.error)throw Error(data.reason||'HTTP '+r.status);
  const times=data.hourly?.time||[],waves=data.hourly?.wave_height||[];
- const rows=times.map((t,i)=>({time:t,value:waves[i]})).filter(x=>x.time.slice(0,10)===date&&typeof x.value==='number'&&Number.isFinite(x.value));
+ const rows=times.map((t,i)=>({time:t,value:waves[i]})).filter(x=>typeof x.value==='number'&&Number.isFinite(x.value));
  if(rows.length<4)throw Error('Copertura insufficiente per il giorno selezionato');
  return {rows,max:Math.max(...rows.map(x=>x.value)),count:rows.length};
 }
@@ -4221,7 +4237,7 @@ function slots(container,data,date){
  const localTime=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
  const start=today?data.rows.findIndex(x=>x.time.slice(11,16)>=localTime):0;
  const index=Math.max(0,start);
- const selected=(start<0?[]:data.rows.slice(index,today?index+9:undefined));
+ const selected=(start<0?[]:data.rows.slice(index,index+6));
  const wrap=document.createElement('div');wrap.className='ll441-slots';
  const h=document.createElement('div');h.className='ll441-slots-title';h.textContent=today?'Onde previste prossime ore · ECMWF':'Onde previste giorno selezionato · ECMWF';wrap.append(h);
  for(let i=0;i<selected.length;i+=3){const group=selected.slice(i,i+3);const box=document.createElement('div');box.className='ll441-slot';const label=document.createElement('span');label.textContent=group[0].time.slice(11,16)+(group.length>1?'–'+group[group.length-1].time.slice(11,16):'');const val=document.createElement('strong');val.textContent=fmt(Math.max(...group.map(x=>x.value)))+' m';box.append(label,val);wrap.append(box);}
@@ -4230,8 +4246,8 @@ function slots(container,data,date){
 async function update(){
  const token=++request;controller?.abort();controller=new AbortController();const signal=controller.signal;
  const c=coord(),date=dateForDay(day()),state=$('ll440State'),results=$('ll440Results');if(!state||!results)return;
- results.replaceChildren();$('ll441Hours')?.replaceChildren();if(!c){state.textContent='Coordinate della località non disponibili.';return;}
- state.textContent='Verifica onde per '+c.name+' · '+date+'…';
+ results.replaceChildren();$('ll441Hours')?.replaceChildren();$('ll443Results')?.replaceChildren();$('ll443Hours')?.replaceChildren();$('ll443State').textContent='In attesa dei dati…';if(!c){state.textContent='Coordinate della località non disponibili.';return;}
+ state.textContent='Verifica onde per '+c.name+' · '+date+'…';compareWind(c,date,signal,token);
  // GFS Wave can be unavailable on this API/location. Never substitute another model under its name.
  const names=[['ecmwf_wam','ECMWF WAM'],['ncep_gfswave016','NOAA GFS Wave 0,16°']];
  const values=await Promise.all(names.map(async ([key,name])=>{try{return {name,data:await getModel(key,c.lat,c.lon,date,signal)}}catch(e){return {name,error:e.name==='AbortError'?'Richiesta annullata':String(e.message||e)}}}));
