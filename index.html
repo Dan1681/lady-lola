@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.4.5 – Home compatta</title>
+<title>Lady Lola 4.5.0 – Premium Design</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -622,9 +622,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="card ll40-weather"><div class="ll40-head"><h2>🌊 Meteo e mare</h2><button type="button" id="ll40Refresh">↻ Aggiorna</button></div>
 <p class="ll40-hint" id="ll40Updated">In attesa delle previsioni Open-Meteo</p>
 <div class="ll40-metrics">
-<div><span>🌬 Vento</span><strong id="ll40Wind">—</strong><small>nodi</small></div>
-<div><span>💨 Raffiche</span><strong id="ll40Gust">—</strong><small>nodi</small></div>
-<div><span>🌊 Onde Hs</span><strong id="ll40Wave">—</strong><small>metri</small></div>
+<div><span>Vento</span><strong id="ll40Wind">—</strong><small>nodi</small></div>
+<div><span>Raffiche</span><strong id="ll40Gust">—</strong><small>nodi</small></div>
+<div><span>Onde Hs</span><strong id="ll40Wave">—</strong><small>metri</small></div>
 <div><span>🌡 Aria</span><strong id="ll40Air">—</strong><small>°C</small></div>
 <div><span>💧 Mare</span><strong id="ll40Sea">—</strong><small>°C</small></div>
 <div class="ll402-direction"><span>🧭 Vento da</span><strong id="ll40Direction">—</strong><small>rosa dei venti</small></div>
@@ -4266,5 +4266,20 @@ async function update(){
 function init(){if(!$('ll440Compare'))return;$('ll440Refresh')?.addEventListener('click',update);$('marineZone')?.addEventListener('change',update);$('marineDay')?.addEventListener('change',update);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&$('meteo')?.classList.contains('active'))update()});update();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script><style id="ll450-premium">
+:root{--bg:#081827;--panel:#102b3e;--panel2:#17394b;--line:#31566a;--text:#f1f7fa;--muted:#b5cbd7;--aqua:#73e0e5}
+body{background:radial-gradient(ellipse at 50% 0%,#153b50 0%,#081827 58%);font-variant-numeric:tabular-nums}
+header{background:#0d2435;border-bottom:1px solid #31566a;box-shadow:none}
+main .card{background:linear-gradient(155deg,#143447,#10283a);border-color:#31566a;border-radius:18px;box-shadow:none}
+main h2,main h3{letter-spacing:-.025em}main h2{font-weight:750}main .muted,main small{color:var(--muted)!important}
+button,main input,main select,main textarea{border-radius:11px}button{font-weight:650;touch-action:manipulation}button.primary{background:#17647b;border-color:#6bd8df}button:focus-visible,a:focus-visible{outline:2px solid #83e9ec;outline-offset:3px}
+#menu{background:#091d2c!important;border-top:1px solid #31566a!important;box-shadow:none!important}#menu button{background:transparent!important;border-color:transparent!important;border-radius:12px!important;color:#b7cbd6!important}#menu button.active{background:#16465b!important;border-color:#67dce8!important;color:#e0fcff!important}
+#home .ll40-intro{background:linear-gradient(125deg,#17475b,#102a3d)!important;border-color:#38677a!important;box-shadow:none!important}
+#home .ll40-weather,#home .ll40-mapcard{padding:15px!important}#home .ll40-metrics>div:not(.ll428-weather-truth){background:#102b3d!important;border:1px solid #36596c!important;padding:12px 5px!important;border-radius:12px!important}
+#home .ll40-metrics strong{font-variant-numeric:tabular-nums;letter-spacing:-.035em}#home .ll40-metrics>div[data-ll450-level="good"] strong{color:#86e5c0}#home .ll40-metrics>div[data-ll450-level="warn"] strong{color:#ffda8c}#home .ll40-metrics>div[data-ll450-level="bad"] strong{color:#ffaaaa}
+#home .ll40-verdict{border-radius:12px!important;border-width:1px 1px 1px 4px!important;padding:12px!important}#home .ll40-verdict strong{letter-spacing:.015em}#home .ll444-integrated{border-radius:0!important;box-shadow:none!important;background:transparent!important}#home .ll40-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}#home .ll40-links>*{text-align:center;display:flex;align-items:center;justify-content:center;min-height:44px}
+#ll440Compare .ll440-tile,#ll4211Tide,.ll429-slot{border-color:#36596c!important;border-radius:12px!important}#ll4220Windy iframe{border-radius:12px}#ll4220Windy button[aria-pressed="true"]{outline:1px solid #73e0e5;outline-offset:-2px}
+@media(max-width:700px){main .card{border-radius:15px}main h2{font-size:19px}main h3{font-size:16px}#home .ll40-hint{font-size:12px;line-height:1.45}#home .ll40-metrics strong{font-size:clamp(17px,5vw,24px)!important}#home .ll40-metrics span{font-size:12px}#home .ll40-head button{min-height:44px}#menu button{min-height:48px!important}#home .ll40-links>*{font-size:12px}}
+@media(prefers-reduced-motion:reduce){button,.card{transition:none!important}}
+</style><script id="ll450-metric-colors">(function(){'use strict';function init(){const specs=[['ll40Wind','windGood','windBad'],['ll40Gust','gustGood','gustBad'],['ll40Wave','waveGood','waveBad']];function update(){const c=typeof window.ll416Thresholds==='function'?window.ll416Thresholds():null;for(const [id,good,bad] of specs){const el=document.getElementById(id);if(!el)continue;const raw=el.textContent.trim().replace(',','.');const n=/^\d+(?:\.\d+)?$/.test(raw)?Number(raw):NaN;const level=!c||!Number.isFinite(n)?'none':n>=c[bad]?'bad':n>c[good]?'warn':'good';el.parentElement.dataset.ll450Level=level;el.setAttribute('aria-label',el.textContent+' · '+({none:'dato non valutabile',good:'entro soglia favorevole',warn:'attenzione',bad:'soglia critica'}[level]));}}for(const [id] of specs){const el=document.getElementById(id);if(el)new MutationObserver(update).observe(el,{childList:true,characterData:true,subtree:true});}window.addEventListener('ll416-settings-changed',update);update();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();</script></body>
 </html>
