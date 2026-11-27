@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.6.4 – Performance & Stability</title>
+<title>Lady Lola 4.6.5 – Dati e backup</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -3350,28 +3350,19 @@ const advice=mk('div',{class:'ll34-compact'});
 advice.innerHTML='<strong>🛡️ Lady Lola Advisor · profilo prudente</strong><p class="ll34-note">ESCO solo con vento ≤ 8 kn, raffiche ≤ 12 kn e onde ≤ 0,3 m, se tutti i dati indispensabili sono disponibili e aggiornati. ATTENZIONE per vento 8–12 kn, raffiche 12–17 kn o onde 0,3–0,5 m. NON ESCO oltre tali soglie, con temporali o avvisi di pericolo. Controllare sempre condizioni di rientro, direzione di vento/onde e costa. Nessun automatismo può garantire la sicurezza.</p><p class="ll34-note">Il pulsante di valutazione sottostante analizza i valori inseriti manualmente nelle fonti; non considera automaticamente tutti i 10 parametri Open-Meteo.</p>';
 advisor.insertBefore(advice,advisor.children[1]||null);
 const backup=mk('details',{class:'ll34-compact'});
-backup.innerHTML='<summary>💾 Backup dei punti pesca e delle impostazioni</summary><p class="ll34-note">Esporta un file JSON locale prima di aggiornare l’app. Contiene anche le coordinate private: non condividerlo pubblicamente.</p><div class="ll34-actions"><button id="ll34Backup" type="button">Esporta backup privato</button><button id="ll34Restore" type="button">Importa backup</button><input id="ll34File" type="file" accept="application/json,.json" hidden></div><p class="ll34-note" id="ll34BackupStatus" role="status"></p>';
+backup.innerHTML='<summary>💾 Backup e ripristino dati personali</summary><p class="ll34-note">Esporta i dati locali di Lady Lola in un file JSON: preferiti, punti pesca, inventario, soglie e impostazioni salvate. Il file non è cifrato: conserva una copia privata. Non include dati non ancora salvati.</p><div class="ll34-actions"><button id="ll34Backup" type="button">Esporta backup privato</button><button id="ll34Restore" type="button">Importa backup</button><input id="ll34File" type="file" accept="application/json,.json" hidden></div><p class="ll34-note" id="ll34BackupStatus" role="status"></p>';
 route.append(backup);
-$('ll34Backup').addEventListener('click',()=>{
- const data={app:'Lady Lola',version:'3.4',created:new Date().toISOString(),storage:{}};
- for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ll_'))data.storage[k]=localStorage.getItem(k);}
- const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);
- const a=mk('a',{href:url,download:'lady-lola-backup-'+new Date().toISOString().slice(0,10)+'.json'});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
- $('ll34BackupStatus').textContent='Backup generato. Conserva il file in un luogo privato.';
-});
+const store = (()=>{
+ const allowed=k=>typeof k==='string'&&/^(?:ll_|ll[0-9]+_|lady_lola_)[a-zA-Z0-9_.-]+$/.test(k);
+ function snapshot(){const storage=Object.create(null);for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(allowed(k))storage[k]=localStorage.getItem(k);}return {app:'Lady Lola',version:'4.6.5',schema:1,created:new Date().toISOString(),storage};}
+ function validate(data){if(!data||data.app!=='Lady Lola'||(data.schema!==undefined&&data.schema!==1)||!data.storage||typeof data.storage!=='object'||Array.isArray(data.storage))throw Error('Backup non riconosciuto');const entries=Object.entries(data.storage);if(!entries.length||entries.length>10000||entries.some(([k,v])=>!allowed(k)||typeof v!=='string'))throw Error('Dati non validi');return entries;}
+ function restore(entries){const previous=entries.map(([k])=>[k,localStorage.getItem(k)]);try{for(const [k,v] of entries)localStorage.setItem(k,v);}catch(err){let failed=false;for(const [k,v] of previous){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){failed=true;}}throw Error(failed?'Ripristino parziale: conserva il backup originale':'Importazione annullata: memoria non disponibile');}}
+ return Object.freeze({snapshot,validate,restore});
+})();
+window.LadyLolaData=store;
+$('ll34Backup').addEventListener('click',()=>{try{const data=store.snapshot();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);const a=mk('a',{href:url,download:'lady-lola-backup-'+new Date().toISOString().slice(0,10)+'.json'});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);$('ll34BackupStatus').textContent='Backup generato: '+Object.keys(data.storage).length+' voci. Conserva il file in privato.';}catch(err){$('ll34BackupStatus').textContent='Backup non riuscito: '+err.message;}});
 $('ll34Restore').addEventListener('click',()=>$('ll34File').click());
-$('ll34File').addEventListener('change',async e=>{
- const file=e.target.files?.[0];if(!file)return;
- try{
-  const data=JSON.parse(await file.text());
-  if(data.app!=='Lady Lola'||!data.storage||typeof data.storage!=='object'||Array.isArray(data.storage))throw Error('Backup non riconosciuto');
-  const entries=Object.entries(data.storage);
-  if(entries.some(([k,v])=>!k.startsWith('ll_')||typeof v!=='string'))throw Error('Dati non validi');
-  if(!confirm('Importare '+entries.length+' impostazioni? I valori con lo stesso nome verranno sovrascritti.'))return;
-  entries.forEach(([k,v])=>localStorage.setItem(k,v));
-  $('ll34BackupStatus').textContent='Importazione completata. Ricarica la pagina per visualizzare i dati.';
- }catch(err){$('ll34BackupStatus').textContent='Importazione non riuscita: '+err.message;}
-});
+$('ll34File').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>20000000)throw Error('File troppo grande');const entries=store.validate(JSON.parse(await file.text()));if(!confirm('Importare '+entries.length+' voci? I dati con la stessa chiave saranno sostituiti. Esporta prima un backup dei dati attuali.'))return;store.restore(entries);$('ll34BackupStatus').textContent='Importazione completata. Ricarica la pagina per applicare i dati.';if(confirm('Ricaricare Lady Lola ora?'))location.reload();}catch(err){$('ll34BackupStatus').textContent='Importazione non riuscita: '+err.message;}finally{e.target.value='';}});
 const appHeader=document.querySelector('header');
 if(appHeader)appHeader.innerHTML=appHeader.innerHTML.replace(/v3\.3\.1|v2\.9|v3\.3\.2/g,'v3.4.8');
 })();
