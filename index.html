@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#081525">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Lady Lola">
-<title>Lady Lola 4.6.2 – Performance & Stability</title>
+<title>Lady Lola 4.6.3 – Performance & Stability</title>
 <style id="lady-lola-v2-style">
 :root{color-scheme:dark;--bg:#081525;--panel:#10283d;--panel2:#17364c;--line:#294b61;--text:#f2f8fc;--muted:#a9c3d1;--aqua:#66dce8}
 *{box-sizing:border-box}html{background:var(--bg);-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19435c 0%,#081525 58%);color:var(--text);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -1513,7 +1513,8 @@ function llRenderZones() {
       places: [...llZoneMap]
         .filter(([key, zone]) => zone.group === area.name)
         .map(([key, zone]) => ({key, name: zone.name}))
-    }))
+    })),
+    {name:"📍 Località cercate",places:[...llZoneMap].filter(([k,z])=>z.group==="📍 Località cercate").map(([key,z])=>({key,name:z.name}))}
   ];
 
   groups.forEach(group => {
@@ -1642,7 +1643,7 @@ function ll4218RenderFavorites() {
       const key = llFindZoneKey(name);
       if (key && select) {
         select.value = key;
-        llUpdateStar();
+        select.dispatchEvent(new Event('change',{bubbles:true}));
         document.getElementById('ll4218FavMessage').textContent = 'Località selezionata: ' + name;
         if (typeof loadMarineWeather === 'function') loadMarineWeather();
         window.dispatchEvent(new Event('ll4222:zone-changed'));
@@ -3483,7 +3484,7 @@ function verdict(w,g,h){
 }
 function nearest(lat,lon){let best='torre',d=Infinity;for(const [k,p] of Object.entries(places)){const z=(p[0]-lat)**2+((p[1]-lon)*Math.cos(lat*Math.PI/180))**2;if(z<d){d=z;best=k;}}return best;}
 function centerMap(lat,lon,zoom=11){const active=map||window.ll40SharedMap;if(active){active.setView([lat,lon],zoom);if(marker)marker.setLatLng([lat,lon]);setTimeout(()=>active.invalidateSize(),80);}}
-function selectPlace(key,pan=true){if(!places[key])return;const p=places[key];$('ll40Area').value=key;$('ll40Sector').value=p[2];setText('ll40AreaInfo',p[3]+' · Settore ARPAS indicativo '+p[2]+' ('+sectorNames[p[2]]+')');centerMap(p[0],p[1],11);const original=$('ll31Zone');if(original){original.value=p[2];original.dispatchEvent(new Event('change',{bubbles:true}));}load(p[0],p[1],p[3]);}
+function selectPlace(key,pan=true){if(!places[key])return;const p=places[key];$('ll40Area').value=key;$('ll40Sector').value=p[2];setText('ll40AreaInfo',p[3]+(p[2]?' · Settore ARPAS indicativo '+p[2]:' · Zona ARPAS da verificare manualmente'));centerMap(p[0],p[1],11);const original=$('ll31Zone');if(original&&p[2]){original.value=p[2];original.dispatchEvent(new Event('change',{bubbles:true}));}load(p[0],p[1],p[3]);}
 async function load(lat,lon,name){
  const token=++request;if(abort)abort.abort();abort=new AbortController();
  const btn=$('ll40Refresh');btn.disabled=true;
@@ -3581,6 +3582,7 @@ function setup(){
    setTimeout(()=>{map.invalidateSize();const p=places[$('ll40Area').value];map.setView([p[0],p[1]],11);},500);
   }catch(e){map=window.ll40SharedMap||null;if(map){const p=places[$('ll40Area').value];setTimeout(()=>{map.invalidateSize();map.setView([p[0],p[1]],11);},500);}}
  }
+ window.ll463HomeZone=(key,z)=>{const id='shared_'+key;places[id]=[z.lat,z.lon,'',z.name];const sel=$('ll40Area');if(![...sel.options].some(o=>o.value===id))sel.add(new Option(z.name,id));selectPlace(id);};
  // Existing legacy scripts also own the original map; avoid duplicate ownership.
  setTimeout(initMap,300);
  selectPlace($('ll40Area').value,false);
@@ -4077,22 +4079,7 @@ function register(place){
  llZoneMap.set(key,zone);
  return key;
 }
-function renderGroup(){
- const select=$('marineZone');if(!select)return;
- const saved=stored().filter(x=>x&&safeName(x.name)&&valid(Number(x.lat),Number(x.lon))).slice(0,100);
- saved.forEach(register);
- // llRenderZones rebuilds the select from llAreas: include custom group only once.
- // Existing llZoneMap entries are stable; avoid duplicate generated area_* keys by rendering the custom options after llRenderZones.
- llRenderZones();
- const optgroup=document.createElement('optgroup');optgroup.label='📍 Località cercate';
- for(const x of saved){
-  const key=register(x);
-  if(!key)continue;
-  const option=document.createElement('option');option.value=key;option.textContent=safeName(x.name);
-  optgroup.append(option);
- }
- if(optgroup.children.length)select.append(optgroup);
-}
+function renderGroup(){stored().forEach(register);llRenderZones();}
 function choose(place){
  const name=safeName(place.name),lat=Number(place.lat),lon=Number(place.lon);
  if(!name||!valid(lat,lon)){show('La località non rientra nell’area della Sardegna.');return;}
@@ -4141,25 +4128,8 @@ async function find(){
 }
 function init(){
  if(!$('ll4224Find'))return;
- // Restore custom zones; keep the built-in list unchanged.
- const select=$('marineZone');
- for(const x of stored()){register(x)}
- const group=document.createElement('optgroup');group.label='📍 Località cercate';
- for(const x of stored()){
-  const key=register(x);if(!key)continue;
-  const opt=document.createElement('option');opt.value=key;opt.textContent=safeName(x.name);group.append(opt);
- }
- if(group.children.length)select.append(group);
- // Keep custom entries available when the built-in list is filtered or rebuilt.
- const original=window.llRenderZones;
- // Global lexical function declarations may not be on window; handle via input listener after original listener.
- $('llZoneSearch')?.addEventListener('input',()=>{
-  const term=$('llZoneSearch').value.trim().toLocaleLowerCase('it');
-  const custom=stored().filter(x=>safeName(x.name).toLocaleLowerCase('it').includes(term));
-  const group=document.createElement('optgroup');group.label='📍 Località cercate';
-  custom.forEach(x=>{const key=register(x);if(!key)return;const opt=document.createElement('option');opt.value=key;opt.textContent=safeName(x.name);group.append(opt)});
-  if(group.children.length)select.append(group);
- });
+ renderGroup();
+ window.ll463Choose=choose;
  $('ll4224Find').addEventListener('click',find);
  $('ll4224Query').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();find()}});
  $('ll4224ManualAdd').addEventListener('click',()=>choose({name:$('ll4224ManualName').value,lat:$('ll4224Lat').value,lon:$('ll4224Lon').value}));
@@ -4312,5 +4282,5 @@ window.addEventListener('ll453-hourly',e=>render(e.detail));window.addEventListe
 </style><script id="ll461-home-nav">
 (()=>{function init(){const home=document.getElementById('home');if(!home||home.dataset.ll461)return;home.dataset.ll461='1';const weather=home.querySelector('.ll40-weather'),verdict=document.getElementById('ll40Verdict'),metrics=home.querySelector('.ll40-metrics');if(weather&&verdict&&metrics)weather.insertBefore(verdict,metrics);const intro=home.querySelector('.ll40-intro p');if(intro)intro.textContent='Condizioni previste, sicurezza e pesca.';const fishing=document.getElementById('ll420MarineFishing'),tide=document.getElementById('ll4211Tide');if(fishing&&tide&&tide.parentElement===fishing){const details=document.createElement('details');details.className='ll461-tides';const summary=document.createElement('summary');summary.textContent='🌊 Maree e approfondimenti';tide.before(details);details.append(summary,tide);const manual=fishing.querySelector('.ll4211-manual');if(manual)details.append(manual);const note=Array.from(fishing.children).find(x=>x.tagName==='P'&&x.textContent.includes('Meteopesca'));if(note)details.append(note);details.addEventListener('toggle',()=>{if(details.open)window.dispatchEvent(new Event('resize'));});}const shortcuts=home.querySelector('.ll40-shortcuts');if(shortcuts&&fishing)fishing.before(shortcuts);const more=document.getElementById('llMorePanel');if(more){const groups=Array.from(more.querySelectorAll('.ll417-group'));if(groups.length===4){for(const i of [1,2,3,0])more.append(groups[i]);}const p=more.querySelector('p');if(p)p.textContent='Gestisci la barca, la pesca e le impostazioni.';}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();
 </script>
-</body>
+<style>#ll463Explore{margin:10px 0;padding:10px;border:1px solid #41667b;border-radius:12px}#ll463Explore summary{cursor:pointer;font-weight:700;padding:8px}#ll463Current{font-weight:700;margin:10px 0}#llZoneSearch{display:none!important}</style><script id="ll463-locations">(()=>{function init(){const $=id=>document.getElementById(id),sel=$('marineZone'),search=$('ll4224Query')?.closest('.ll4224-search'),fav=$('ll4218FavList')?.closest('.ll4218-fav-panel');if(!sel||!search||!fav)return;const host=search.parentElement;const current=document.createElement('p');current.id='ll463Current';current.setAttribute('aria-live','polite');host.insertBefore(current,host.firstChild);host.insertBefore(search,fav);const gps=document.createElement('button');gps.type='button';gps.textContent='📍 Usa posizione GPS';search.after(gps);const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');gps.after(status);const explore=document.createElement('details');explore.id='ll463Explore';const summary=document.createElement('summary');summary.textContent='Esplora le coste della Sardegna';explore.append(summary);const label=sel.previousElementSibling;if(label?.tagName==='LABEL')label.remove();sel.before(explore);explore.append(sel);sel.setAttribute('aria-label','Località per area geografica');const star=$('llFavoriteButton');if(star)explore.after(star);let last='';function sync(){const z=marineZones[sel.value];if(!z)return;current.textContent='📍 Località selezionata: '+z.name;if(last===sel.value)return;last=sel.value;window.ll463HomeZone?.(sel.value,z);}sel.addEventListener('change',()=>{sync();if(typeof loadMarineWeather==='function')loadMarineWeather();});window.addEventListener('ll4222:zone-changed',sync);gps.onclick=()=>{if(!navigator.geolocation){status.textContent='GPS non disponibile';return;}status.textContent='Richiesta posizione…';navigator.geolocation.getCurrentPosition(p=>{const {latitude:lat,longitude:lon}=p.coords;if(lat<38.8||lat>41.4||lon<8||lon>10.1){status.textContent='Posizione fuori dall’area Sardegna';return;}window.ll463Choose?.({name:'Posizione GPS',lat,lon});status.textContent='Posizione selezionata per le previsioni, non per la navigazione.';},()=>{status.textContent='Posizione non disponibile: verifica i permessi.';},{timeout:12000});};const observer=new MutationObserver(()=>{const z=marineZones[sel.value];if(z)current.textContent='📍 Località selezionata: '+z.name;});observer.observe(sel,{childList:true,subtree:true});const z=marineZones[sel.value];if(z)current.textContent='📍 Località selezionata: '+z.name;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();</script></body>
 </html>
